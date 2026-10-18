@@ -81,6 +81,8 @@ public static class LiminalStop01
         fox.transform.SetParent(stop.transform, false);
         fox.transform.localPosition = new Vector3(.5f, .06f, -.95f);
 
+        DoorAnchors(stop.transform, booth.transform);
+
         // spawn: standing on the booth floor, looking out through the door
         var world = scene.GetRootGameObjects().Select(g => g.GetComponentsInChildren<Component>(true).FirstOrDefault(c => c != null && c.GetType().Name == "VRCSceneDescriptor")).FirstOrDefault(c => c != null);
         if (world != null) world.transform.SetPositionAndRotation(booth.transform.TransformPoint(0, .05f, .05f), booth.transform.rotation);
@@ -91,6 +93,38 @@ public static class LiminalStop01
         scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
         EditorBuildSettings.scenes = scenes.ToArray();
         Debug.Log("[Liminal] Stop 01 built in " + ScenePath);
+    }
+
+    // Door system anchors (added by the doors session, 2026-10-18; wired by LiminalDoors/World/Wire doors). Astra:
+    // "Spawn in the booth, and stepping out through the booth door sends you straight to a random door." You arrive
+    // and come back where you spawn, on the booth floor; the forward door is a trigger just outside the booth's door
+    // (local +Z), 0.7 m clear of the spawn. Safe to rerun; it only replaces these three objects.
+    [MenuItem("LiminalDoors/Stop 01/Add door anchors")]
+    public static void AddDoorAnchors()
+    {
+        var scene = SceneManager.GetActiveScene().path == ScenePath ? SceneManager.GetActiveScene() : EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var stop = scene.GetRootGameObjects().FirstOrDefault(g => g.name == StopName);
+        var booth = stop != null ? stop.transform.Find("Phone booth") : null;
+        if (booth == null) throw new Exception("No " + StopName + "/Phone booth; run LiminalDoors/Stop 01/Build first.");
+        DoorAnchors(stop.transform, booth);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+    }
+
+    static void DoorAnchors(Transform stop, Transform booth)
+    {
+        foreach (var n in new[] { "Arrival point", "Return point", "Forward door trigger" })
+        {
+            var old = stop.Find(n); if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
+        }
+        foreach (var n in new[] { "Arrival point", "Return point" })
+        {
+            var p = new GameObject(n); p.transform.SetParent(stop, false);
+            p.transform.SetPositionAndRotation(booth.TransformPoint(0, .05f, .05f), booth.rotation);
+        }
+        var door = new GameObject("Forward door trigger"); door.transform.SetParent(stop, false);
+        door.transform.SetPositionAndRotation(booth.TransformPoint(0, 1.05f, .95f), booth.rotation);
+        var box = door.AddComponent<BoxCollider>(); box.isTrigger = true; box.size = new Vector3(1.1f, 2.1f, .45f);
     }
 
     // One-time scene setup: plain sky, one sun, soft ambient light, the VRChat world descriptor.

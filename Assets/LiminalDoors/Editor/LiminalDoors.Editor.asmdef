@@ -1,7 +1,10 @@
 {
     "name": "LiminalDoors.Editor",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "Unity.Postprocessing.Runtime",
+        "UnityUnicorn.AssetCreator.Editor"
+    ],
     "includePlatforms": [
         "Editor"
     ],
