@@ -99,6 +99,7 @@ public static class LiminalStop01
         fox.transform.localPosition = new Vector3(.5f, .06f, -.95f);
 
         DoorAnchors(stop.transform, booth.transform);
+        LiminalWorldGlow.AddStopVolume(stop.transform);   // so the booth's HDR sign and sparkles bloom while you're here
         bool rewire = scene.GetRootGameObjects().Any(g => g.name == "World - door travel");
 
         // spawn: standing on the booth floor, looking out through the door
@@ -127,6 +128,19 @@ public static class LiminalStop01
         var booth = stop != null ? stop.transform.Find("Phone booth") : null;
         if (booth == null) throw new Exception("No " + StopName + "/Phone booth; run LiminalDoors/Stop 01/Build first.");
         DoorAnchors(stop.transform, booth);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+    }
+
+    // Stop 01's glow: the shared Liminal Glow bloom (LiminalWorldGlow), on only while you're at the booth. Adds it to the
+    // existing stop without rebuilding the booth (the booth session asked for it, 2026-10-18).
+    [MenuItem("LiminalDoors/Stop 01/Add glow volume")]
+    public static void AddGlow()
+    {
+        var scene = SceneManager.GetActiveScene().path == ScenePath ? SceneManager.GetActiveScene() : EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var stop = scene.GetRootGameObjects().FirstOrDefault(g => g.name == StopName);
+        if (stop == null) throw new Exception("No " + StopName + "; run LiminalDoors/Stop 01/Build first.");
+        LiminalWorldGlow.AddStopVolume(stop.transform);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
     }

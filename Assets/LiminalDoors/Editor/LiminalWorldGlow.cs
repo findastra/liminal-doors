@@ -85,9 +85,11 @@ public static class LiminalWorldGlow
         if (res != null) layer.Init(AssetDatabase.LoadAssetAtPath<PostProcessResources>(res));
     }
 
-    // A global bloom volume for one stop, under its root.
+    // A global bloom volume for one stop, under its root. Safe to rerun: it replaces the stop's old one.
     public static void AddStopVolume(Transform stop)
     {
+        var old = stop.Find("Glow (global volume)");
+        if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
         var go = new GameObject("Glow (global volume)");
         go.transform.SetParent(stop, false);
         var v = go.AddComponent<PostProcessVolume>();
