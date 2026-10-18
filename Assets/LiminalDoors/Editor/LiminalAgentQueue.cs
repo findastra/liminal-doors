@@ -6,8 +6,10 @@
 //   refresh                     -> AssetDatabase.Refresh (compiles new scripts)
 //   save                        -> saves open scenes
 //   menu LiminalDoors/<path>    -> runs one of this project's LiminalDoors/ menu items (nothing else is allowed)
+//   desktop-test                -> saves, then SDK Build & Test with one desktop client (no upload);
+//                                  progress in Review/desktop-test-status.txt (LiminalDesktopTest, 2026-10-18)
 // The result goes to Review/agent-queue/<same name>.result.txt and the .cmd file is deleted.
-// Building, desktop tests and uploads are not wired here yet; uploads always need the owner's OK in chat.
+// Uploads are not wired here; they always need the owner's OK in chat.
 using System;
 using System.IO;
 using System.Linq;
@@ -65,7 +67,14 @@ public static class LiminalAgentQueue
                 if (!arg.StartsWith("LiminalDoors/")) return "REFUSED: only LiminalDoors/ menu items can be run from the queue.";
                 EditorSceneManager.SaveOpenScenes();
                 return EditorApplication.ExecuteMenuItem(arg) ? "Ran " + arg + ". See its own Review/ report." : "FAILED: no menu item " + arg;
-            default: return "Unknown command. Use: status, refresh, save, menu LiminalDoors/...";
+            case "desktop-test":
+                // LiminalDesktopTest lives in Assembly-CSharp-Editor (it needs the SDK); looked up by name so this assembly doesn't.
+                var test = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("LiminalDesktopTest")).FirstOrDefault(t => t != null);
+                if (test == null) return "FAILED: LiminalDesktopTest is not compiled (check the console for errors).";
+                EditorSceneManager.SaveOpenScenes();
+                test.GetMethod("Run").Invoke(null, null);
+                return "Started. See Review/desktop-test-status.txt.";
+            default: return "Unknown command. Use: status, refresh, save, menu LiminalDoors/..., desktop-test";
         }
     }
 
