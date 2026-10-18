@@ -1,6 +1,6 @@
 # Handoff: Claude, 2026-10-18 (door system and stop 02 on the fresh base)
 
-status: open (door trip passes in ClientSim; the VRChat build waits on the SDK's layer setup)
+status: open (door trip passes in ClientSim; VRChat desktop test passes; walking it in the client not done)
 from: Claude Opus 5.5, 2026-10-18 (the doors session)
 for: any agent continuing Liminal Doors
 
@@ -46,9 +46,11 @@ A first version on the old copy is kept on `claude/doors-and-stop-02-20261018` (
 
 ## Not done / open
 
-1. **The VRChat desktop test can't build yet.** The SDK says: "You must address Layers and Collision Matrix issues before you can build."
-   - The fresh template hasn't run the SDK's one-time *Setup Layers for VRChat* and *Setup Collision Matrix* steps.
-   - Both change ProjectSettings (TagManager, physics). The SDK asks to confirm them, so they wait for Astra's OK. They can be run from the VRChat SDK > Show Control Panel > Builder tab.
-2. Not tested: walking it in the VRChat client, other players, headset.
+1. ~~The VRChat desktop test can't build yet~~ **Done, 2026-10-18 12:30.**
+   - With Astra's OK, *LiminalDoors/World/Set up VRChat layers* (`EditorUdon/Editor/LiminalVrchatLayers.cs`) ran the SDK's *Setup Layers for VRChat* and *Setup Collision Matrix*. Both went from False to True (`Review/world-layers/report.md`).
+   - Only layer 3 moved: it was "reserved3" and is now VRChat's "Item" (reserved3 went to 22). Every object in the scene and in `Booth/Phone Booth.prefab` is on Default (0), so nothing needed reassigning.
+   - The desktop test (queue `desktop-test`) built `scene-standalonewindows64-liminal doors-193f469f-....vrcw` (8.2 MB).
+   - `output_log_2026-10-18_12-30-26.txt` has that bundle in `--url=`, "Successfully joined room" (12:30:33) and "Finished entering world." (12:30:36). It shows 0 exceptions and no Udon errors, so the door traveler's Start ran cleanly.
+2. Not tested: walking through the doors in the VRChat client (computer use can't drive VRChat), other players, headset.
 3. The README's stop table still lists only stop 01. The booth session owns that file right now.
 4. Stop 01 has no visible gold light at its door yet (the booth is being redesigned); the trigger is there.
