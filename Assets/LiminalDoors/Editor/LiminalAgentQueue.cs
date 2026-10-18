@@ -16,6 +16,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [InitializeOnLoad]
 public static class LiminalAgentQueue
@@ -50,6 +51,17 @@ public static class LiminalAgentQueue
         Write(file, DateTime.Now.ToString("HH:mm:ss") + " " + command + "\n" + result);
     }
 
+    // Saves only scenes that already have a file. SaveOpenScenes() pops a modal "Save Scene" dialog for an Untitled
+    // scene (as on a project's first open), which blocks the editor until someone clicks it (2026-10-18).
+    static void SaveNamedScenes()
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            var scene = SceneManager.GetSceneAt(i);
+            if (scene.isDirty && !string.IsNullOrEmpty(scene.path)) EditorSceneManager.SaveScene(scene);
+        }
+    }
+
     static void Write(string cmdFile, string text) =>
         File.WriteAllText(Path.ChangeExtension(cmdFile, null) + ".result.txt", text + "\n");
 
@@ -62,16 +74,16 @@ public static class LiminalAgentQueue
         {
             case "status": return Status();
             case "refresh": AssetDatabase.Refresh(); return "Refreshed. Check status again after compiling finishes.";
-            case "save": EditorSceneManager.SaveOpenScenes(); return "Saved open scenes.";
+            case "save": SaveNamedScenes(); return "Saved open scenes.";
             case "menu":
                 if (!arg.StartsWith("LiminalDoors/")) return "REFUSED: only LiminalDoors/ menu items can be run from the queue.";
-                EditorSceneManager.SaveOpenScenes();
+                SaveNamedScenes();
                 return EditorApplication.ExecuteMenuItem(arg) ? "Ran " + arg + ". See its own Review/ report." : "FAILED: no menu item " + arg;
             case "desktop-test":
                 // LiminalDesktopTest lives in Assembly-CSharp-Editor (it needs the SDK); looked up by name so this assembly doesn't.
                 var test = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("LiminalDesktopTest")).FirstOrDefault(t => t != null);
                 if (test == null) return "FAILED: LiminalDesktopTest is not compiled (check the console for errors).";
-                EditorSceneManager.SaveOpenScenes();
+                SaveNamedScenes();
                 test.GetMethod("Run").Invoke(null, null);
                 return "Started. See Review/desktop-test-status.txt.";
             default: return "Unknown command. Use: status, refresh, save, menu LiminalDoors/..., desktop-test";

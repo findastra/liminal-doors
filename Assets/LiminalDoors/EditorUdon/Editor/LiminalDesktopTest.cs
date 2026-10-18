@@ -28,7 +28,12 @@ public static class LiminalDesktopTest
     public static void Run()
     {
         Directory.CreateDirectory("Review");
-        if (SceneManager.GetActiveScene().path != ScenePath) { EditorSceneManager.SaveOpenScenes(); EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single); }
+        if (SceneManager.GetActiveScene().path != ScenePath)
+        {
+            var active = SceneManager.GetActiveScene();   // never SaveOpenScenes(): an Untitled scene pops a modal Save dialog
+            if (active.isDirty && !string.IsNullOrEmpty(active.path)) EditorSceneManager.SaveScene(active);
+            EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        }
         var descriptor = UnityEngine.Object.FindObjectOfType<VRC.SDK3.Components.VRCSceneDescriptor>();
         if (descriptor == null) { Write("FAILED: no VRCSceneDescriptor (VRCWorld) in " + ScenePath); return; }
         if (descriptor.GetComponent<PipelineManager>() == null) descriptor.gameObject.AddComponent<PipelineManager>();
