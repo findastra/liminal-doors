@@ -39,130 +39,120 @@ MonoBehaviour:
     and pink sparkles swirling up around it (Unity Stable Sparkle), gold base glow.'
   steps:
   - id: plan
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
+    note: 'Astra''s picks: hot pink, butter-yellow glow, gold and pink sparkles;
+      budget 5 materials and 400 particles by her choice'
+    doneAt: 2026-10-18T21:29:14Z
+    doneBy: Claude (agent)
     details: liminal-doors-phone-booth v1.0.0 (prop) for PC; budget 10000 triangles,
       5 materials, 1024 px, 400 particles
   - id: provenance
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
+    note: booth shape from Astra's own Infinite Pole; everything else made in Liminal
+      Doors
+    doneAt: 2026-10-18T21:29:14Z
+    doneBy: Claude (agent)
     details: 'creator: Astra (built with Claude); source: Booth shape from Astra''s
       Infinite Pole (her own world); materials, sparkles and prefab made in Liminal
       Doors; licence: own-work; public: yes'
   - id: scale-pivot
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: warn
-    note: 
-    doneAt: 
-    doneBy: 
+    note: 'checked the meshes: the door is on +Z, the pivot is the booth floor''s
+      centre; the 0.47 m offset is the open door swinging out on +Z'
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
     details: 'WARN: pivot is 0.47 m from the middle of the footprint
 
       size
       1.54 x 2.75 x 2.36 m (w x h x d)'
   - id: geometry
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
+    note: 3,576 triangles
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
     details: 3576 triangles in 6 meshes (budget 10000)
   - id: materials
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
-    details: 'Booth paint: lilToon
+    note: 5 materials (Astra merged 7 to 5); one transparent surface, the glass
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
+    details: 'Booth paint: Unity Stable/Candy Paint (glows)
 
-      Booth glow: lilToon
+      Booth glow: Unity
+      Stable/Candy Paint (glows)
 
-      Booth glass
-      (Mochie): Mochie/Glass (transparent)
+      Booth glass (pink): Unity Stable/Pink Glass
+      (transparent)
 
-      Payphone face (lilToon): lilToon
+      Payphone face (candy): Unity Stable/Candy Paint
 
       Booth
-      sparkles: Legacy Shaders/Particles/Additive (transparent)'
+      sparkles: Unity Stable/Sparkle (transparent)'
   - id: textures
-    done: 0
-    version: 
-    status: fail
-    note: 
-    doneAt: 
-    doneBy: 
-    details: 'booth-candy-matcap 256x256, Compressed, mipmaps
-
-      FAIL: Glass_Rain_Texturesheet
-      8192x8192 is over 1024 px
-
-      WARN: Glass_Rain_Texturesheet: import max
-      size 8192 (set 1024)
-
-      Glass_Rain_Texturesheet 8192x8192, Compressed,
-      mipmaps
-
-      Droplet Mask 1024x1024, CompressedHQ, mipmaps
-
-      WARN: SSR
-      Noise: uncompressed
-
-      SSR Noise 64x64, Uncompressed, mipmaps
-
-      booth-sparkle
-      64x64, Compressed, mipmaps'
-  - id: colliders
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
+    note: one 64 px sparkle texture
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
+    details: booth-sparkle 64x64, Compressed, mipmaps
+  - id: colliders
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: 'only the 1.3 m booth floor, 4 cm thick, top at 4 cm: where people stand,
+      nothing above the surface'
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
     details: 'Booth floor: BoxCollider, top 0.04 m'
   - id: lighting
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
-    details: '0 lights; glowing materials: none; asset is static'
+    note: static, no lights; the paint and sign glow through emission
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
+    details: '0 lights; glowing materials: Booth paint, Booth glow; asset is static'
   - id: effects
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
-    details: 'Swirling sparkles: max 300, Legacy Shaders/Particles/Additive, Local
-      space
+    note: 360 particles max (swirl 300 + base glow 60), no collision, our own additive
+      Sparkle shader
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
+    details: 'Swirling sparkles: max 300, Unity Stable/Sparkle, Local space
 
-      Base glow: max 60, Legacy Shaders/Particles/Additive, Local space'
+      Base
+      glow: max 60, Unity Stable/Sparkle, Local space'
   - id: prefab
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
-    details: 'requires lilToon 2.3.4 (lilToon) from the shaders-shop; not packed
+    note: packs our own Unity Stable shaders so it works without the shop
+    doneAt: 2026-10-18T21:29:15Z
+    doneBy: Claude (agent)
+    details: 'packs our own PinkGlass.shader (Unity Stable shaders) so it works without
+      the shop
 
-      requires
-      Mochie''s Unity Shaders (free) 1.77.1 (Mochie/Glass) from the shaders-shop;
-      not packed
+      packs our own Sparkle.shader (Unity Stable shaders) so it works
+      without the shop
 
-      prefab Assets/LiminalDoors/Booth/Phone Booth.prefab; folder
-      Assets/LiminalDoors/Booth; 18 project files in the package'
+      packs our own CandyPaint.shader (Unity Stable shaders)
+      so it works without the shop
+
+      prefab Assets/LiminalDoors/Booth/Phone
+      Booth.prefab; folder Assets/LiminalDoors/Booth; 16 project files in the package'
   - id: review
     done: 0
     version: 

@@ -1,0 +1,269 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0c5656f1c043464ca3cbd3dea5a2ff6, type: 3}
+  m_Name: liminal-doors-stop-01-sky-asset-recipe
+  m_EditorClassIdentifier: 
+  id: liminal-doors-stop-01-sky
+  displayName: Liminal Doors stop 1 sunset sky and cloud sea
+  kind: sky
+  version: 1.0.0
+  description: 'Stop 1''s world: a sunset sky (lavender, pink, apricot, butter-yellow
+    horizon, a low sun) over a sea of rolling pink clouds with cumulus rising out
+    of it, small puffs around the booth and a reflection probe for the sunset.'
+  forPC: 1
+  forAndroid: 0
+  moves: 0
+  prefab: {fileID: 6257996877450586152, guid: fc5965b435ce7f645a72efbd477b5d64, type: 3}
+  maxTriangles: 30000
+  maxMaterials: 4
+  maxTextureSize: 1024
+  maxParticles: 0
+  creator: Astra (built with Claude)
+  source: 'Made in Liminal Doors: Unity Stable shaders, generated meshes and cloud
+    texture'
+  license: own-work
+  attribution: 
+  publicOk: 1
+  changelog: '1.0.0: first version. Sunset Sky dome, Cloud Sea (parallax billows,
+    soft self-shadow, sun glow, haze), 14 cumulus, 8 booth puffs, sunset reflection
+    probe.'
+  steps:
+  - id: plan
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: Astra asked for stop 1's sunset sky and sea of pink clouds as our own shaders;
+      budget 30k triangles, 4 materials
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: liminal-doors-stop-01-sky v1.0.0 (sky) for PC; budget 30000 triangles,
+      4 materials, 1024 px, 0 particles
+  - id: provenance
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: 'all made in Liminal Doors: Unity Stable shaders, generated meshes and
+      cloud texture'
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: 'creator: Astra (built with Claude); source: Made in Liminal Doors:
+      Unity Stable shaders, generated meshes and cloud texture; licence: own-work;
+      public: yes'
+  - id: scale-pivot
+    done: 1
+    version: 1.0.0
+    status: warn
+    note: 'a sky: the pivot is the stop''s centre (the booth floor); the dome reaches
+      1,800 m down by design; no front, the sun sits behind the booth''s door side
+      (+Z faces away from it)'
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: 'WARN: lowest visible point is -1800.00 m from the pivot (base should
+      be at 0)
+
+      size 3600.00 x 3600.00 x 3600.00 m (w x h x d)'
+  - id: geometry
+    done: 1
+    version: 1.0.0
+    status: warn
+    note: 'no lightmap UVs needed: sky, sea and puffs are self-lit (unlit) shaders
+      and never use lightmaps'
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: 'WARN: Sunset sky dome: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cloud sea: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 1: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 2: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 3: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 4: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 5: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 6: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 7: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 8: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 9: no lightmap UVs (UV2); bake with light probes
+      or add UV2
+
+      WARN: Cumulus 10: no lightmap UVs (UV2); bake with light
+      probes or add UV2
+
+      WARN: Cumulus 11: no lightmap UVs (UV2); bake with
+      light probes or add UV2
+
+      WARN: Cumulus 12: no lightmap UVs (UV2); bake
+      with light probes or add UV2
+
+      WARN: Cumulus 13: no lightmap UVs (UV2);
+      bake with light probes or add UV2
+
+      WARN: Cumulus 14: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 1: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 2: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 3: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 4: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 5: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 6: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 7: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      WARN: Puff 8: no lightmap UVs
+      (UV2); bake with light probes or add UV2
+
+      29120 triangles in 24 meshes
+      (budget 30000)'
+  - id: materials
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: 4 materials, no transparency
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: 'Sunset sky: Unity Stable/Sunset Sky
+
+      Cloud sea: Unity Stable/Cloud
+      Sea
+
+      Cloud puff: Unity Stable/Cloud Puff
+
+      Cloud puff (near): Unity
+      Stable/Cloud Puff'
+  - id: textures
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: one 256 px generated cloud-shape texture, linear, compressed
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: cloud-shapes 256x256, Compressed, mipmaps
+  - id: colliders
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: 'none: clouds aren''t walkable; the booth floor is the booth''s'
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: no colliders
+  - id: lighting
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: static (batching, occludee; never an occluder), no lights; a realtime reflection
+      probe renders once on load for the sunset reflections
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: '0 lights; glowing materials: none; asset is static'
+  - id: effects
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: no particles
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: no particle systems
+  - id: prefab
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: packs our own Unity Stable shaders and the generated meshes and texture
+    doneAt: 2026-10-18T21:29:19Z
+    doneBy: Claude (agent)
+    details: 'packs our own CloudPuff.shader (Unity Stable shaders) so it works without
+      the shop
+
+      packs our own CloudSea.shader (Unity Stable shaders) so it
+      works without the shop
+
+      packs our own SunsetSky.shader (Unity Stable
+      shaders) so it works without the shop
+
+      prefab Assets/LiminalDoors/Sky/Stop
+      01 Sky.prefab; folder Assets/LiminalDoors/Sky; 12 project files in the package'
+  - id: review
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 3 preview renders in Exports/unity-assets-library/liminal-doors-stop-01-sky/1.0.0/previews
+  - id: export
+    done: 0
+    version: 
+    status: fail
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 'FAIL: step ''Plan: name, version, budget'' isn''t done
+
+      FAIL:
+      step ''Provenance: who made it, from where, licence'' isn''t done
+
+      FAIL:
+      step ''Scale, pivot and facing'' isn''t done
+
+      FAIL: step ''Geometry:
+      triangles, normals, lightmap UVs'' isn''t done
+
+      FAIL: step ''Materials
+      and shaders'' isn''t done
+
+      FAIL: step ''Textures: size, compression,
+      mipmaps'' isn''t done
+
+      FAIL: step ''Colliders: simple, where people stand,
+      never above the surface'' isn''t done
+
+      FAIL: step ''Lighting: static,
+      emission, no realtime lights'' isn''t done
+
+      FAIL: step ''Effects: particles
+      capped, cheap, low overdraw'' isn''t done
+
+      FAIL: step ''Prefab: one clean,
+      self-contained prefab'' isn''t done
+
+      FAIL: step ''Review in the world:
+      renders and desktop test'' isn''t done'
+  exportedVersions: []

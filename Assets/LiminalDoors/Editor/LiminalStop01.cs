@@ -100,6 +100,7 @@ public static class LiminalStop01
 
         DoorAnchors(stop.transform, booth.transform);
         LiminalWorldGlow.AddStopVolume(stop.transform);   // so the booth's HDR sign and sparkles bloom while you're here
+        LiminalStop01Sky.Place(stop.transform);           // the sunset sky and sea of pink clouds (Astra, 2026-10-18)
         bool rewire = scene.GetRootGameObjects().Any(g => g.name == "World - door travel");
 
         // spawn: standing on the booth floor, looking out through the door

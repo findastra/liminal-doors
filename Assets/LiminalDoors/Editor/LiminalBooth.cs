@@ -53,12 +53,12 @@ public static class LiminalBooth
     {
         var butter = new Color(1f, .86f, .46f);
         var paint = Mat("Booth paint", "Unity Stable/Candy Paint");
-        paint.SetColor("_Color", new Color(1f, .2f, .56f)); paint.SetColor("_ShadeColor", new Color(.62f, .24f, .58f));
+        paint.SetColor("_Color", new Color(1f, .2f, .56f)); paint.SetColor("_ShadeColor", new Color(.8f, .38f, .68f));   // lighter shade: the sunset sun is behind the booth
         paint.SetFloat("_ShadeStep", .42f); paint.SetFloat("_ShadeSoftness", .22f);
         paint.SetColor("_RimColor", new Color(1.4f, .95f, .7f)); paint.SetFloat("_RimPower", 3f);
         paint.SetColor("_GlossColor", new Color(1.6f, 1.5f, 1.45f)); paint.SetFloat("_GlossPower", 140f); paint.SetFloat("_CoatStrength", .35f);
         paint.SetColor("_GlitterColor", new Color(2.6f, 2.1f, 1.1f)); paint.SetFloat("_GlitterDensity", 55f); paint.SetFloat("_GlitterAmount", .4f);
-        paint.SetFloat("_GlitterSharpness", 60f); paint.SetFloat("_GlitterTwinkle", 1.2f); paint.SetColor("_EmissionColor", new Color(.06f, .005f, .03f));
+        paint.SetFloat("_GlitterSharpness", 60f); paint.SetFloat("_GlitterTwinkle", 1.2f); paint.SetColor("_EmissionColor", new Color(.11f, .012f, .05f));
         EditorUtility.SetDirty(paint);
 
         var glow = Mat("Booth glow", "Unity Stable/Candy Paint");   // butter-yellow sign and payphone lights

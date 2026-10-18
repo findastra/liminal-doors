@@ -167,7 +167,8 @@ namespace UnityUnicorn.AssetCreator
                         bool particle = s.particles.Any(p => { var pr = p.GetComponent<ParticleSystemRenderer>(); return pr != null && pr.sharedMaterial == mat; });
                         if (see && !particle) transparent++;
                         if (r.forAndroid && !sh.StartsWith("VRChat/Mobile/") && !sh.StartsWith("Mobile/") && !sh.StartsWith("Legacy Shaders/Particles/")) res.Warn(mat.name + ": '" + sh + "' is not a mobile shader (Android)");
-                        res.Info(mat.name + ": " + sh + (see ? " (transparent)" : "") + (mat.IsKeywordEnabled("_EMISSION") ? " (glows)" : ""));
+                        bool glows = mat.IsKeywordEnabled("_EMISSION") || (mat.HasProperty("_EmissionColor") && mat.GetColor("_EmissionColor").maxColorComponent > .01f);
+                        res.Info(mat.name + ": " + sh + (see ? " (transparent)" : "") + (glows ? " (glows)" : ""));
                     }
                     if (transparent > 1) res.Warn(transparent + " transparent surface materials; keep it to one");
                     else if (transparent == 1 && r.forAndroid) res.Warn("one transparent surface material; VRChat advises none on Android");
@@ -228,7 +229,7 @@ namespace UnityUnicorn.AssetCreator
                             var f = GameObjectUtility.GetStaticEditorFlags(rr.gameObject);
                             if ((f & StaticEditorFlags.BatchingStatic) == 0 || (f & StaticEditorFlags.OccludeeStatic) == 0) res.Warn(rr.name + ": not static (batching / occludee)");
                         }
-                    var glow = s.materials.Where(m => m.IsKeywordEnabled("_EMISSION")).Select(m => m.name).ToList();
+                    var glow = s.materials.Where(m => m.IsKeywordEnabled("_EMISSION") || (m.HasProperty("_EmissionColor") && m.GetColor("_EmissionColor").maxColorComponent > .01f)).Select(m => m.name).ToList();
                     res.Info(s.lights.Count + " lights; glowing materials: " + (glow.Count > 0 ? string.Join(", ", glow) : "none") + (r.moves ? "; asset moves (not static)" : "; asset is static"));
                     return res;
                 } },
@@ -266,7 +267,8 @@ namespace UnityUnicorn.AssetCreator
                     }
                     if (missing > 0) res.Fail(missing + " missing scripts");
                     var outside = AssetDatabase.GetDependencies(s.prefabPath, true).Where(p => p.StartsWith("Assets/") && !p.StartsWith(s.folder + "/") && p != s.prefabPath).ToList();
-                    foreach (var p in outside.Where(p => !ShopShaders.IsShopPath(p))) res.Warn("depends on " + p + " outside " + s.folder);
+                    foreach (var p in outside.Where(p => !ShopShaders.IsShopPath(p) && !ShopShaders.IsOwnPath(p))) res.Warn("depends on " + p + " outside " + s.folder);
+                    foreach (var p in outside.Where(ShopShaders.IsOwnPath)) res.Info("packs our own " + Path.GetFileName(p) + " (Unity Stable shaders) so it works without the shop");
                     foreach (var q in ShopShaders.For(s.materials)) res.Info("requires " + q.name + " " + q.version + " (" + q.shader + ") from the shaders-shop; not packed");
                     res.Info("prefab " + s.prefabPath + "; folder " + s.folder + "; " + AssetDatabase.GetDependencies(s.prefabPath, true).Count(p => p.StartsWith("Assets/")) + " project files in the package");
                     return res;

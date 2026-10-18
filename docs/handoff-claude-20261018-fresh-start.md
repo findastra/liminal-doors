@@ -1,6 +1,6 @@
 # Handoff: Claude, 2026-10-18 (fresh start)
 
-status: open (fresh base built and rendered; waiting for Astra's booth changes; not yet swapped into the PC folder)
+status: open (booth and stop 01 sky ready for Astra's review; export and publishing next)
 from: Claude Opus 5.5, 2026-10-18
 for: any agent continuing Liminal Doors
 
@@ -39,3 +39,44 @@ mound, cloud sea, sky, bloom and phone scripts.
    - Astra approved closing the Liminal Doors editor and switching that folder to this branch.
 3. **Not in the fresh base yet:** clouds and sky for stop 01, the glass fox, doors, the phone. The Infinite Pole voice-link scripts were dropped with the rest; the phone gets designed when more stops have booths.
 4. Not tested yet on the fresh base: desktop test, headset and upload.
+
+## Later the same day: tools, shaders, the booth and stop 01's world
+
+Astra asked for the booth to match its world, with sparkles swirling around it, built through a new
+**unity-asset-creator** trick and tool. Exports go to a GitHub database, **unity-assets-library**. When the booth still
+looked dull she also asked for a **shaders-shop** module. All three are Unity Stable (Unity Unicorn) tools, built here
+for now; they get published to findastra/unity-unicorn once they're ready.
+
+- **unity-asset-creator** (`Assets/UnityAssetCreator`, `Tools/unity-asset-creator`):
+  - a researched 12-step checklist (sources linked) with automatic checks;
+  - an ordered checklist window, plus queue-runnable menus and a confirmations file for agents;
+  - previews in the world's light;
+  - export: a `.unitypackage` of the prefab and what it uses, the previews, and `manifest.json` with the ledger row,
+    the finished checklist and `requires_shaders`. Our own Unity Stable shaders are packed in; third-party shop shaders
+    are listed, not packed.
+- **shaders-shop** (`Assets/ShadersShop`, `Tools/shaders-shop`):
+  - a catalog of 12 researched shaders, refreshed from each source;
+  - installs the way VCC does, after showing the exact files and size, and survives reloads;
+  - per-world shader records: `docs/shaders-in-world.json`, plus the read-only scans of Infinite Pole and Piranesi
+    House in `Tools/shaders-shop/worlds/`;
+  - "Report shader errors". With Astra's OK it installed lilToon, ORL, Poiyomi and Mochie.
+- **Our own shaders** (`Assets/ShadersShop/UnityStable`): Candy Paint, Pink Glass, Sparkle, Sunset Sky, Cloud Sea and
+  Cloud Puff. lilToon and Poiyomi only switch features on through their own inspectors, so scripted materials use ours.
+- **Booth** (`LiminalBooth.cs`, Booth/Phone Booth.prefab): hot pink Candy Paint, butter-yellow glow, Pink Glass, and gold
+  and pink sparkles swirling up (Astra's picks, 5 materials, 360 particles).
+- **Stop 01's world** (`LiminalStop01Sky.cs`, Sky/Stop 01 Sky.prefab, placed by Stop 01/Build):
+  - a sunset sky dome over a 2.4 km cloud sea (parallax billows), 14 cumulus, 8 puffs around the booth's base and a
+    sunset reflection probe;
+  - it sets the scene's sun low and warm behind the booth, the sunset as skybox, and pink ambient light.
+- **Checklists:** steps 1-10 are done for both assets (notes in their recipes). Step 11 waits for Astra's review of
+  `docs/renders/stop-01-*.png` and the asset previews in `docs/renders/assets/`.
+- **Desktop test** with the sky (15:30): this bundle in `--url=`, "Finished entering world." at 15:30:15, no Udon errors.
+
+### Open
+1. Astra's review (step 11), then export booth v1.0.0 and sky v1.0.0, create findastra/unity-assets-library (public,
+   her choice), and open the export pull request.
+2. Publish unity-asset-creator, unity-assets-library and shaders-shop on Unity Unicorn (Unity Stable), and add their
+   tool boxes to its pet program page.
+3. The asset creator's previews and Stop 01/Render don't show bloom in the editor. The scene has active global glow
+   volumes; VRChat's reference camera has the post-processing layer.
+4. The cloud sea shows stretched streaks at grazing angles in the middle distance; the glass fox; the phone.

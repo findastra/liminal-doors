@@ -26,6 +26,10 @@ namespace UnityUnicorn.AssetCreator
         public static bool IsShopPath(string path) =>
             path.StartsWith("Packages/") || Load().shaders.Where(e => e.install != "builtin" && e.install != "own").Any(e => e.detect_paths.Any(d => path.StartsWith(d + "/")));
 
+        // A file of our own Unity Stable shaders: packed with the asset, so it works in a world without the shop.
+        public static bool IsOwnPath(string path) =>
+            Load().shaders.Where(e => e.install == "own").Any(e => e.detect_paths.Any(d => path.StartsWith(d + "/")));
+
         public static List<Required> For(IEnumerable<Material> materials)
         {
             var cat = Load(); var list = new List<Required>();
@@ -35,6 +39,7 @@ namespace UnityUnicorn.AssetCreator
                 var path = AssetDatabase.GetAssetPath(m.shader); var name = m.shader.name;
                 var e = cat.shaders.FirstOrDefault(x => x.install != "builtin" && x.detect_paths.Any(d => path.StartsWith(d + "/")))
                         ?? cat.shaders.FirstOrDefault(x => x.install != "builtin" && x.shader_prefixes.Any(p => name.StartsWith(p)));
+                if (e != null && e.install == "own") continue;   // our own shaders travel inside the package
                 if (e == null || list.Any(r => r.id == e.id && r.shader == name)) continue;
                 list.Add(new Required { id = e.id, name = e.name, version = InstalledVersion(path, e.version), shader = name });
             }
