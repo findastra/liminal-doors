@@ -5,7 +5,8 @@
 //   status                      -> signed-in SDK account, scene, compile/play state
 //   refresh                     -> AssetDatabase.Refresh (compiles new scripts)
 //   save                        -> saves open scenes
-//   menu LiminalDoors/<path>    -> runs one of this project's LiminalDoors/ menu items (nothing else is allowed)
+//   menu LiminalDoors/<path>    -> runs one of this project's LiminalDoors/ menu items, or a Unity Unicorn/ tool's
+//                                  (unity-asset-creator); nothing else is allowed
 //   desktop-test                -> saves, then SDK Build & Test with one desktop client (no upload);
 //                                  progress in Review/desktop-test-status.txt (LiminalDesktopTest, 2026-10-18)
 // The result goes to Review/agent-queue/<same name>.result.txt and the .cmd file is deleted.
@@ -76,7 +77,7 @@ public static class LiminalAgentQueue
             case "refresh": AssetDatabase.Refresh(); return "Refreshed. Check status again after compiling finishes.";
             case "save": SaveNamedScenes(); return "Saved open scenes.";
             case "menu":
-                if (!arg.StartsWith("LiminalDoors/")) return "REFUSED: only LiminalDoors/ menu items can be run from the queue.";
+                if (!arg.StartsWith("LiminalDoors/") && !arg.StartsWith("Unity Unicorn/")) return "REFUSED: only LiminalDoors/ and Unity Unicorn/ menu items can be run from the queue.";
                 SaveNamedScenes();
                 return EditorApplication.ExecuteMenuItem(arg) ? "Ran " + arg + ". See its own Review/ report." : "FAILED: no menu item " + arg;
             case "desktop-test":
@@ -86,7 +87,7 @@ public static class LiminalAgentQueue
                 SaveNamedScenes();
                 test.GetMethod("Run").Invoke(null, null);
                 return "Started. See Review/desktop-test-status.txt.";
-            default: return "Unknown command. Use: status, refresh, save, menu LiminalDoors/..., desktop-test";
+            default: return "Unknown command. Use: status, refresh, save, menu LiminalDoors/... or Unity Unicorn/..., desktop-test";
         }
     }
 

@@ -1,0 +1,186 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0c5656f1c043464ca3cbd3dea5a2ff6, type: 3}
+  m_Name: liminal-doors-phone-booth-asset-recipe
+  m_EditorClassIdentifier: 
+  id: liminal-doors-phone-booth
+  displayName: Liminal Doors phone booth
+  kind: prop
+  version: 1.0.0
+  description: 'The pink phone booth at the start of Liminal Doors: hot pink with
+    a butter-yellow glowing sign and warm pink-lit glass, with gold and pink sparkles
+    swirling up around it and a soft gold glow at its base.'
+  forPC: 1
+  forAndroid: 0
+  moves: 0
+  prefab: {fileID: 3133622112822875829, guid: f0a430abc6953124787b48dc69e07529, type: 3}
+  maxTriangles: 10000
+  maxMaterials: 5
+  maxTextureSize: 1024
+  maxParticles: 400
+  creator: Astra (built with Claude)
+  source: Booth shape from Astra's Infinite Pole (her own world); materials, sparkles
+    and prefab made in Liminal Doors
+  license: own-work
+  attribution: 
+  publicOk: 1
+  changelog: '1.0.0: first version. Hot pink look, glowing sign, swirling gold and
+    pink sparkles, gold base glow.'
+  steps:
+  - id: plan
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: liminal-doors-phone-booth v1.0.0 (prop) for PC; budget 10000 triangles,
+      5 materials, 1024 px, 400 particles
+  - id: provenance
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 'creator: Astra (built with Claude); source: Booth shape from Astra''s
+      Infinite Pole (her own world); materials, sparkles and prefab made in Liminal
+      Doors; licence: own-work; public: yes'
+  - id: scale-pivot
+    done: 0
+    version: 
+    status: warn
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 'WARN: pivot is 0.47 m from the middle of the footprint
+
+      size
+      1.54 x 2.75 x 2.36 m (w x h x d)'
+  - id: geometry
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 3576 triangles in 6 meshes (budget 10000)
+  - id: materials
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 'Booth body: Standard (glows)
+
+      Booth sign: Standard (glows)
+
+      Booth
+      glass: Standard (transparent) (glows)
+
+      Payphone face: Standard
+
+      Booth
+      sparkles: Legacy Shaders/Particles/Additive (transparent)'
+  - id: textures
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: booth-sparkle 64x64, Compressed, mipmaps
+  - id: colliders
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 'Booth floor: BoxCollider, top 0.04 m'
+  - id: lighting
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: '0 lights; glowing materials: Booth body, Booth sign, Booth glass; asset
+      is static'
+  - id: effects
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 'Swirling sparkles: max 300, Legacy Shaders/Particles/Additive, Local
+      space
+
+      Base glow: max 60, Legacy Shaders/Particles/Additive, Local space'
+  - id: prefab
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: prefab Assets/LiminalDoors/Booth/Phone Booth.prefab; folder Assets/LiminalDoors/Booth;
+      13 project files in the package
+  - id: review
+    done: 0
+    version: 
+    status: pass
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 3 preview renders in Exports/unity-assets-library/liminal-doors-phone-booth/1.0.0/previews
+  - id: export
+    done: 0
+    version: 
+    status: fail
+    note: 
+    doneAt: 
+    doneBy: 
+    details: 'FAIL: step ''Plan: name, version, budget'' isn''t done
+
+      FAIL:
+      step ''Provenance: who made it, from where, licence'' isn''t done
+
+      FAIL:
+      step ''Scale, pivot and facing'' isn''t done
+
+      FAIL: step ''Geometry:
+      triangles, normals, lightmap UVs'' isn''t done
+
+      FAIL: step ''Materials
+      and shaders'' isn''t done
+
+      FAIL: step ''Textures: size, compression,
+      mipmaps'' isn''t done
+
+      FAIL: step ''Colliders: simple, where people stand,
+      never above the surface'' isn''t done
+
+      FAIL: step ''Lighting: static,
+      emission, no realtime lights'' isn''t done
+
+      FAIL: step ''Effects: particles
+      capped, cheap, low overdraw'' isn''t done
+
+      FAIL: step ''Prefab: one clean,
+      self-contained prefab'' isn''t done
+
+      FAIL: step ''Review in the world:
+      renders and desktop test'' isn''t done'
+  exportedVersions: []
