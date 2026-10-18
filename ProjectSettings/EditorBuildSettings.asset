@@ -6,8 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity
-    guid: b8954ae008bc4204aa26c7f449ebc5ea
-  m_configObjects:
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: a45021e60c2e54b49882cf5ff8ef01fd,
-      type: 2}
+    path: Assets/LiminalDoors/Scenes/Liminal Doors.unity
+    guid: d46dbab0181dbc7459114c5853cf9e2a
+  m_configObjects: {}

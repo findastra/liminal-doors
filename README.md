@@ -1,27 +1,35 @@
 # Liminal Doors
 
-Astra's VRChat world of doors (PC). Each door leads to a stop: a quiet, empty place with one hidden glass animal.
-The world's caretaker pet is **Door Dormouse** (pet program #82, The Threshold). The floor plan, concept book and
-idea inbox were drafted by Codex on 2026-10-15/16; this Unity project starts the playable world.
+A VRChat world of doors that open onto quiet in-between places: an empty pool after closing, a laundrette with a sky
+turning in one washer, a platform between trains. Behind every door hides one little glass animal. Hatching now: the
+first door opens on Astra's pink phone booth, alone above a sea of pink clouds. PC VR / desktop.
 
-![Stop 01: Fox / Pink Booth](docs/renders/stop-01-01-hero-door.png)
+The world's caretaker pet is **Door Dormouse** (pet program #82, The Threshold). The floor plan, concept book and idea
+inbox were drafted by Codex on 2026-10-15/16.
 
-## Stops built
+![Stop 01: the booth, still plain](docs/renders/stop-01-01-door.png)
 
-| # | Animal | Stop | Scene | Status |
-|---|---|---|---|---|
-| 01 | Fox | Pink Booth | `Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity` | Scene and renders. No door travel, phone, fox or walkable mound yet |
+## Fresh start (2026-10-18)
 
-Stop 01 is the exact pink booth from Astra's Infinite Pole, on its own cloud mound above Infinite Pole's pink cloud sea,
-under the same sunset sky and Pinkscape bloom. Those assets are copied from Infinite Pole with their original GUIDs
-(`Assets/Astra/...`); the booth and sea prefabs were extracted from `AstrasInfinitePole.unity` with
-`Tools/infinite-pole-export/extract_prefab.py` (read only). New here: the gold door drift, the fox hiding spot and the VRChat spawn.
+This project starts from VRChat Creator Companion's **World template** (VRChat SDK 3.10.5, Unity 2022.3.22f1). From
+Astra's Infinite Pole it takes only the **phone booth's shape** (six meshes in `Assets/LiminalDoors/Booth/Meshes`), and
+that booth is being changed: for now it wears plain materials. An earlier version that copied much more of Infinite
+Pole is kept on the branch `claude/stop-01-pink-booth-20261018`.
+
+## Stops
+
+| # | Animal | Stop | Status |
+|---|---|---|---|
+| 01 | Fox | Pink Booth | Plain booth with a floor and the spawn inside. Booth changes, clouds, sky, fox and doors to come |
+
+All stops live in one scene, `Assets/LiminalDoors/Scenes/Liminal Doors.unity`; stop 01 is its root `Stop 01 - Fox - Pink Booth`.
 
 ## Working in it
 
-- Unity 2022.3.22f1, VRChat Worlds SDK 3.10.5 (embedded in `Packages/`, not committed), linear colour, post-processing v2.
-- Menu **LiminalDoors > Stop 01**: *Build scene* rewrites the stop from the prefabs, *Render review shots* writes
-  `Review/stop-01-render/`, *Open scene* opens it framed on the door.
-- Agents drive an open editor through `Review/agent-queue/*.cmd` (`status`, `refresh`, `save`, `menu LiminalDoors/...`),
-  the same as in Infinite Pole. Never relaunch or batchmode Unity while the project is open.
+- The VRChat SDK packages are unpacked into `Packages/` from Creator Companion's cache and aren't committed. Open the
+  project in VCC or Unity 2022.3.22f1 to restore them.
+- Menu **LiminalDoors > Stop 01**: *Build* rebuilds the stop (existing materials are kept), *Render* writes
+  `Review/stop-01-render/`, *Open* frames the booth door. **LiminalDoors > Desktop test** runs the SDK's Build & Test (no upload).
+- Agents drive an open editor through `Review/agent-queue/*.cmd` (`status`, `refresh`, `save`, `menu LiminalDoors/...`,
+  `desktop-test`) instead of relaunching Unity.
 - Uploads, releases and `main` change only with Astra's OK.

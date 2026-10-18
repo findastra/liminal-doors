@@ -1,12 +1,16 @@
-// Claude, 2026-10-18. Liminal Doors, stop 01: Fox / Pink Booth (floor register 2026-10-15, scene 1).
-// "The exact booth from Astra's Infinite Pole, alone above a sea of pink clouds. Enter the booth through a
-// fine drift of gold light." The booth, its cloud mound and sparkles, the cloud sea, the sky and the bloom are
-// Infinite Pole's own assets, copied with their GUIDs (prefabs extracted from AstrasInfinitePole.unity, read only).
-// New here: the gold door drift, the empty fox hiding spot (the glass fox is a later pass) and the VRChat spawn.
+// Claude, 2026-10-18. Liminal Doors, fresh start (Astra, 2026-10-18: "do not start with a copy of Astra's Infinite
+// Pole. The only thing you were supposed to take from there was the phone booth as a base, and we are changing it.")
+// The project is VRChat Creator Companion's World template. From Infinite Pole there are only the booth's six shape
+// meshes (Assets/LiminalDoors/Booth/Meshes); everything else here is new. The booth wears plain materials until Astra
+// says how it changes.
 //
-// Menu: LiminalDoors/Stop 01/Build scene  -> (re)writes Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity
-//       LiminalDoors/Stop 01/Render review shots -> Review/stop-01-render/*.png + report.md
-// Batch (new project only, never on an open editor): -executeMethod LiminalStop01.BatchBuildAndRender
+// Stop 01 (Fox / Pink Booth) is the root "Stop 01 - Fox - Pink Booth" in the one world scene, so later stops can sit
+// next to it. Building it again replaces only that root; materials that already exist are kept, so hand edits survive.
+//
+// Menu: LiminalDoors/Stop 01/Build      -> writes or updates Assets/LiminalDoors/Scenes/Liminal Doors.unity
+//       LiminalDoors/Stop 01/Render     -> Review/stop-01-render/*.png + report.md
+//       LiminalDoors/Stop 01/Open       -> opens the scene framed on the booth door
+// Batch (a project no editor has open only): -executeMethod LiminalStop01.BatchBuildAndRender
 using System;
 using System.IO;
 using System.Linq;
@@ -14,229 +18,181 @@ using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public static class LiminalStop01
 {
-    public const string ScenePath = "Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity";
-    const string BoothPrefab = "Assets/LiminalDoors/Prefabs/Pink Booth (from Infinite Pole).prefab";
-    const string SeaPrefab = "Assets/LiminalDoors/Prefabs/Pink Cloud Sea (from Infinite Pole).prefab";
-    const string SkyMaterial = "Assets/Astra/Materials/Backdrop/Pink Cloud Sea Sky.mat";
-    const string BloomProfile = "Assets/Astra/Materials/Pinkscape Bloom.asset";
-    const string GoldMaterial = "Assets/LiminalDoors/Materials/Door Gold Drift.mat";
+    public const string ScenePath = "Assets/LiminalDoors/Scenes/Liminal Doors.unity";
+    public const string StopName = "Stop 01 - Fox - Pink Booth";
+    const string MeshDir = "Assets/LiminalDoors/Booth/Meshes/";
+    const string MatDir = "Assets/LiminalDoors/Booth/Materials/";
+    const string SkyPath = "Assets/LiminalDoors/Materials/Plain Sky.mat";
     const string ReviewDir = "Review/stop-01-render";
 
-    [MenuItem("LiminalDoors/Stop 01/Build scene")]
-    public static void BuildScene()
+    // the booth's parts: mesh file, material name, colour, metallic, smoothness, see-through
+    static readonly (string mesh, string mat, Color color, float metal, float smooth, bool glass)[] Parts =
     {
-        var booth = Load<GameObject>(BoothPrefab);
-        var sea = Load<GameObject>(SeaPrefab);
-        var sky = Load<Material>(SkyMaterial);
-        var bloom = Load<PostProcessProfile>(BloomProfile);
+        ("Booth body", "Booth body", new Color(.86f, .85f, .84f), 0f, .35f, false),
+        ("Booth sign", "Booth sign", new Color(.95f, .95f, .95f), 0f, .2f, false),
+        ("Booth glass", "Booth glass", new Color(.86f, .92f, .96f, .22f), 0f, .92f, true),
+        ("Payphone chrome", "Payphone chrome", new Color(.72f, .72f, .74f), .9f, .78f, false),
+        ("Payphone face", "Payphone face", new Color(.16f, .16f, .17f), 0f, .4f, false),
+        ("Payphone lights", "Payphone lights", new Color(.8f, .8f, .8f), 0f, .3f, false),
+    };
 
-        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        var stop = new GameObject("Stop 01 - Fox - Pink Booth");
+    [MenuItem("LiminalDoors/Stop 01/Build")]
+    public static void Build()
+    {
+        Scene scene;
+        if (File.Exists(ScenePath)) scene = SceneManager.GetActiveScene().path == ScenePath ? SceneManager.GetActiveScene() : EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        else
+        {
+            scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            SetupWorld(scene);
+            Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
+            EditorSceneManager.SaveScene(scene, ScenePath);
+        }
 
-        // Both prefabs keep their Infinite Pole world pose, so the booth sits on its mound 1.4 m above the sea
-        // exactly as it does there.
-        var boothGo = (GameObject)PrefabUtility.InstantiatePrefab(booth, scene);
-        boothGo.name = "Pink booth (from Astra's Infinite Pole)";
-        boothGo.transform.SetParent(stop.transform, true);
-        var seaGo = (GameObject)PrefabUtility.InstantiatePrefab(sea, scene);
-        seaGo.name = "Pink cloud sea (from Astra's Infinite Pole)";
-        seaGo.transform.SetParent(stop.transform, true);
+        var old = scene.GetRootGameObjects().FirstOrDefault(g => g.name == StopName);
+        if (old != null) UnityEngine.Object.DestroyImmediate(old);
+        var stop = new GameObject(StopName);
+        SceneManager.MoveGameObjectToScene(stop, scene);
 
-        // Booth geometry lives under "Banner booth" (scale 1.1). Its door is on local +Z; the payphone hangs on -Z.
-        var frame = boothGo.transform.Find("Banner booth");
-        if (frame == null) throw new Exception("Booth prefab has no 'Banner booth' child.");
+        // the booth: every part shares the meshes' own origin (floor centre); the door is on local +Z
+        var booth = new GameObject("Phone booth");
+        booth.transform.SetParent(stop.transform, false);
+        foreach (var p in Parts)
+        {
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(MeshDir + p.mesh + ".asset");
+            if (mesh == null) throw new Exception("Missing booth mesh " + MeshDir + p.mesh + ".asset");
+            var go = new GameObject(p.mesh);
+            go.transform.SetParent(booth.transform, false);
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var r = go.AddComponent<MeshRenderer>();
+            r.sharedMaterial = Material(p.mat, p.color, p.metal, p.smooth, p.glass);
+            if (p.glass) r.shadowCastingMode = ShadowCastingMode.Off;
+        }
+        var floor = new GameObject("Booth floor");
+        floor.transform.SetParent(booth.transform, false);
+        var fc = floor.AddComponent<BoxCollider>(); fc.center = new Vector3(0, .02f, 0); fc.size = new Vector3(1.3f, .04f, 1.3f);
 
-        var drift = new GameObject("Door light drift (gold)");
-        drift.transform.SetParent(stop.transform, false);
-        drift.transform.SetPositionAndRotation(frame.TransformPoint(0, 1.15f, 0.95f), frame.rotation);
-        BuildGoldDrift(drift);
-
-        var fox = new GameObject("Fox hiding spot (glass fox: later pass)");
+        var fox = new GameObject("Fox hiding spot (glass fox: later)");
         fox.transform.SetParent(stop.transform, false);
-        fox.transform.SetPositionAndRotation(frame.TransformPoint(0.5f, 0.06f, -0.95f), frame.rotation);
+        fox.transform.localPosition = new Vector3(.5f, .06f, -.95f);
 
-        // Global bloom, the same profile and settings as Infinite Pole's "Volume".
-        var volumeGo = new GameObject("Pinkscape bloom (global volume)");
-        volumeGo.transform.SetParent(stop.transform, false);
-        var volume = volumeGo.AddComponent<PostProcessVolume>();
-        volume.sharedProfile = bloom;
-        volume.isGlobal = true;
-        volume.priority = 10;
-        volume.weight = 1;
+        // spawn: standing on the booth floor, looking out through the door
+        var world = scene.GetRootGameObjects().Select(g => g.GetComponentsInChildren<Component>(true).FirstOrDefault(c => c != null && c.GetType().Name == "VRCSceneDescriptor")).FirstOrDefault(c => c != null);
+        if (world != null) world.transform.SetPositionAndRotation(booth.transform.TransformPoint(0, .05f, .05f), booth.transform.rotation);
 
-        // VRChat reference camera (kept inactive, as the SDK expects) carries the post-processing layer.
-        var refCam = new GameObject("VRChat reference camera");
-        refCam.transform.SetParent(stop.transform, false);
-        var cam = refCam.AddComponent<Camera>();
-        cam.nearClipPlane = 0.05f; cam.farClipPlane = 2500f; cam.allowHDR = true;
-        AddPostLayer(refCam);
-        refCam.SetActive(false);
-
-        AddVrcWorld(stop.transform, frame, cam);
-
-        RenderSettings.skybox = sky;
-        RenderSettings.fog = false;
-        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-        RenderSettings.ambientLight = new Color(0.24f, 0.22f, 0.3f);
-        RenderSettings.sun = null;
-
-        Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
-        EditorSceneManager.SaveScene(scene, ScenePath);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
         var scenes = EditorBuildSettings.scenes.Where(s => s.path != ScenePath).ToList();
         scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
         EditorBuildSettings.scenes = scenes.ToArray();
-        Debug.Log("[Liminal] Stop 01 scene written: " + ScenePath);
+        Debug.Log("[Liminal] Stop 01 built in " + ScenePath);
     }
 
-    static void BuildGoldDrift(GameObject go)
+    // One-time scene setup: plain sky, one sun, soft ambient light, the VRChat world descriptor.
+    static void SetupWorld(Scene scene)
     {
-        var mat = AssetDatabase.LoadAssetAtPath<Material>(GoldMaterial);
-        if (mat == null)
+        var sky = AssetDatabase.LoadAssetAtPath<Material>(SkyPath);
+        if (sky == null)
         {
-            var shader = Shader.Find("Astra/Soft Sparkle");
-            if (shader == null) throw new Exception("Shader Astra/Soft Sparkle not found.");
-            mat = new Material(shader) { name = "Door Gold Drift", enableInstancing = true };
-            mat.SetColor("_Color", new Color(1f, 0.74f, 0.32f, 1f) * 2.4f); // HDR so the bloom picks it up
-            Directory.CreateDirectory(Path.GetDirectoryName(GoldMaterial));
-            AssetDatabase.CreateAsset(mat, GoldMaterial);
+            sky = new Material(Shader.Find("Skybox/Procedural")) { name = "Plain Sky" };
+            sky.SetFloat("_SunSize", .035f); sky.SetFloat("_AtmosphereThickness", 1.1f); sky.SetFloat("_Exposure", 1.15f);
+            sky.SetColor("_SkyTint", new Color(.5f, .5f, .5f)); sky.SetColor("_GroundColor", new Color(.42f, .4f, .41f));
+            Directory.CreateDirectory(Path.GetDirectoryName(SkyPath));
+            AssetDatabase.CreateAsset(sky, SkyPath);
         }
+        RenderSettings.skybox = sky;
+        RenderSettings.ambientMode = AmbientMode.Trilight;
+        RenderSettings.ambientSkyColor = new Color(.62f, .64f, .7f);
+        RenderSettings.ambientEquatorColor = new Color(.5f, .49f, .5f);
+        RenderSettings.ambientGroundColor = new Color(.32f, .31f, .32f);
+        RenderSettings.fog = false;
 
-        var ps = go.AddComponent<ParticleSystem>();
-        var main = ps.main;
-        main.loop = true; main.prewarm = true;
-        main.duration = 10f;
-        main.startLifetime = new ParticleSystem.MinMaxCurve(5f, 9f);
-        main.startSpeed = new ParticleSystem.MinMaxCurve(0.02f, 0.08f);
-        main.startSize = new ParticleSystem.MinMaxCurve(0.018f, 0.045f);
-        main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 0.86f, 0.5f, 1f), new Color(1f, 0.66f, 0.3f, 0.8f));
-        main.simulationSpace = ParticleSystemSimulationSpace.World;
-        main.maxParticles = 260;
+        var sunGo = new GameObject("Sun");
+        SceneManager.MoveGameObjectToScene(sunGo, scene);
+        var sun = sunGo.AddComponent<Light>();
+        sun.type = LightType.Directional; sun.color = new Color(1f, .96f, .9f); sun.intensity = 1.1f;
+        sun.shadows = LightShadows.Soft; sun.lightmapBakeType = LightmapBakeType.Realtime;
+        sunGo.transform.rotation = Quaternion.Euler(32f, 210f, 0f);
+        RenderSettings.sun = sun;
 
-        var emission = ps.emission; emission.rateOverTime = 30f;
-
-        var shape = ps.shape;
-        shape.shapeType = ParticleSystemShapeType.Box;
-        shape.scale = new Vector3(1.25f, 2.1f, 0.7f);
-
-        var vel = ps.velocityOverLifetime;
-        vel.enabled = true; vel.space = ParticleSystemSimulationSpace.Local;
-        vel.x = new ParticleSystem.MinMaxCurve(-0.02f, 0.02f);
-        vel.y = new ParticleSystem.MinMaxCurve(0.01f, 0.06f);
-        vel.z = new ParticleSystem.MinMaxCurve(-0.05f, 0.01f); // drifts gently in through the door
-
-        var noise = ps.noise;
-        noise.enabled = true; noise.strength = 0.12f; noise.frequency = 0.35f; noise.scrollSpeed = 0.08f;
-
-        var col = ps.colorOverLifetime;
-        col.enabled = true;
-        var g = new Gradient();
-        g.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
-                  new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.2f), new GradientAlphaKey(0.8f, 0.75f), new GradientAlphaKey(0f, 1f) });
-        col.color = g;
-
-        var r = go.GetComponent<ParticleSystemRenderer>();
-        r.sharedMaterial = mat;
-        r.renderMode = ParticleSystemRenderMode.Billboard;
-        r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        r.receiveShadows = false;
-    }
-
-    static void AddPostLayer(GameObject camGo)
-    {
-        var layer = camGo.AddComponent<PostProcessLayer>();
-        layer.volumeTrigger = camGo.transform;
-        layer.volumeLayer = 1; // Default, as in Infinite Pole
-        layer.stopNaNPropagation = true;
-        layer.antialiasingMode = PostProcessLayer.Antialiasing.SubpixelMorphologicalAntialiasing;
-        // The layer needs its resources asset to render outside play mode.
-        var res = AssetDatabase.FindAssets("t:PostProcessResources").Select(AssetDatabase.GUIDToAssetPath).FirstOrDefault();
-        if (res != null) layer.Init(AssetDatabase.LoadAssetAtPath<PostProcessResources>(res));
-    }
-
-    // Uses the SDK's own VRCWorld prefab when the worlds SDK is present; looked up by name so this file
-    // compiles without the SDK.
-    static void AddVrcWorld(Transform parent, Transform frame, Camera referenceCamera)
-    {
-        var path = AssetDatabase.FindAssets("VRCWorld t:Prefab").Select(AssetDatabase.GUIDToAssetPath)
-            .FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == "VRCWorld");
+        var path = AssetDatabase.FindAssets("VRCWorld t:Prefab").Select(AssetDatabase.GUIDToAssetPath).FirstOrDefault(p => Path.GetFileNameWithoutExtension(p) == "VRCWorld");
         if (path == null) { Debug.LogWarning("[Liminal] VRCWorld prefab not found; no spawn added."); return; }
-        var world = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path));
-        world.transform.SetParent(parent, false);
-        // Spawn standing inside the booth on its floor collider, looking out through the door.
-        world.transform.SetPositionAndRotation(frame.TransformPoint(0, 0.05f, 0.05f), frame.rotation);
+        var world = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path), scene);
         var desc = world.GetComponents<Component>().FirstOrDefault(c => c != null && c.GetType().Name == "VRCSceneDescriptor");
-        if (desc == null) return;
-        var so = new SerializedObject(desc);
-        var refCam = so.FindProperty("ReferenceCamera");
-        if (refCam != null) refCam.objectReferenceValue = referenceCamera.gameObject;
-        var respawn = so.FindProperty("RespawnHeightY");
-        if (respawn != null) respawn.floatValue = -60f;
-        so.ApplyModifiedPropertiesWithoutUndo();
+        if (desc != null)
+        {
+            var so = new SerializedObject(desc);
+            var respawn = so.FindProperty("RespawnHeightY"); if (respawn != null) respawn.floatValue = -60f;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
     }
 
-    // Opens the stop and points the Scene view at the booth door, the same angle as the hero render.
-    [MenuItem("LiminalDoors/Stop 01/Open scene")]
-    public static void OpenScene()
+    static Material Material(string name, Color color, float metal, float smooth, bool glass)
+    {
+        var path = MatDir + name + ".mat";
+        var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (m != null) return m;   // keep hand edits
+        m = new Material(Shader.Find("Standard")) { name = name, enableInstancing = true };
+        m.color = color; m.SetFloat("_Metallic", metal); m.SetFloat("_Glossiness", smooth);
+        if (glass)
+        {
+            m.SetFloat("_Mode", 3);   // Transparent
+            m.SetOverrideTag("RenderType", "Transparent");
+            m.SetInt("_SrcBlend", (int)BlendMode.One); m.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0);
+            m.DisableKeyword("_ALPHATEST_ON"); m.DisableKeyword("_ALPHABLEND_ON"); m.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+            m.renderQueue = (int)RenderQueue.Transparent;
+        }
+        Directory.CreateDirectory(MatDir);
+        AssetDatabase.CreateAsset(m, path);
+        return m;
+    }
+
+    [MenuItem("LiminalDoors/Stop 01/Open")]
+    public static void Open()
     {
         if (SceneManager.GetActiveScene().path != ScenePath) EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-        var frame = GameObject.Find("Stop 01 - Fox - Pink Booth/Pink booth (from Astra's Infinite Pole)/Banner booth")?.transform;
-        if (frame == null) return;
-        Selection.activeGameObject = frame.parent.gameObject;
+        var booth = GameObject.Find(StopName + "/Phone booth"); if (booth == null) return;
+        Selection.activeGameObject = booth;
         var sv = SceneView.lastActiveSceneView != null ? SceneView.lastActiveSceneView : EditorWindow.GetWindow<SceneView>();
-        Vector3 c = frame.TransformPoint(0, 1.2f, 0);
-        sv.LookAt(c, Quaternion.LookRotation(-frame.forward + Vector3.down * 0.05f - frame.right * 0.2f), 3.2f);
+        var t = booth.transform;
+        sv.LookAt(t.TransformPoint(0, 1.3f, 0), Quaternion.LookRotation(-t.forward + Vector3.down * .08f - t.right * .3f), 3.4f);
         sv.Repaint();
     }
 
     // ---------- review renders ----------
 
-    struct Shot { public string name; public Vector3 pos; public Vector3 look; public float fov; }
-
-    [MenuItem("LiminalDoors/Stop 01/Render review shots")]
-    public static void RenderShots()
+    [MenuItem("LiminalDoors/Stop 01/Render")]
+    public static void Render()
     {
-        var scene = SceneManager.GetActiveScene();
-        if (scene.path != ScenePath) scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-        var frame = GameObject.Find("Stop 01 - Fox - Pink Booth/Pink booth (from Astra's Infinite Pole)/Banner booth")?.transform;
-        if (frame == null) throw new Exception("Scene has no booth; run Build scene first.");
-
-        // Particles don't run outside play mode; step each one 9 s in so the sparkles and gold drift show.
-        foreach (var ps in UnityEngine.Object.FindObjectsOfType<ParticleSystem>())
-            ps.Simulate(9f, false, true, true);
-
-        Vector3 c = frame.TransformPoint(0, 1.2f, 0), fwd = frame.forward, right = frame.right, up = Vector3.up;
-        var shots = new[]
+        if (SceneManager.GetActiveScene().path != ScenePath) EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        var booth = GameObject.Find(StopName + "/Phone booth")?.transform;
+        if (booth == null) throw new Exception("No booth in the scene; run Stop 01/Build first.");
+        var shots = new (string name, Vector3 pos, Vector3 look, float fov)[]
         {
-            new Shot { name = "01-hero-door", pos = c + fwd * 5.4f + right * 1.1f - up * 0.35f, look = c + up * 0.15f, fov = 42 },
-            new Shot { name = "02-wide-15m", pos = c + fwd * 14f + right * 5f + up * 2.5f, look = c - up * 0.6f, fov = 50 },
-            new Shot { name = "03-birds-eye", pos = c + up * 26f + fwd * 7f, look = c - up * 1f, fov = 50 },
-            new Shot { name = "04-behind-fox-spot", pos = c - fwd * 4.2f - right * 1.6f + up * 0.1f, look = c - up * 0.5f, fov = 45 },
-            new Shot { name = "05-spawn-view", pos = frame.TransformPoint(0, 1.55f, 0.05f), look = frame.TransformPoint(0, 1.3f, 6f), fov = 70 },
+            ("01-door", booth.TransformPoint(1.3f, 1.05f, 5.3f), booth.TransformPoint(0, 1.35f, 0), 40),
+            ("02-three-quarter", booth.TransformPoint(-3.6f, 2.2f, 4.2f), booth.TransformPoint(0, 1.25f, 0), 42),
+            ("03-back", booth.TransformPoint(2.4f, 1.6f, -4.4f), booth.TransformPoint(0, 1.3f, 0), 42),
+            ("04-spawn-view", booth.TransformPoint(0, 1.55f, .05f), booth.TransformPoint(0, 1.35f, 6f), 70),
         };
-
         Directory.CreateDirectory(ReviewDir);
-        var camGo = new GameObject("_review camera") { hideFlags = HideFlags.DontSave };
         var report = new StringBuilder();
-        report.AppendLine("# Liminal Doors stop 01 review renders");
-        report.AppendLine("Rendered " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss zzz") + " in Unity " + Application.unityVersion +
-                          " (" + SystemInfo.graphicsDeviceType + ", " + PlayerSettings.colorSpace + " colour).");
+        report.AppendLine("# Liminal Doors stop 01 (fresh start) review renders");
+        report.AppendLine("Rendered " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss zzz") + " in Unity " + Application.unityVersion + " (" + SystemInfo.graphicsDeviceType + ", " + PlayerSettings.colorSpace + " colour).");
         report.AppendLine("Scene: `" + ScenePath + "`");
         report.AppendLine();
+        var camGo = new GameObject("_review camera") { hideFlags = HideFlags.DontSave };
         try
         {
             var cam = camGo.AddComponent<Camera>();
-            cam.clearFlags = CameraClearFlags.Skybox;
-            cam.nearClipPlane = 0.05f; cam.farClipPlane = 2500f; cam.allowHDR = true; cam.allowMSAA = false;
-            AddPostLayer(camGo);
+            cam.clearFlags = CameraClearFlags.Skybox; cam.nearClipPlane = .05f; cam.farClipPlane = 2000f; cam.allowHDR = true; cam.allowMSAA = true;
             foreach (var s in shots)
             {
-                camGo.transform.position = s.pos;
-                camGo.transform.rotation = Quaternion.LookRotation(s.look - s.pos, Vector3.up);
+                camGo.transform.SetPositionAndRotation(s.pos, Quaternion.LookRotation(s.look - s.pos, Vector3.up));
                 cam.fieldOfView = s.fov;
                 var file = Path.Combine(ReviewDir, "stop-01-" + s.name + ".png");
                 RenderTo(cam, 1920, 1080, file);
@@ -244,60 +200,33 @@ public static class LiminalStop01
             }
         }
         finally { UnityEngine.Object.DestroyImmediate(camGo); }
-
         var renderers = UnityEngine.Object.FindObjectsOfType<Renderer>();
         report.AppendLine();
-        report.AppendLine("Renderers in scene: " + renderers.Length + " (" + renderers.Count(r => r.enabled && r.gameObject.activeInHierarchy) + " visible).");
+        report.AppendLine("Renderers: " + renderers.Length);
         foreach (var r in renderers.OrderBy(r => r.name))
-            report.AppendLine("- " + r.name + ": " + string.Join(", ", r.sharedMaterials.Select(m => m == null ? "MISSING MATERIAL" : m.name + " / " + m.shader.name)) +
-                              (r.gameObject.activeInHierarchy ? "" : " (inactive)"));
+            report.AppendLine("- " + r.name + ": " + string.Join(", ", r.sharedMaterials.Select(m => m == null ? "MISSING MATERIAL" : m.name + " / " + m.shader.name)));
         File.WriteAllText(Path.Combine(ReviewDir, "report.md"), report.ToString());
         Debug.Log("[Liminal] Stop 01 renders written to " + ReviewDir);
     }
 
     static void RenderTo(Camera cam, int w, int h, string file)
     {
-        var rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB) { antiAliasing = 1 };
+        var rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB) { antiAliasing = 8 };
         var prev = RenderTexture.active;
         try
         {
-            cam.targetTexture = rt;
-            cam.Render();
-            RenderTexture.active = rt;
+            cam.targetTexture = rt; cam.Render(); RenderTexture.active = rt;
             var tex = new Texture2D(w, h, TextureFormat.RGB24, false);
-            tex.ReadPixels(new Rect(0, 0, w, h), 0, 0);
-            tex.Apply();
+            tex.ReadPixels(new Rect(0, 0, w, h), 0, 0); tex.Apply();
             File.WriteAllBytes(file, tex.EncodeToPNG());
             UnityEngine.Object.DestroyImmediate(tex);
         }
-        finally
-        {
-            cam.targetTexture = null;
-            RenderTexture.active = prev;
-            rt.Release();
-            UnityEngine.Object.DestroyImmediate(rt);
-        }
+        finally { cam.targetTexture = null; RenderTexture.active = prev; rt.Release(); UnityEngine.Object.DestroyImmediate(rt); }
     }
 
     public static void BatchBuildAndRender()
     {
-        try
-        {
-            BuildScene();
-            RenderShots();
-            EditorApplication.Exit(0);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            EditorApplication.Exit(1);
-        }
-    }
-
-    static T Load<T>(string path) where T : UnityEngine.Object
-    {
-        var a = AssetDatabase.LoadAssetAtPath<T>(path);
-        if (a == null) throw new Exception("Missing asset: " + path);
-        return a;
+        try { Build(); Render(); EditorApplication.Exit(0); }
+        catch (Exception e) { Debug.LogException(e); EditorApplication.Exit(1); }
     }
 }
