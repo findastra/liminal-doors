@@ -41,7 +41,16 @@ namespace UnityUnicorn.AssetCreator
                 var post = Type.GetType("UnityEngine.Rendering.PostProcessing.PostProcessLayer, Unity.Postprocessing.Runtime");
                 // the world's own post-processing (e.g. bloom on the VRChat reference camera, which stays inactive)
                 var refLayer = post != null ? Resources.FindObjectsOfTypeAll(post).OfType<Component>().FirstOrDefault(x => x.gameObject.scene.IsValid()) : null;
-                if (refLayer != null) { var l = camGo.AddComponent(post); EditorUtility.CopySerialized(refLayer, l); post.GetField("volumeTrigger")?.SetValue(l, camGo.transform); }
+                if (refLayer != null)
+                {
+                    // set the layer up explicitly (copying it isn't enough): volume trigger, the world's volume layers, resources
+                    var l = camGo.AddComponent(post);
+                    post.GetField("volumeTrigger")?.SetValue(l, camGo.transform);
+                    var mask = post.GetField("volumeLayer"); if (mask != null) mask.SetValue(l, mask.GetValue(refLayer));
+                    var resType = Type.GetType("UnityEngine.Rendering.PostProcessing.PostProcessResources, Unity.Postprocessing.Runtime");
+                    var resPath = AssetDatabase.FindAssets("t:PostProcessResources").Select(AssetDatabase.GUIDToAssetPath).FirstOrDefault();
+                    if (resType != null && resPath != null) post.GetMethod("Init", new[] { resType })?.Invoke(l, new object[] { AssetDatabase.LoadAssetAtPath(resPath, resType) });
+                }
                 float d = rad / Mathf.Tan(cam.fieldOfView * .5f * Mathf.Deg2Rad) * 1.08f;
                 var c = b.center; var fwd = copy.transform.forward; var right = copy.transform.right;
                 var shots = new (string name, Vector3 dir)[]
