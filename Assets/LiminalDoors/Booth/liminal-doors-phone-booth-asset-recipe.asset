@@ -33,8 +33,10 @@ MonoBehaviour:
   license: own-work
   attribution: 
   publicOk: 1
-  changelog: '1.0.0: first version. Hot pink look, glowing sign, swirling gold and
-    pink sparkles, gold base glow.'
+  changelog: '1.0.0: first version. Hot pink candy paint (Unity Stable Candy Paint:
+    toon shade, sunset rim light, lacquer gloss, gold glitter flecks), butter-yellow
+    glowing sign, pink glass with sky reflections (Unity Stable Pink Glass), gold
+    and pink sparkles swirling up around it (Unity Stable Sparkle), gold base glow.'
   steps:
   - id: plan
     done: 0
@@ -81,25 +83,44 @@ MonoBehaviour:
     note: 
     doneAt: 
     doneBy: 
-    details: 'Booth body: Standard (glows)
+    details: 'Booth paint: lilToon
 
-      Booth sign: Standard (glows)
+      Booth glow: lilToon
 
-      Booth
-      glass: Standard (transparent) (glows)
+      Booth glass
+      (Mochie): Mochie/Glass (transparent)
 
-      Payphone face: Standard
+      Payphone face (lilToon): lilToon
 
       Booth
       sparkles: Legacy Shaders/Particles/Additive (transparent)'
   - id: textures
     done: 0
     version: 
-    status: pass
+    status: fail
     note: 
     doneAt: 
     doneBy: 
-    details: booth-sparkle 64x64, Compressed, mipmaps
+    details: 'booth-candy-matcap 256x256, Compressed, mipmaps
+
+      FAIL: Glass_Rain_Texturesheet
+      8192x8192 is over 1024 px
+
+      WARN: Glass_Rain_Texturesheet: import max
+      size 8192 (set 1024)
+
+      Glass_Rain_Texturesheet 8192x8192, Compressed,
+      mipmaps
+
+      Droplet Mask 1024x1024, CompressedHQ, mipmaps
+
+      WARN: SSR
+      Noise: uncompressed
+
+      SSR Noise 64x64, Uncompressed, mipmaps
+
+      booth-sparkle
+      64x64, Compressed, mipmaps'
   - id: colliders
     done: 0
     version: 
@@ -115,8 +136,7 @@ MonoBehaviour:
     note: 
     doneAt: 
     doneBy: 
-    details: '0 lights; glowing materials: Booth body, Booth sign, Booth glass; asset
-      is static'
+    details: '0 lights; glowing materials: none; asset is static'
   - id: effects
     done: 0
     version: 
@@ -135,8 +155,14 @@ MonoBehaviour:
     note: 
     doneAt: 
     doneBy: 
-    details: prefab Assets/LiminalDoors/Booth/Phone Booth.prefab; folder Assets/LiminalDoors/Booth;
-      13 project files in the package
+    details: 'requires lilToon 2.3.4 (lilToon) from the shaders-shop; not packed
+
+      requires
+      Mochie''s Unity Shaders (free) 1.77.1 (Mochie/Glass) from the shaders-shop;
+      not packed
+
+      prefab Assets/LiminalDoors/Booth/Phone Booth.prefab; folder
+      Assets/LiminalDoors/Booth; 18 project files in the package'
   - id: review
     done: 0
     version: 

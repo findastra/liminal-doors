@@ -87,8 +87,10 @@ namespace UnityUnicorn.AssetCreator
             var scan = Scan.Of(r);
             Directory.CreateDirectory(r.ExportDir);
             var package = r.ExportDir + "/" + r.id + "-v" + r.version + ".unitypackage";
-            // the prefab and everything it uses (not every file that happens to sit in the folder; the recipe stays out)
-            AssetDatabase.ExportPackage(new[] { r.PrefabPath }, package, ExportPackageOptions.IncludeDependencies);
+            // the prefab and everything it uses: not every file that happens to sit in the folder (the recipe stays out),
+            // and not the shaders the shaders-shop installs (listed under requires_shaders instead)
+            var files = AssetDatabase.GetDependencies(r.PrefabPath, true).Where(p => p.StartsWith("Assets/") && !ShopShaders.IsShopPath(p)).ToArray();
+            AssetDatabase.ExportPackage(files, package, ExportPackageOptions.Default);
             if (!File.Exists(package)) throw new Exception("Unity didn't write " + package);
 
             var m = new Manifest
@@ -104,6 +106,7 @@ namespace UnityUnicorn.AssetCreator
             m.stats.max_texture_px = scan.textures.Count > 0 ? scan.textures.Max(t => Mathf.Max(t.width, t.height)) : 0;
             m.stats.particles_max = scan.particles.Sum(p => p.main.maxParticles); m.stats.colliders = scan.colliders.Count;
             if (scan.hasVisual) m.stats.size_m = new[] { Round(scan.visual.size.x), Round(scan.visual.size.y), Round(scan.visual.size.z) };
+            m.requires_shaders = ShopShaders.For(scan.materials);
             m.files.package = new FileEntry { name = Path.GetFileName(package), bytes = new FileInfo(package).Length, sha256 = Sha(package) };
             if (Directory.Exists(r.PreviewDir))
                 foreach (var p in Directory.GetFiles(r.PreviewDir, "*.png").OrderBy(x => x))
@@ -174,6 +177,7 @@ namespace UnityUnicorn.AssetCreator
             public List<string> platforms;
             public string creator, source, license, attribution; public bool public_ok;
             public MadeIn made_in = new MadeIn(); public MadeWith made_with = new MadeWith(); public Stats stats = new Stats(); public Files files = new Files();
+            public List<ShopShaders.Required> requires_shaders = new List<ShopShaders.Required>();
             public List<ChecklistEntry> checklist = new List<ChecklistEntry>();
             public string changelog, exported_at;
         }

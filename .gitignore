@@ -77,3 +77,11 @@ crashlytics-build.properties
 /*.log
 /ClientSimStorage/
 __pycache__/
+
+# shaders-shop installs: restored from the shop (docs/shaders-in-world.json lists them), like the VPM packages
+/Assets/Mochie/
+/Assets/Mochie.meta
+# Poiyomi editor preferences
+/Poi/
+# unity-asset-creator exports (published to findastra/unity-assets-library)
+/Exports/

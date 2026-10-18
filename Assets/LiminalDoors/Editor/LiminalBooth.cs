@@ -5,8 +5,12 @@
 // Shape: the six booth meshes taken from Astra's Infinite Pole. Everything else here is new: materials, the sparkle
 // texture (drawn by this script), the two particle systems and the prefab.
 //
-// Menu: LiminalDoors/Booth/Apply look       -> sets the booth materials to the chosen look (overwrites hand edits)
-//       LiminalDoors/Booth/Build prefab     -> Assets/LiminalDoors/Booth/Phone Booth.prefab + its asset recipe
+// Astra, later on 2026-10-18: "I think it all looks dull ... make our own shaders or something." So the booth now wears
+// our own Unity Stable shaders from the shaders-shop: Candy Paint (toon shade, sunset rim light, lacquer gloss, sky in the
+// clear coat, gold glitter flecks), Pink Glass (tinted, sky reflections, soft edge) and Sparkle (HDR glints for the bloom).
+//
+// Menu: LiminalDoors/Booth/Apply shader look (Unity Stable) -> sets the booth materials (overwrites hand edits)
+//       LiminalDoors/Booth/Build prefab                     -> Assets/LiminalDoors/Booth/Phone Booth.prefab + its asset recipe
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -25,43 +29,64 @@ public static class LiminalBooth
 
     // Astra, 2026-10-18 (asset-creator step 5): merge 7 materials to 5. The payphone housing wears the booth's hot pink and
     // the payphone lights share the sign's butter-yellow glow; the prefab uses body, sign (glow), glass, payphone face, sparkles.
-    static string MaterialFor(string part) => part == "Payphone chrome" ? "Booth body" : part == "Payphone lights" ? "Booth sign" : part;
+    static string MaterialFor(string part) =>
+        part == "Booth body" || part == "Payphone chrome" ? "Booth paint" :
+        part == "Booth sign" || part == "Payphone lights" ? "Booth glow" :
+        part == "Booth glass" ? "Booth glass (pink)" : "Payphone face (candy)";
 
-    // the look: albedo, metallic, smoothness, HDR emission (black = none)
-    static void Look(string name, Color albedo, float metal, float smooth, Color emission)
+    static Material Mat(string name, string shader)
     {
-        var m = AssetDatabase.LoadAssetAtPath<Material>(Dir + "Materials/" + name + ".mat");
-        if (m == null) throw new System.Exception("Missing material " + name);
-        bool glass = m.GetFloat("_Mode") >= 2;
-        m.color = albedo; m.SetFloat("_Metallic", metal); m.SetFloat("_Glossiness", smooth); m.enableInstancing = true;
-        if (emission.maxColorComponent > 0)
-        {
-            m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", emission);
-            m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
-        }
-        else { m.DisableKeyword("_EMISSION"); m.SetColor("_EmissionColor", Color.black); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack; }
-        if (glass) m.renderQueue = (int)RenderQueue.Transparent;
-        EditorUtility.SetDirty(m);
+        var path = Dir + "Materials/" + name + ".mat";
+        var sh = Shader.Find(shader); if (sh == null) throw new System.Exception("Shader '" + shader + "' isn't in this world (shaders-shop)");
+        var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (m == null) { m = new Material(sh) { name = name }; AssetDatabase.CreateAsset(m, path); }
+        else if (m.shader != sh) m.shader = sh;
+        m.enableInstancing = true;
+        return m;
     }
 
-    [MenuItem("LiminalDoors/Booth/Apply look")]
-    public static void ApplyLook()
+    // The booth in the Unity Stable shaders (our own; lilToon and Poiyomi only switch features on through their own
+    // inspectors, so they can't be set up from a script). Candy Paint: hot pink lacquer with a warm sunset rim, gloss,
+    // sky in the clear coat and gold glitter flecks. Pink Glass: tinted glass with sky reflections and a soft edge.
+    [MenuItem("LiminalDoors/Booth/Apply shader look (Unity Stable)")]
+    public static void ApplyShaderLook()
     {
         var butter = new Color(1f, .86f, .46f);
-        Look("Booth body", new Color(1f, .16f, .52f), 0f, .55f, new Color(.22f, .02f, .1f));            // hot pink, a little self-lit in the dusk
-        Look("Booth sign", new Color(1f, .93f, .62f), 0f, .3f, butter * 2.4f);                           // butter-yellow glow (HDR: the bloom picks it up)
-        Look("Booth glass", new Color(1f, .62f, .78f, .26f), 0f, .95f, new Color(.32f, .07f, .17f));     // warm pink-lit glass
-        Look("Payphone chrome", new Color(1f, .66f, .8f), .85f, .82f, Color.black);                       // pink chrome
-        Look("Payphone face", new Color(.2f, .08f, .15f), 0f, .45f, Color.black);                         // dark plum
-        Look("Payphone lights", new Color(1f, .9f, .6f), 0f, .3f, butter * 1.7f);
+        var paint = Mat("Booth paint", "Unity Stable/Candy Paint");
+        paint.SetColor("_Color", new Color(1f, .2f, .56f)); paint.SetColor("_ShadeColor", new Color(.62f, .24f, .58f));
+        paint.SetFloat("_ShadeStep", .42f); paint.SetFloat("_ShadeSoftness", .22f);
+        paint.SetColor("_RimColor", new Color(1.4f, .95f, .7f)); paint.SetFloat("_RimPower", 3f);
+        paint.SetColor("_GlossColor", new Color(1.6f, 1.5f, 1.45f)); paint.SetFloat("_GlossPower", 140f); paint.SetFloat("_CoatStrength", .35f);
+        paint.SetColor("_GlitterColor", new Color(2.6f, 2.1f, 1.1f)); paint.SetFloat("_GlitterDensity", 55f); paint.SetFloat("_GlitterAmount", .4f);
+        paint.SetFloat("_GlitterSharpness", 60f); paint.SetFloat("_GlitterTwinkle", 1.2f); paint.SetColor("_EmissionColor", new Color(.06f, .005f, .03f));
+        EditorUtility.SetDirty(paint);
+
+        var glow = Mat("Booth glow", "Unity Stable/Candy Paint");   // butter-yellow sign and payphone lights
+        glow.SetColor("_Color", new Color(1f, .93f, .66f)); glow.SetColor("_EmissionColor", butter * 2.4f);
+        glow.SetFloat("_GlitterAmount", 0f); glow.SetFloat("_CoatStrength", .1f);
+        EditorUtility.SetDirty(glow);
+
+        var face = Mat("Payphone face (candy)", "Unity Stable/Candy Paint");   // dark plum keypad with gloss
+        face.SetColor("_Color", new Color(.22f, .09f, .17f)); face.SetColor("_ShadeColor", new Color(.6f, .5f, .6f));
+        face.SetFloat("_GlitterAmount", 0f); face.SetColor("_RimColor", new Color(.6f, .35f, .5f)); face.SetFloat("_CoatStrength", .5f);
+        EditorUtility.SetDirty(face);
+
+        var glass = Mat("Booth glass (pink)", "Unity Stable/Pink Glass");
+        glass.SetColor("_Tint", new Color(1f, .72f, .84f, .16f)); glass.SetFloat("_Reflection", .9f); glass.SetFloat("_ReflectionBlur", .5f);
+        glass.SetColor("_EdgeGlow", new Color(1.2f, .5f, .8f)); glass.SetFloat("_EdgePower", 2.5f);
+        EditorUtility.SetDirty(glass);
+
+        // test materials from the lilToon / Mochie attempt, never shipped
+        foreach (var old in new[] { "Booth glass (Mochie)", "Payphone face (lilToon)" }) AssetDatabase.DeleteAsset(Dir + "Materials/" + old + ".mat");
+        AssetDatabase.DeleteAsset(Dir + "Textures/booth-candy-matcap.png");
         AssetDatabase.SaveAssets();
-        Debug.Log("[Liminal] booth look applied");
+        Debug.Log("[Liminal] booth shader look applied (Unity Stable)");
     }
 
     [MenuItem("LiminalDoors/Booth/Build prefab")]
     public static void BuildPrefab()
     {
-        ApplyLook();
+        ApplyShaderLook();
         EnsureSparkleTexture();
         var sparkle = EnsureSparkleMaterial();
 
@@ -184,11 +209,12 @@ public static class LiminalBooth
         var m = AssetDatabase.LoadAssetAtPath<Material>(SparkleMat);
         if (m == null)
         {
-            m = new Material(Shader.Find("Legacy Shaders/Particles/Additive")) { name = "Booth sparkles" };
+            m = new Material(Shader.Find("Unity Stable/Sparkle")) { name = "Booth sparkles" };
             AssetDatabase.CreateAsset(m, SparkleMat);
         }
+        m.shader = Shader.Find("Unity Stable/Sparkle");
         m.SetTexture("_MainTex", AssetDatabase.LoadAssetAtPath<Texture2D>(SparkleTex));
-        m.SetColor("_TintColor", new Color(.9f, .84f, .78f, .8f));   // the shader doubles it, so the brightest sparkles reach the bloom
+        m.SetFloat("_Brightness", 2.6f);   // HDR: the brightest sparkles pass the bloom threshold
         m.enableInstancing = true;
         EditorUtility.SetDirty(m);
         return m;
@@ -200,6 +226,7 @@ public static class LiminalBooth
         if (r == null) { r = ScriptableObject.CreateInstance<AssetRecipe>(); NewRecipe(r); AssetDatabase.CreateAsset(r, RecipePath); }
         r.prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
         r.maxMaterials = 5; r.maxParticles = 400;   // Astra, 2026-10-18: merge to 5 materials; more and brighter sparkles (300 + 60 base glow)
+        r.changelog = "1.0.0: first version. Hot pink candy paint (Unity Stable Candy Paint: toon shade, sunset rim light, lacquer gloss, gold glitter flecks), butter-yellow glowing sign, pink glass with sky reflections (Unity Stable Pink Glass), gold and pink sparkles swirling up around it (Unity Stable Sparkle), gold base glow.";
         EditorUtility.SetDirty(r); AssetDatabase.SaveAssets();
     }
 

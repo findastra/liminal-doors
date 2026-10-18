@@ -266,7 +266,8 @@ namespace UnityUnicorn.AssetCreator
                     }
                     if (missing > 0) res.Fail(missing + " missing scripts");
                     var outside = AssetDatabase.GetDependencies(s.prefabPath, true).Where(p => p.StartsWith("Assets/") && !p.StartsWith(s.folder + "/") && p != s.prefabPath).ToList();
-                    foreach (var p in outside) res.Warn("depends on " + p + " outside " + s.folder);
+                    foreach (var p in outside.Where(p => !ShopShaders.IsShopPath(p))) res.Warn("depends on " + p + " outside " + s.folder);
+                    foreach (var q in ShopShaders.For(s.materials)) res.Info("requires " + q.name + " " + q.version + " (" + q.shader + ") from the shaders-shop; not packed");
                     res.Info("prefab " + s.prefabPath + "; folder " + s.folder + "; " + AssetDatabase.GetDependencies(s.prefabPath, true).Count(p => p.StartsWith("Assets/")) + " project files in the package");
                     return res;
                 } },
