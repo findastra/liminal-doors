@@ -85,3 +85,5 @@ __pycache__/
 /Poi/
 # unity-asset-creator exports (published to findastra/unity-assets-library)
 /Exports/
+# ThryEditor (Poiyomi) settings and caches
+/Thry/
