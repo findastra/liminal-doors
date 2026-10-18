@@ -1,6 +1,6 @@
 # Handoff: Claude, 2026-10-18 (stop 01 hatched in Unity)
 
-status: open (stop 01 walkable, phone wired, desktop test passed; fox, doors and the phone's purpose open)
+status: open (stop 01 walkable, phone wired as a voice link, desktop test passed; fox and doors open)
 from: Claude Opus 5.5, 2026-10-18
 for: any agent continuing Liminal Doors
 
@@ -39,7 +39,7 @@ Done in a side session, driving the open editor only through `Review/agent-queue
 - **Phone** (`Assets/LiminalDoors/EditorUdon/Editor/LiminalStop01Phone.cs`, menu *LiminalDoors/Stop 01/Wire phone*).
   - `AstraPhoneBooth` / `AstraPhoneLine` (`.cs`, U# program `.asset` and compiled programs) are copied from Infinite Pole with their GUIDs into `Assets/Astra/Scripts/`.
   - The voice zone has AstraPhoneBooth with booth 0, linked to a new "Phone line" object with hub 0. UdonSharp compiled with no errors.
-  - With one booth nobody is on the other end yet. **Ask Astra what the "quiet telephone interaction" should be.**
+  - With one booth nobody is on the other end yet. **Astra (2026-10-18): keep the Infinite Pole voice link as the phone for now; the interaction gets designed when more stops have booths.**
 - **Desktop test** (`LiminalDesktopTest.cs`; queue verb `desktop-test`; also menu *LiminalDoors/Desktop test*). Build & Test ran without an SDK sign-in.
   - New bundle `scene-standalonewindows64-01 fox - pink booth-f473fbb0-….vrcw` (4.1 MB, 04:09).
   - `output_log_2026-10-18_04-10-01.txt` has that bundle in `--url=`, "Successfully joined room" and "Finished entering world." (04:10:11).
@@ -50,7 +50,7 @@ Done in a side session, driving the open editor only through `Review/agent-queue
 
 ## Not done / open
 
-1. **Phone purpose:** wired the Infinite Pole way (linked voices between booths), but there is only one booth. The "quiet telephone interaction" needs Astra's idea.
+1. **Phone:** decided by Astra on 2026-10-18. Keep the Infinite Pole voice link (linked voices between booths) for now. Design the "quiet telephone interaction" once more stops have booths; each new booth joins the same Phone line with the next booth number.
 2. **Fox:** no glass fox yet. The idea inbox puts the animals in a later pass (glass-animal tool, Unity Unicorn PR #3 not merged).
 3. **Doors:** no random forward doors and no return door yet (core traversal rule in the idea inbox).
 4. Not tested: walking in the VRChat client, headset and upload. The Scene view has no bloom, because the only camera with bloom is the inactive VRChat reference camera.
