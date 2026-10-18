@@ -7,6 +7,7 @@ The plates were made with OpenAI Codex's built-in image generation on 2026-10-15
 - Floor 37 is the wide top band of plate 7 (1536 x 476).
 - `floors/extras/`: plate 7's two lower panels, references rather than floors: A, a glass wolf (glass-animal look), and B, a bubble chair.
 - `floors-contact-sheet-20261018.png`: all 37 at a glance.
+- `liminal-doors-redline-sheet-20261018.jpg`: the same layout at full size (3098 x 4385 px, floor 37 across the bottom) for redlines in Procreate. The Concept Atlas's "Export all 37 for redlines" button saves this file. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.
 
 To change a floor, replace its file with your edit. A new date in the name (for example `-20261019`) keeps the original next to it.
 
