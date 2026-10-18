@@ -1,0 +1,11 @@
+{
+  "schema": "unity-unicorn.tool-catalog/v1",
+  "tools": [
+    {
+      "id": "world-spawn-tool",
+      "name": "world-spawn-tool-20261018.json",
+      "kind": "Generator",
+      "description": "Spawn a new VRChat world. First things first: a public GitHub repo, then a link with a cute one-line summary in the Findastra profile README (by pull request). Then a Unity project skeleton copied from a working reference world: packages and the embedded VRChat SDK, project settings renamed for the new world, the agent queue and a README. Preview by default; never writes into an existing folder or merges anything."
+    }
+  ]
+}

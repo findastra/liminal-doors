@@ -88,3 +88,6 @@ crashlytics-build.properties
 *.pem
 
 /ClientSimStorage/
+
+# Python caches (Tools/)
+__pycache__/

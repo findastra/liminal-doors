@@ -25,3 +25,11 @@ under the same sunset sky and Pinkscape bloom. Those assets are copied from Infi
 - Agents drive an open editor through `Review/agent-queue/*.cmd` (`status`, `refresh`, `save`, `menu LiminalDoors/...`),
   the same as in Infinite Pole. Never relaunch or batchmode Unity while the project is open.
 - Uploads, releases and `main` change only with Astra's OK.
+
+## Tools born here
+
+- [`Tools/world-spawn-tool`](Tools/world-spawn-tool/world-spawn-tool-20261018.md): spawns Astra's next VRChat world.
+  First the public repo and the Findastra profile link, then the Unity project skeleton. It's a Unity Unicorn tool
+  and moves to [findastra/unity-unicorn](https://github.com/findastra/unity-unicorn) once it has enough in it.
+- [`Tools/infinite-pole-export`](Tools/infinite-pole-export): copy assets from Astra's Infinite Pole with their GUIDs,
+  and turn a scene subtree into a prefab (read only on the source project).
