@@ -35,7 +35,7 @@ public static class LiminalDoorsTravel
     const string ScenePath = "Assets/LiminalDoors/Scenes/Liminal Doors.unity";
     const string TravelName = "World - door travel";
     const string ScriptDir = "Assets/LiminalDoors/Scripts";
-    const string StartSky = "Assets/LiminalDoors/Materials/Plain Sky.mat";   // stop 01's sky (LiminalStop01)
+    const string StartSky = "Assets/LiminalDoors/Materials/Plain Sky.mat";   // stop 01's sky only if the scene has none (see SkyFor)
     const string Out = "Review/world-doors";
     const float SlotGap = 2600f;   // stops must be farther apart than the camera's far clip (2500 m)
 
@@ -212,6 +212,7 @@ public static class LiminalDoorsTravel
     }
 
     static int passed, failed;
+    static Material startSky;   // the scene's sky as play mode starts, which is stop 01's
 
     static void Tick()
     {
@@ -234,7 +235,7 @@ public static class LiminalDoorsTravel
         switch (step)
         {
             case 0:
-                passed = failed = 0;
+                passed = failed = 0; startSky = RenderSettings.skybox;
                 Check("starts in the pink booth with only stop 01 switched on", s1.activeSelf && stops.Skip(1).All(x => !x.activeSelf) && Near(me.GetPosition(), Pt(s1, "Arrival point").position));
                 Enter(Trig(s1, "Forward door trigger")); break;
             case 1:
@@ -243,7 +244,7 @@ public static class LiminalDoorsTravel
                 Enter(Trig(s2, "Arrival door trigger")); break;
             case 2:
                 Check("stop 02's arrival door takes you back into the booth", s1.activeSelf && !s2.activeSelf && Near(me.GetPosition(), Pt(s1, "Return point").position));
-                Check("the sky is stop 01's again", RenderSettings.skybox != null && RenderSettings.skybox == SkyFor(s1));
+                Check("the sky is stop 01's again", RenderSettings.skybox != null && RenderSettings.skybox == startSky);
                 Enter(Trig(s1, "Forward door trigger")); break;
             case 3:
                 Check("out through the booth door again: stop 02", s2.activeSelf && Near(me.GetPosition(), Pt(s2, "Arrival point").position));
@@ -298,7 +299,15 @@ public static class LiminalDoorsTravel
 
     static Material SkyFor(GameObject stop)
     {
-        if (stop.name.StartsWith("Stop 01")) return AssetDatabase.LoadAssetAtPath<Material>(StartSky);
+        if (stop.name.StartsWith("Stop 01"))
+        {
+            // stop 01 is the start, so its sky is the scene's own (the booth session's sunset sky, 2026-10-18), read when
+            // the doors are wired; Stop 01's Build rewires after setting it. Another stop's sky there means a render or a
+            // test left it switched, so fall back.
+            var s = RenderSettings.skybox;
+            if (s != null && (!s.name.StartsWith("Stop ") || s.name.StartsWith("Stop 01"))) return s;
+            return AssetDatabase.LoadAssetAtPath<Material>(StartSky);
+        }
         return AssetDatabase.LoadAssetAtPath<Material>("Assets/LiminalDoors/Materials/Stop " + stop.name.Substring(5, 2) + " Sky.mat");
     }
 
