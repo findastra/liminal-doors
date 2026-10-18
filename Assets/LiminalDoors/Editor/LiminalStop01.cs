@@ -25,6 +25,7 @@ public static class LiminalStop01
 {
     public const string ScenePath = "Assets/LiminalDoors/Scenes/Liminal Doors.unity";
     public const string StopName = "Stop 01 - Fox - Pink Booth";
+    const string BoothPrefab = "Assets/LiminalDoors/Booth/Phone Booth.prefab";   // Astra's booth, when it's made
     const string MeshDir = "Assets/LiminalDoors/Booth/Meshes/";
     const string MatDir = "Assets/LiminalDoors/Booth/Materials/";
     const string SkyPath = "Assets/LiminalDoors/Materials/Plain Sky.mat";
@@ -59,29 +60,46 @@ public static class LiminalStop01
         var stop = new GameObject(StopName);
         SceneManager.MoveGameObjectToScene(stop, scene);
 
-        // the booth: every part shares the meshes' own origin (floor centre); the door is on local +Z
-        var booth = new GameObject("Phone booth");
-        booth.transform.SetParent(stop.transform, false);
-        foreach (var p in Parts)
+        // the booth: Astra's finished booth prefab when it exists (the booth session, 2026-10-18), otherwise the six plain
+        // meshes. Either way its origin is the floor centre and the door is on local +Z, which the spawn and the door
+        // anchors rely on; the instance is always named "Phone booth".
+        GameObject booth;
+        var boothPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BoothPrefab);
+        if (boothPrefab != null)
         {
-            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(MeshDir + p.mesh + ".asset");
-            if (mesh == null) throw new Exception("Missing booth mesh " + MeshDir + p.mesh + ".asset");
-            var go = new GameObject(p.mesh);
-            go.transform.SetParent(booth.transform, false);
-            go.AddComponent<MeshFilter>().sharedMesh = mesh;
-            var r = go.AddComponent<MeshRenderer>();
-            r.sharedMaterial = Material(p.mat, p.color, p.metal, p.smooth, p.glass);
-            if (p.glass) r.shadowCastingMode = ShadowCastingMode.Off;
+            booth = (GameObject)PrefabUtility.InstantiatePrefab(boothPrefab, scene);
+            booth.name = "Phone booth";
+            booth.transform.SetParent(stop.transform, false);
         }
-        var floor = new GameObject("Booth floor");
-        floor.transform.SetParent(booth.transform, false);
-        var fc = floor.AddComponent<BoxCollider>(); fc.center = new Vector3(0, .02f, 0); fc.size = new Vector3(1.3f, .04f, 1.3f);
+        else
+        {
+            booth = new GameObject("Phone booth");
+            booth.transform.SetParent(stop.transform, false);
+            foreach (var p in Parts)
+            {
+                var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(MeshDir + p.mesh + ".asset");
+                if (mesh == null) throw new Exception("Missing booth mesh " + MeshDir + p.mesh + ".asset");
+                var go = new GameObject(p.mesh);
+                go.transform.SetParent(booth.transform, false);
+                go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var r = go.AddComponent<MeshRenderer>();
+                r.sharedMaterial = Material(p.mat, p.color, p.metal, p.smooth, p.glass);
+                if (p.glass) r.shadowCastingMode = ShadowCastingMode.Off;
+            }
+        }
+        if (booth.transform.Find("Booth floor") == null)   // the prefab may bring its own floor
+        {
+            var floor = new GameObject("Booth floor");
+            floor.transform.SetParent(booth.transform, false);
+            var fc = floor.AddComponent<BoxCollider>(); fc.center = new Vector3(0, .02f, 0); fc.size = new Vector3(1.3f, .04f, 1.3f);
+        }
 
         var fox = new GameObject("Fox hiding spot (glass fox: later)");
         fox.transform.SetParent(stop.transform, false);
         fox.transform.localPosition = new Vector3(.5f, .06f, -.95f);
 
         DoorAnchors(stop.transform, booth.transform);
+        bool rewire = scene.GetRootGameObjects().Any(g => g.name == "World - door travel");
 
         // spawn: standing on the booth floor, looking out through the door
         var world = scene.GetRootGameObjects().Select(g => g.GetComponentsInChildren<Component>(true).FirstOrDefault(c => c != null && c.GetType().Name == "VRCSceneDescriptor")).FirstOrDefault(c => c != null);
@@ -93,6 +111,8 @@ public static class LiminalStop01
         scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
         EditorBuildSettings.scenes = scenes.ToArray();
         Debug.Log("[Liminal] Stop 01 built in " + ScenePath);
+        // a rebuilt stop 01 loses its door's wiring with the old root; wire the doors again when the world has them
+        if (rewire) EditorApplication.ExecuteMenuItem("LiminalDoors/World/Wire doors");
     }
 
     // Door system anchors (added by the doors session, 2026-10-18; wired by LiminalDoors/World/Wire doors). Astra:
