@@ -3,8 +3,12 @@
 // fine drift of gold light." The booth, its cloud mound and sparkles, the cloud sea, the sky and the bloom are
 // Infinite Pole's own assets, copied with their GUIDs (prefabs extracted from AstrasInfinitePole.unity, read only).
 // New here: the gold door drift, the empty fox hiding spot (the glass fox is a later pass) and the VRChat spawn.
+// 2026-10-18 (doors): this scene is now the whole world ("Liminal Doors.unity"; it was "01 Fox - Pink Booth.unity").
+// Stop 01 is the start: you spawn in the booth, and stepping out through the booth door (the gold light) sends you to a
+// random stop (Astra). VRCWorld and the reference camera sit at the scene root so switching stops never hides them.
+// Build scene writes a fresh world with stop 01 only; LiminalDoors/World/Build all adds the rest in order.
 //
-// Menu: LiminalDoors/Stop 01/Build scene  -> (re)writes Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity
+// Menu: LiminalDoors/Stop 01/Build scene  -> (re)writes Assets/LiminalDoors/Scenes/Liminal Doors.unity
 //       LiminalDoors/Stop 01/Render review shots -> Review/stop-01-render/*.png + report.md
 // Batch (new project only, never on an open editor): -executeMethod LiminalStop01.BatchBuildAndRender
 using System;
@@ -19,7 +23,8 @@ using UnityEngine.SceneManagement;
 
 public static class LiminalStop01
 {
-    public const string ScenePath = "Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity";
+    public const string ScenePath = "Assets/LiminalDoors/Scenes/Liminal Doors.unity";
+    const string OldScenePath = "Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity";
     const string BoothPrefab = "Assets/LiminalDoors/Prefabs/Pink Booth (from Infinite Pole).prefab";
     const string SeaPrefab = "Assets/LiminalDoors/Prefabs/Pink Cloud Sea (from Infinite Pole).prefab";
     const string SkyMaterial = "Assets/Astra/Materials/Backdrop/Pink Cloud Sea Sky.mat";
@@ -34,6 +39,14 @@ public static class LiminalStop01
         var sea = Load<GameObject>(SeaPrefab);
         var sky = Load<Material>(SkyMaterial);
         var bloom = Load<PostProcessProfile>(BloomProfile);
+
+        // one-time rename of the stop 01 scene to the world scene (MoveAsset keeps its GUID)
+        if (File.Exists(OldScenePath) && !File.Exists(ScenePath))
+        {
+            if (SceneManager.GetActiveScene().path == OldScenePath) EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var err = AssetDatabase.MoveAsset(OldScenePath, ScenePath);
+            if (!string.IsNullOrEmpty(err)) throw new Exception("Could not rename the scene: " + err);
+        }
 
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var stop = new GameObject("Stop 01 - Fox - Pink Booth");
@@ -69,15 +82,30 @@ public static class LiminalStop01
         volume.priority = 10;
         volume.weight = 1;
 
+        // Door anchors (wired by LiminalDoors/World/Wire doors). You arrive and come back inside the booth, where you
+        // spawn; the forward door is a trigger just outside the booth's door, inside the gold light, so stepping out
+        // sends you on. The spawn is 0.8 m from it, well clear.
+        var arrive = new GameObject("Arrival point");
+        arrive.transform.SetParent(stop.transform, false);
+        arrive.transform.SetPositionAndRotation(frame.TransformPoint(0, 0.05f, 0.05f), frame.rotation);
+        var back = new GameObject("Return point");
+        back.transform.SetParent(stop.transform, false);
+        back.transform.SetPositionAndRotation(frame.TransformPoint(0, 0.05f, 0.05f), frame.rotation);
+        var door = new GameObject("Forward door trigger");
+        door.transform.SetParent(stop.transform, false);
+        door.transform.SetPositionAndRotation(frame.TransformPoint(0, 1.05f, 1.0f), frame.rotation);
+        var doorBox = door.AddComponent<BoxCollider>();
+        doorBox.isTrigger = true;
+        doorBox.size = new Vector3(1.2f, 2.2f, 0.45f);
+
         // VRChat reference camera (kept inactive, as the SDK expects) carries the post-processing layer.
         var refCam = new GameObject("VRChat reference camera");
-        refCam.transform.SetParent(stop.transform, false);
         var cam = refCam.AddComponent<Camera>();
         cam.nearClipPlane = 0.05f; cam.farClipPlane = 2500f; cam.allowHDR = true;
         AddPostLayer(refCam);
         refCam.SetActive(false);
 
-        AddVrcWorld(stop.transform, frame, cam);
+        AddVrcWorld(null, frame, cam);
 
         RenderSettings.skybox = sky;
         RenderSettings.fog = false;
@@ -87,9 +115,7 @@ public static class LiminalStop01
 
         Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
         EditorSceneManager.SaveScene(scene, ScenePath);
-        var scenes = EditorBuildSettings.scenes.Where(s => s.path != ScenePath).ToList();
-        scenes.Insert(0, new EditorBuildSettingsScene(ScenePath, true));
-        EditorBuildSettings.scenes = scenes.ToArray();
+        EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };   // one world, one scene
         Debug.Log("[Liminal] Stop 01 scene written: " + ScenePath);
     }
 
@@ -146,7 +172,7 @@ public static class LiminalStop01
         r.receiveShadows = false;
     }
 
-    static void AddPostLayer(GameObject camGo)
+    internal static void AddPostLayer(GameObject camGo)
     {
         var layer = camGo.AddComponent<PostProcessLayer>();
         layer.volumeTrigger = camGo.transform;
@@ -255,7 +281,7 @@ public static class LiminalStop01
         Debug.Log("[Liminal] Stop 01 renders written to " + ReviewDir);
     }
 
-    static void RenderTo(Camera cam, int w, int h, string file)
+    internal static void RenderTo(Camera cam, int w, int h, string file)
     {
         var rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB) { antiAliasing = 1 };
         var prev = RenderTexture.active;

@@ -18,7 +18,7 @@ using UnityEngine.SceneManagement;
 
 public static class LiminalStop01Phone
 {
-    const string ScenePath = "Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity";
+    const string ScenePath = "Assets/LiminalDoors/Scenes/Liminal Doors.unity";   // the world scene (was 01 Fox - Pink Booth)
     const string StopName = "Stop 01 - Fox - Pink Booth";
     const string ZonePath = "Pink booth (from Astra's Infinite Pole)/Banner booth/Phone booth voice zone";
     const string LineName = "Phone line";

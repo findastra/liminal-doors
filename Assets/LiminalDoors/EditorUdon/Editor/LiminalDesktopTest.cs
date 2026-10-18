@@ -17,7 +17,7 @@ using VRC.SDK3.Editor;
 
 public static class LiminalDesktopTest
 {
-    const string ScenePath = "Assets/LiminalDoors/Scenes/01 Fox - Pink Booth.unity";
+    const string ScenePath = "Assets/LiminalDoors/Scenes/Liminal Doors.unity";   // the world scene (was 01 Fox - Pink Booth)
     const string Status = "Review/desktop-test-status.txt";
     static double deadline;
 
