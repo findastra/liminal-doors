@@ -1,0 +1,35 @@
+{
+  "schema": "liminal-doors.tools-by-floor/v1",
+  "updated": "2026-10-19",
+  "about": "Which tools made which Liminal Doors floor. The Collection page's T button reads this. Astra (2026-10-19): track which tools were used in which worlds and which ones get better, so the finished toolkit can be packaged. Paths link to the newest version on GitHub; when PR #2 is merged, change ref to main.",
+  "repo": "findastra/liminal-doors",
+  "ref": "claude/fresh-start-20261018",
+  "tools": {
+    "codex-image": {"name": "OpenAI Codex image generation", "does": "Drew the seven concept plates the floors come from (2026-10-15).", "by": "OpenAI Codex", "url": null},
+    "floor-cutter": {"name": "Floor cutter", "does": "Cut the seven plates into one picture per floor along their divider lines.", "path": "concept-art/tools/cut-floors.ps1"},
+    "redline-sheet": {"name": "Redline sheet maker", "does": "Lays every floor out on one numbered sheet for redlines in Procreate.", "path": "concept-art/tools/redline-sheet.ps1"},
+    "contact-sheet": {"name": "Contact sheet maker", "does": "All floors at a glance, six across.", "path": "concept-art/tools/contact-sheet.ps1"},
+    "web-pictures": {"name": "Web picture maker", "does": "Light JPEG copies of the floors for the Collection page.", "path": "concept-art/tools/floors-to-jpg.ps1"},
+    "stop-01-builder": {"name": "Stop 01 builder", "does": "Builds Pinkscape: the booth, its floor and the spawn inside it.", "path": "Assets/LiminalDoors/Editor/LiminalStop01.cs"},
+    "stop-01-sky": {"name": "Pinkscape sky and cloud sea", "does": "Sunset sky, the sea of pink clouds and the cloud puffs.", "path": "Assets/LiminalDoors/Editor/LiminalStop01Sky.cs"},
+    "booth-builder": {"name": "Phone booth builder", "does": "Puts the K6 kiosk together in Unity: baked maps, glass, the pink phone panel.", "path": "Assets/LiminalDoors/Editor/LiminalBooth.cs"},
+    "blender-booth": {"name": "Blender phone booth", "does": "Models the K6 kiosk and payphone by hand-made rules, with baked wear.", "path": "Tools/Blender/make_phone_booth.py"},
+    "asset-creator": {"name": "Unity Asset Creator", "does": "The step-by-step checklist the booth was made with.", "path": "Assets/UnityAssetCreator/Editor", "tree": true},
+    "unity-stable": {"name": "Unity Stable shaders", "does": "Our own shaders: Handmade PBR, Pink Glass, Sparkle, Sunset Sky, Cloud Sea, Cloud Puff, Candy Paint.", "path": "Assets/ShadersShop/UnityStable", "tree": true},
+    "stop-02-builder": {"name": "Stop 02 builder", "does": "Builds Faraway Field: the ground, grass, sky and doors.", "path": "Assets/LiminalDoors/Editor/LiminalStop02.cs"},
+    "field-shaders": {"name": "Faraway Field shaders", "does": "Field Grass, Field Ground, Evening Sky, Soft Lit and Soft Glow.", "path": "Assets/LiminalDoors/Shaders", "tree": true},
+    "door-system": {"name": "Door system", "does": "Forward doors go somewhere random; the door you arrive by keeps the real way back.", "path": "Assets/LiminalDoors/Scripts/LiminalTraveler.cs"},
+    "door-wiring": {"name": "Door wiring and trip test", "does": "Connects every door and walks a test trip through them.", "path": "Assets/LiminalDoors/EditorUdon/Editor/LiminalDoorsTravel.cs"},
+    "world-glow": {"name": "Liminal Glow", "does": "Our own bloom, so doors and motes glow.", "path": "Assets/LiminalDoors/Editor/LiminalWorldGlow.cs"},
+    "desktop-test": {"name": "Desktop test", "does": "Runs the VRChat SDK's Build & Test without uploading.", "path": "Assets/LiminalDoors/EditorUdon/Editor/LiminalDesktopTest.cs"},
+    "agent-queue": {"name": "Agent queue", "does": "Lets Claude drive the open Unity editor safely.", "path": "Assets/LiminalDoors/Editor/LiminalAgentQueue.cs"},
+    "shaders-shop": {"name": "Shaders Shop", "does": "Installs and keeps a ledger of the world's shaders.", "path": "Assets/ShadersShop/Editor", "tree": true},
+    "world-spawn-tool": {"name": "world-spawn-tool", "does": "Unity Unicorn's first steps for a new world: the public repo and the profile link.", "repo": "findastra/unity-unicorn", "ref": "main", "path": "scripts/world-spawn-tool", "tree": true}
+  },
+  "every_floor": ["codex-image", "floor-cutter", "redline-sheet", "contact-sheet", "web-pictures"],
+  "whole_world": ["door-system", "door-wiring", "world-glow", "desktop-test", "agent-queue", "shaders-shop", "world-spawn-tool"],
+  "floors": {
+    "1": ["stop-01-builder", "stop-01-sky", "booth-builder", "blender-booth", "asset-creator", "unity-stable"],
+    "2": ["stop-02-builder", "field-shaders"]
+  }
+}
