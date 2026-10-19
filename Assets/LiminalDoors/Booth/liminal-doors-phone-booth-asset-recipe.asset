@@ -225,20 +225,22 @@ MonoBehaviour:
       prefab Assets/LiminalDoors/Booth/Phone
       Booth.prefab; folder Assets/LiminalDoors/Booth; 30 project files in the package'
   - id: review
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
+    note: 'Astra looked at the Unity renders (stop 01, close-ups, asset previews)
+      and said: Yes, the booth looks ready. Desktop test 02:36 entered the world
+      with no exceptions.'
+    doneAt: 2026-10-19T14:06:20Z
+    doneBy: Astra in chat
     details: 3 preview renders in Exports/unity-assets-library/liminal-doors-phone-booth/1.0.0/previews
   - id: export
-    done: 0
-    version: 
-    status: fail
-    note: 
-    doneAt: 
-    doneBy: 
-    details: 'FAIL: step ''Review in the world: renders and desktop test'' isn''t
-      done'
-  exportedVersions: []
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: exported to Exports/unity-assets-library/liminal-doors-phone-booth/1.0.0
+    doneAt: 2026-10-19T14:06:53Z
+    doneBy: agent queue
+    details: ready to export v1.0.0 to Exports/unity-assets-library/liminal-doors-phone-booth/1.0.0
+  exportedVersions:
+  - 1.0.0

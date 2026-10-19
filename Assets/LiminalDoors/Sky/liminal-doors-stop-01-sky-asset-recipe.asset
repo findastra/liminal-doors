@@ -221,20 +221,22 @@ MonoBehaviour:
       prefab Assets/LiminalDoors/Sky/Stop
       01 Sky.prefab; folder Assets/LiminalDoors/Sky; 12 project files in the package'
   - id: review
-    done: 0
-    version: 
+    done: 1
+    version: 1.0.0
     status: pass
-    note: 
-    doneAt: 
-    doneBy: 
+    note: Astra asked to mark her review on the booth and the sky and export both
+      (2026-10-19), after the stop 01 renders with the sunset sky and cloud sea.
+      Desktop test 02:36 entered the world with no exceptions.
+    doneAt: 2026-10-19T14:06:30Z
+    doneBy: Astra in chat
     details: 3 preview renders in Exports/unity-assets-library/liminal-doors-stop-01-sky/1.0.0/previews
   - id: export
-    done: 0
-    version: 
-    status: fail
-    note: 
-    doneAt: 
-    doneBy: 
-    details: 'FAIL: step ''Review in the world: renders and desktop test'' isn''t
-      done'
-  exportedVersions: []
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: exported to Exports/unity-assets-library/liminal-doors-stop-01-sky/1.0.0
+    doneAt: 2026-10-19T14:06:54Z
+    doneBy: agent queue
+    details: ready to export v1.0.0 to Exports/unity-assets-library/liminal-doors-stop-01-sky/1.0.0
+  exportedVersions:
+  - 1.0.0

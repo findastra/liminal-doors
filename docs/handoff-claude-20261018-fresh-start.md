@@ -121,3 +121,21 @@ researched to fix the phone and the booth to look real and handcrafted, not comp
 ### Open (2026-10-19)
 1. Astra's review of the handmade booth (step 11), then the exports in the list above.
 2. Old items 2-4 above still stand.
+
+## 2026-10-19 08:10: booth and sky exported, library created
+
+- Astra: "Yes, the booth looks ready. Mark my review on the booth and the sky, export both v1.0.0, create the public
+  unity-assets-library repo and open the export pull request."
+- Step 11 is marked "by Astra in chat" on both recipes. `Export every ready recipe` wrote
+  `Exports/unity-assets-library/<id>/1.0.0/`: the booth is a 30.1 MB package, the sky 277 KB. Both are
+  self-contained and need no shaders-shop shaders.
+- New public repo **findastra/unity-assets-library** with a README, `library.json` (`unity-unicorn.library/v1`) and
+  `.gitattributes` on `main`. The export pull request is findastra/unity-assets-library#1, and Astra merges it.
+- New tool `Tools/unity-asset-creator/publish-asset-20261018.py`. It checks each export (checksums, all steps done,
+  licence can be public, under 95 MB, no machine paths), copies it into `assets/<id>/<version>/`, and updates
+  `library.json` and the README table. Then it commits on `export/...` and opens the PR.
+  - `gh` started from Python couldn't see the shell's GitHub login, so the tool prints the `gh pr create` command
+    instead. I opened #1 from the shell.
+- Open item 1 above is done apart from Astra's merge. Still open: the library's licence (none chosen yet; its
+  README asks people to ask first), and publishing unity-asset-creator, unity-assets-library and shaders-shop on Unity
+  Unicorn (Unity Stable) with tool boxes on its pet program page.
