@@ -15,7 +15,7 @@ To change a floor, replace its file with your edit. A new date in the name (for 
 
 | # | Animal | Place | File | Cut from |
 |---|---|---|---|---|
-| 01 | Fox | Pink Booth | `floors/01-fox-pink-booth-20261015.png` | plate 1, left column, row 1 |
+| 01 | Fox | Pinkscape (you spawn in the pink booth) | `floors/01-fox-pinkscape-20261015.png` | plate 1, left column, row 1 |
 | 02 | Hare | Faraway Field | `floors/02-hare-faraway-field-20261015.png` | plate 1, right column, row 1 |
 | 03 | Axolotl | Pool After Closing | `floors/03-axolotl-pool-after-closing-20261015.png` | plate 1, left column, row 2 |
 | 04 | Raccoon | Last Laundrette | `floors/04-raccoon-last-laundrette-20261015.png` | plate 1, right column, row 2 |

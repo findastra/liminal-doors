@@ -62,7 +62,7 @@ layouts, music or characters, or a world that is itself a copy of a film or show
 ## Floor by floor
 
 **Your own work (fine):**
-- 01 Pink Booth: the booth from Astra's Infinite Pole, now a handmade K6 kiosk in this repo.
+- 01 Pinkscape: the booth you spawn in, from Astra's Infinite Pole, now a handmade K6 kiosk in this repo.
 - 17 Soft Staircase: the planned spiral is Infinite Pole's own staircase.
 
 **Copied from a specific creator. Don't build these without the source or permission:**
