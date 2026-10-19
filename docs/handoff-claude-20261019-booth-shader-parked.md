@@ -1,6 +1,9 @@
 # Handoff: booth fixes parked until Unity work resumes (Claude, 2026-10-19)
 
-status: parked on branch `claude/booth-panel-and-shader-20261019`, not merged and not imported in Unity.
+status: **done 2026-10-19 02:40.** Astra asked to finish it despite the hold: "Finish the booth fixes now even though
+Unity is on hold: compile the Handmade PBR shader, re-import the booth, render it for me and run the desktop test."
+The parked branch `claude/booth-panel-and-shader-20261019` is now in `claude/fresh-start-20261018`. The rest of
+Unity (rename, spawn, portals, grass) stays on hold per `docs/handoff-claude-20261019-concepts-first.md`.
 
 Astra, 2026-10-19, on the handmade booth (`137b26a`): "the thing the phone is sitting on inside looks weird. not
 sure what it is supposed to be. the colors all look flat, there is no texture. I think we are missing shaders."
@@ -37,3 +40,16 @@ That newer instruction wins, so this work stops here and waits on its own branch
    desktop test, then open a pull request into `claude/fresh-start-20261018`.
 4. Lighting still to judge: the sun sits low behind the booth, so its front is lit only by flat pink ambient light.
    Post colour grading (contrast, tonemapping) would belong to the stop's glow volume (`LiminalWorldGlow.cs`).
+
+## Done (02:40)
+
+- Shader: "178 shaders checked, 0 with errors" (Unity Stable/Handmade PBR included).
+- Re-imported (25,889 triangles), prefab rebuilt, asset creator steps 1-10 pass (notes refreshed).
+- **Trap:** after a Unity restart, the stop's realtime reflection probe is black in the editor until rendered, so metal
+  and clear coat render black. `LiminalDoors/Booth/Refresh reflections` renders it; run it before `Stop 01/Render` and
+  `Booth/Render close-ups`. VRChat renders it on load.
+- Renders: `docs/renders/stop-01-*.png`, `docs/renders/booth/booth-*.png`.
+- Desktop test 02:36: this bundle in `--url=`, "Finished entering world." at 02:36:15, no exceptions.
+- Shaders shop: the catalog's Unity Stable entry lists Handmade PBR; `docs/shaders-in-world.json` rescanned.
+- Still open: Astra's review (step 11), then the exports. The lighting (sun behind the booth, flat pink ambient) and
+  colour grading stay as they are; they're scene-wide, and the scene is on hold.

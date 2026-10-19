@@ -1,7 +1,7 @@
 {
     "schema": "unity-unicorn.world-shaders/v1",
     "world": "Liminal Doors",
-    "scanned_at": "2026-10-18T18:55:12Z",
+    "scanned_at": "2026-10-19T08:36:38Z",
     "unity": "2022.3.22f1",
     "scanned_by": "shaders-shop (agent queue)",
     "scenes": [
@@ -89,21 +89,6 @@
             ]
         },
         {
-            "shader": "Skybox/Procedural",
-            "shader_path": "Resources/unity_builtin_extra",
-            "catalog_id": "unity-builtin",
-            "catalog_name": "Unity built-in",
-            "license": "unity-builtin",
-            "source": "Unity built-in",
-            "version": "",
-            "materials": [
-                "Assets/LiminalDoors/Materials/Plain Sky.mat"
-            ],
-            "scenes": [
-                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
-            ]
-        },
-        {
             "shader": "Standard",
             "shader_path": "Resources/unity_builtin_extra",
             "catalog_id": "unity-builtin",
@@ -112,14 +97,100 @@
             "source": "Unity built-in",
             "version": "",
             "materials": [
-                "Assets/LiminalDoors/Booth/Materials/Booth glass.mat",
-                "Assets/LiminalDoors/Booth/Materials/Booth sign.mat",
-                "Assets/LiminalDoors/Booth/Materials/Payphone chrome.mat",
                 "Packages/com.vrchat.worlds/Samples/UdonExampleScene/SampleAssetsSet/Materials/GridFloor_udon.mat",
-                "Packages/com.vrchat.worlds/Samples/UdonExampleScene/SampleAssetsSet/Materials/SampleAssets_matte.mat",
-                "Assets/LiminalDoors/Booth/Materials/Payphone face.mat",
-                "Assets/LiminalDoors/Booth/Materials/Booth body.mat",
-                "Assets/LiminalDoors/Booth/Materials/Payphone lights.mat"
+                "Packages/com.vrchat.worlds/Samples/UdonExampleScene/SampleAssetsSet/Materials/SampleAssets_matte.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Cloud Puff",
+            "shader_path": "Assets/ShadersShop/UnityStable/CloudPuff.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Sky/Materials/Cloud puff.mat",
+                "Assets/LiminalDoors/Sky/Materials/Cloud puff (near).mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Cloud Sea",
+            "shader_path": "Assets/ShadersShop/UnityStable/CloudSea.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Sky/Materials/Cloud sea.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Handmade PBR",
+            "shader_path": "Assets/ShadersShop/UnityStable/HandmadePBR.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Booth/Materials/Payphone.mat",
+                "Assets/LiminalDoors/Booth/Materials/Booth.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Pink Glass",
+            "shader_path": "Assets/ShadersShop/UnityStable/PinkGlass.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Booth/Materials/Booth glass (pink).mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Sparkle",
+            "shader_path": "Assets/ShadersShop/UnityStable/Sparkle.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Booth/Materials/Booth sparkles.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Sunset Sky",
+            "shader_path": "Assets/ShadersShop/UnityStable/SunsetSky.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Sky/Materials/Sunset sky.mat"
             ],
             "scenes": [
                 "Assets/LiminalDoors/Scenes/Liminal Doors.unity"

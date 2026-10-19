@@ -8,8 +8,10 @@
 // (Tools/Blender/make_phone_booth.py): a K6 kiosk with bevelled cast-iron parts, narrow-wide-narrow glazing, lit
 // TELEPHONE signs, gilded crowns, a dome, a brass door pull, and a real payphone (keypad, card, coin slots, handset,
 // coiled cord). Its textures are baked there: ambient occlusion, edge wear, grime, rain streaks and sun fade over CC0
-// ambientCG scans (PaintedMetal002, Metal009, Smear002, Scratches001). Unity's Standard shader shows them (true PBR:
-// the sunset reflects in the paint, chrome and brass); the glass is Unity Stable Pink Glass with fingerprints.
+// ambientCG scans (PaintedMetal002, Metal009, Smear002, Scratches001). Our own Unity Stable/Handmade PBR shows them
+// (clear coat that mirrors the sunset, world-space scan detail, specular occlusion); the glass is Pink Glass with
+// fingerprints. Later that day Astra found the plum board behind the phone weird: the phone now hangs on a panel built
+// into the back wall, in the booth's pink.
 // The six Infinite Pole meshes in Meshes/ stay only for LiminalStop01's fallback.
 //
 // Menu: LiminalDoors/Booth/Import Blender model -> Model/*.asset meshes from Review/booth-blender/phone-booth.json,
@@ -90,15 +92,16 @@ public static class LiminalBooth
         foreach (var path in Directory.GetFiles(TexDir, "*.png").Select(p => p.Replace('\\', '/')))
         {
             var name = Path.GetFileNameWithoutExtension(path);
-            if (!(name.StartsWith("booth-") || name.StartsWith("payphone-") || name.StartsWith("glass-")) || name == "booth-sparkle") continue;
+            if (!(name.StartsWith("booth-") || name.StartsWith("payphone-") || name.StartsWith("glass-") || name.StartsWith("detail-")) || name == "booth-sparkle") continue;
             var imp = (TextureImporter)AssetImporter.GetAtPath(path); if (imp == null) continue;
             bool color = name.EndsWith("-albedo") || name.EndsWith("-emission");
             imp.textureType = name.EndsWith("-normal") ? TextureImporterType.NormalMap : TextureImporterType.Default;
             imp.sRGBTexture = color;
             imp.alphaSource = name.EndsWith("-metallic-smoothness") ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
-            imp.mipmapEnabled = true; imp.wrapMode = name.StartsWith("glass-") ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
+            bool tiles = name.StartsWith("glass-") || name.StartsWith("detail-");   // tiling scans
+            imp.mipmapEnabled = true; imp.wrapMode = tiles ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
             imp.anisoLevel = name.EndsWith("-albedo") || name.EndsWith("-normal") ? 4 : 1;
-            imp.maxTextureSize = name.StartsWith("payphone-") || name.EndsWith("-occlusion") || name.EndsWith("-emission") || name.StartsWith("glass-") ? 1024 : 2048;
+            imp.maxTextureSize = name.StartsWith("payphone-") || name.EndsWith("-occlusion") || name.EndsWith("-emission") || tiles ? 1024 : 2048;
             imp.textureCompression = TextureImporterCompression.Compressed; imp.crunchedCompression = false;
             imp.SaveAndReimport();
         }
@@ -117,21 +120,27 @@ public static class LiminalBooth
 
     static Texture2D Tex(string name) => AssetDatabase.LoadAssetAtPath<Texture2D>(TexDir + name + ".png") ?? throw new Exception("missing texture " + TexDir + name + ".png");
 
-    // Unity's Standard shader with the baked maps (metallic in R, smoothness in A of the metallic-smoothness map).
-    static Material Pbr(string name, string prefix, float emission)
+    // Our own Unity Stable/Handmade PBR with the baked maps (metallic R, clear coat G, worn edges B, smoothness A) and a
+    // tiling scan for the fine detail. Astra, 2026-10-19: "the colors all look flat, there is no texture. I think we are
+    // missing shaders." Unity's Standard had no clear coat and no detail sharper than the atlas.
+    static Material Handmade(string name, string prefix, float emission, string detail, float tiling, float detailNormal, float detailRough,
+                             float coat, float edgeSheen, float saturation, float contrast)
     {
-        var m = Mat(name, "Standard");
+        var m = Mat(name, "Unity Stable/Handmade PBR");
         m.SetColor("_Color", Color.white); m.SetTexture("_MainTex", Tex(prefix + "-albedo"));
-        m.SetTexture("_MetallicGlossMap", Tex(prefix + "-metallic-smoothness")); m.SetFloat("_GlossMapScale", 1f); m.SetFloat("_SmoothnessTextureChannel", 0f);
-        m.EnableKeyword("_METALLICGLOSSMAP");
-        m.SetTexture("_BumpMap", Tex(prefix + "-normal")); m.SetFloat("_BumpScale", 1f); m.EnableKeyword("_NORMALMAP");
-        m.SetTexture("_OcclusionMap", Tex(prefix + "-occlusion")); m.SetFloat("_OcclusionStrength", 1f);
+        m.SetTexture("_MetallicGlossMap", Tex(prefix + "-metallic-smoothness")); m.SetFloat("_SmoothnessScale", 1f);
+        m.SetTexture("_BumpMap", Tex(prefix + "-normal")); m.SetFloat("_BumpScale", 1f);
+        m.SetTexture("_OcclusionMap", Tex(prefix + "-occlusion")); m.SetFloat("_OcclusionStrength", 1f); m.SetFloat("_SpecularOcclusion", .8f);
+        m.SetTexture("_DetailNormalMap", Tex("detail-" + detail + "-normal")); m.SetTexture("_DetailRoughMap", Tex("detail-" + detail + "-roughness"));
+        m.SetFloat("_DetailTiling", tiling); m.SetFloat("_DetailNormalScale", detailNormal); m.SetFloat("_DetailRoughAmount", detailRough);
+        m.SetFloat("_CoatStrength", coat); m.SetFloat("_CoatSmoothness", .93f);
+        m.SetFloat("_EdgeSheen", edgeSheen); m.SetFloat("_Saturation", saturation); m.SetFloat("_Contrast", contrast);
         if (emission > 0)
         {
             m.SetTexture("_EmissionMap", Tex(prefix + "-emission")); m.SetColor("_EmissionColor", Color.white * emission);
-            m.EnableKeyword("_EMISSION"); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+            m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
         }
-        else { m.DisableKeyword("_EMISSION"); m.SetColor("_EmissionColor", Color.black); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack; }
+        else { m.SetTexture("_EmissionMap", null); m.SetColor("_EmissionColor", Color.black); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack; }
         EditorUtility.SetDirty(m);
         return m;
     }
@@ -139,8 +148,10 @@ public static class LiminalBooth
     [MenuItem("LiminalDoors/Booth/Apply look")]
     public static void ApplyLook()
     {
-        Pbr("Booth", "booth", 2.0f);          // the butter-yellow signs glow past the bloom threshold
-        Pbr("Payphone", "payphone", 0f);
+        // enamel booth: glossy clear coat over the pink, orange peel and scratches from the painted-metal scan
+        Handmade("Booth", "booth", 2.0f, "paint", 1.6f, .45f, .2f, 1f, .4f, 1.08f, 1.12f);   // the butter-yellow signs glow past the bloom threshold
+        // payphone: brushed steel and chrome (no coat), glossy handset and card (their coat comes from the bake)
+        Handmade("Payphone", "payphone", 0f, "steel", 3.5f, .35f, .15f, 1f, .3f, 1f, 1.08f);
         var glass = Mat("Booth glass (pink)", "Unity Stable/Pink Glass");
         glass.SetColor("_Tint", new Color(1f, .72f, .84f, .14f)); glass.SetFloat("_Reflection", .9f); glass.SetFloat("_ReflectionBlur", .5f);
         glass.SetColor("_EdgeGlow", new Color(1.2f, .5f, .8f)); glass.SetFloat("_EdgePower", 2.5f);
@@ -150,7 +161,7 @@ public static class LiminalBooth
         foreach (var old in new[] { "Booth paint", "Booth glow", "Payphone face (candy)", "Booth glass (Mochie)", "Payphone face (lilToon)" })
             AssetDatabase.DeleteAsset(Dir + "Materials/" + old + ".mat");
         AssetDatabase.SaveAssets();
-        Debug.Log("[Liminal] booth look applied (Blender bake + Standard)");
+        Debug.Log("[Liminal] booth look applied (Blender bake + Unity Stable/Handmade PBR)");
     }
 
     [MenuItem("LiminalDoors/Booth/Build prefab")]
@@ -191,6 +202,17 @@ public static class LiminalBooth
         finally { Object.DestroyImmediate(root); }
         EnsureRecipe();
         Debug.Log("[Liminal] booth prefab written: " + PrefabPath);
+    }
+
+    // The stop's reflection probe is realtime and renders when the world loads (VRChat). In the editor it stays black
+    // after a restart until something renders it, and then every reflection (metal, clear coat) renders black too.
+    [MenuItem("LiminalDoors/Booth/Refresh reflections")]
+    public static void RefreshReflections()
+    {
+        int n = 0;
+        foreach (var p in Object.FindObjectsOfType<ReflectionProbe>())
+            if (p.mode == ReflectionProbeMode.Realtime) { p.RenderProbe(); n++; }
+        Debug.Log("[Liminal] rendered " + n + " realtime reflection probes");
     }
 
     // Close-ups of the booth in the open scene (its own sky and light) for review: the payphone, a crown and sign, the
@@ -342,7 +364,7 @@ public static class LiminalBooth
         r.description = "The pink K6 phone booth at the start of Liminal Doors: a bevelled cast-iron kiosk in hot pink enamel with chipped edges and weathering, lit butter-yellow TELEPHONE signs, gilded crowns, a brass door pull, pink glass with fingerprints, and a payphone inside with a chrome keypad, handset and coiled cord. Gold and pink sparkles swirl up around it.";
         r.source = "Modelled in Blender by Tools/Blender/make_phone_booth.py after Sir Giles Gilbert Scott's K6 kiosk (proportions only); textures baked there from CC0 ambientCG scans; sparkles and prefab made in Liminal Doors";
         r.attribution = "Surface scans: ambientCG.com PaintedMetal002, Metal009, Smear002, Scratches001 (CC0; credit not required)";
-        r.changelog = "1.0.0: first version. Handmade K6 booth modelled in Blender (bevels, recessed posts, narrow-wide-narrow glazing, lit TELEPHONE signs, gilded crowns, dome, brass pull); baked ambient occlusion, edge wear, grime, rain streaks and sun fade over CC0 scans; Standard PBR materials; payphone with chrome keypad, instruction card, coin slots, handset and coiled cord; pink glass with fingerprints (Unity Stable Pink Glass); gold and pink sparkles swirling up around it (Unity Stable Sparkle); gold base glow.";
+        r.changelog = "1.0.0: first version. Handmade K6 booth modelled in Blender (bevels, recessed posts, narrow-wide-narrow glazing, lit TELEPHONE signs, gilded crowns, dome, brass pull); baked ambient occlusion, edge wear, grime, rain streaks and sun fade over CC0 scans; our own Unity Stable/Handmade PBR (clear coat, world-space scan detail); the payphone on a panel built into the back wall, with chrome keypad, instruction card, coin slots, handset and coiled cord; pink glass with fingerprints (Unity Stable Pink Glass); gold and pink sparkles swirling up around it (Unity Stable Sparkle); gold base glow.";
         EditorUtility.SetDirty(r); AssetDatabase.SaveAssets();
     }
 

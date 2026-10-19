@@ -353,8 +353,8 @@
       "author": "Astra (built with Claude)",
       "license": "own-work",
       "homepage": "",
-      "kind": "sky / clouds / sparkle",
-      "why": "Our own shaders, made because no free sea-of-clouds sky exists: a sunset sky, a cloud sea and a sparkle shader.",
+      "kind": "sky / clouds / sparkle / PBR props",
+      "why": "Our own shaders, made because no free sea-of-clouds sky exists (a sunset sky, a cloud sea, a sparkle shader), plus Handmade PBR for baked hand-made props: clear coat, world-space scan detail, specular occlusion (Astra, 2026-10-19: the booth looked flat on Standard).",
       "install": "own",
       "vpm_repo": "",
       "good_for": [
@@ -366,7 +366,10 @@
       "features": [
         "sunset sky",
         "sea of clouds",
-        "glitter sparkle"
+        "glitter sparkle",
+        "candy paint",
+        "pink glass with fingerprints",
+        "handmade PBR with clear coat"
       ],
       "detect_paths": [
         "Assets/ShadersShop/UnityStable"
