@@ -4,6 +4,16 @@ Astra asked: "run our copyright tool over these ideas to see if they were taken 
 Unity Unicorn's copyright tools (`copyright-logger` and `copyright-catcher`, unity-unicorn PR #1) log the license of
 asset folders inside a Unity project. They can't judge ideas, so this check was done by hand by Claude Opus 5.5.
 
+**Decision (Astra, 2026-10-19): "just get rid of the worlds you found are copies, except mine of course."**
+- Removed from the collection: floors 34 (Bubble Chair Cloud Lounge), 35 (Midnight Glass Garden, the glass wolf) and
+  37 (Secret Undersea Galaxy).
+- Also removed: plate 7's glass wolf and bubble chair reference panels.
+- Dropped from the idea list: the exact Backrooms replica, and copying Copperhead's ASMR tools.
+- Floor numbers stay as they were, so the collection now has 34 floors and skips 34, 35 and 37.
+- Kept: Astra's own work, the Infinite Pole booth (01) and staircase (17).
+- The glass wolf can come back only as the original asset with its creator's terms, or as our own model. See
+  "Getting the real wolf" below.
+
 **Method.**
 1. Read Codex's idea inbox and floor register (2026-10-15). They list 16 VRChat worlds Astra gave as references and
    what each was for.

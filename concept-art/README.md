@@ -1,13 +1,15 @@
 ﻿# Liminal Doors concept art: one image per floor
 
-The 37 floors of the Concept Atlas, cut out of the seven concept plates so each can be edited on its own (Astra, 2026-10-18).
+The 34 floors of the Concept Atlas, cut out of the seven concept plates so each can be edited on its own (Astra, 2026-10-18).
 The plates were made with OpenAI Codex's built-in image generation on 2026-10-15 (art direction, not Unity scenes); the originals stay in Codex's outputs and the Atlas site.
 
 - `floors/NN-animal-place-20261015.png`: one floor each, about 500 x 505 px, cut inside the plate's divider lines. Each still shows its floor number in the bottom-left corner, as on the plates.
-- Floor 37 is the wide top band of plate 7 (1536 x 476).
-- `floors/extras/`: plate 7's two lower panels, references rather than floors: A, a glass wolf (glass-animal look), and B, a bubble chair.
-- `floors-contact-sheet-20261018.png`: all 37 at a glance.
-- `liminal-doors-redline-sheet-20261018.jpg`: the same layout at full size (3098 x 4385 px, floor 37 across the bottom) for redlines in Procreate. The Concept Atlas's "Export all 37 for redlines" button saves this file. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.
+- **Removed 2026-10-19 (Astra):** floors 34 (Chipmunk / Bubble Chair Cloud Lounge), 35 (Wolf / Midnight Glass Garden) and
+  37 (Nautilus / Secret Undersea Galaxy), and plate 7's glass wolf and bubble chair reference panels. The
+  originality check (`../docs/originality-check-20261019.md`) found them copied from other creators' VRChat worlds
+  (Crystals Absence by Arkîe, Astral Bounds by Vectriel). Floor numbers are kept, so the collection skips 34, 35 and 37.
+- `floors-contact-sheet-20261019.png`: all 34 at a glance.
+- `liminal-doors-redline-sheet-20261019.jpg`: the same layout at full size (3098 x 3374 px) for redlines in Procreate. The Concept Atlas's "Export all 34 for redlines" button saves this file; the + on each card makes a sheet of just the floors you pick. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.
 
 To change a floor, replace its file with your edit. A new date in the name (for example `-20261019`) keeps the original next to it.
 
@@ -46,7 +48,4 @@ To change a floor, replace its file with your edit. A new date in the name (for 
 | 31 | Otter | Steam Between Stars | `floors/31-otter-steam-between-stars-20261015.png` | plate 6, left column, row 1 |
 | 32 | Sandpiper | Sunset Sandbar | `floors/32-sandpiper-sunset-sandbar-20261015.png` | plate 6, right column, row 1 |
 | 33 | Dolphin | Aquaglass Concourse | `floors/33-dolphin-aquaglass-concourse-20261015.png` | plate 6, left column, row 2 |
-| 34 | Chipmunk | Bubble Chair Cloud Lounge | `floors/34-chipmunk-bubble-chair-cloud-lounge-20261015.png` | plate 6, right column, row 2 |
-| 35 | Wolf | Midnight Glass Garden | `floors/35-wolf-midnight-glass-garden-20261015.png` | plate 6, left column, row 3 |
 | 36 | Kingfisher | Blue-Sky Terminal | `floors/36-kingfisher-blue-sky-terminal-20261015.png` | plate 6, right column, row 3 |
-| 37 | Nautilus | Secret Undersea Galaxy | `floors/37-nautilus-secret-undersea-galaxy-20261015.png` | plate 7, top band |
