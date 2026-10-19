@@ -1,7 +1,7 @@
 # unity-asset-creator checklist: how to build a good VRChat world asset
 
-The ordered steps the **unity-asset-creator** tool walks through, and the trick follows. Version 1.0.0, 2026-10-18,
-by Claude Opus 5.5 (`claude-opus-5-5`) for Astra. It belongs to Unity Unicorn (`pet-program-5`) and is incubating in
+The ordered steps the **unity-asset-creator** tool walks through, and the trick follows. Version 1.1.0, 2026-10-19
+(1.0.0 was 2026-10-18), by Claude Opus 5.5 (`claude-opus-5-5`) for Astra. It belongs to Unity Unicorn (`pet-program-5`) and is incubating in
 Liminal Doors until it moves to [findastra/unity-unicorn](https://github.com/findastra/unity-unicorn).
 
 Each step says **what to do**, **why** (with its source), and **what the tool checks by itself**. Steps go in order:
@@ -51,6 +51,8 @@ Numbers are for **one asset** in a world. VRChat's own budget is for the whole w
 - **Why:** triangle count is VRChat's headline world budget. Merging unrelated objects stops occlusion culling from
   hiding them ([VRChat](https://creators.vrchat.com/platforms/android/quest-content-optimization)).
 - **Tool checks:** total triangles against the budget, meshes without normals, missing UV2 on static parts (warning).
+- **Make it look made, not generated:** see [Craft](#craft-make-it-look-made-not-generated) below; it applies to
+  steps 4, 5 and 6.
 
 ## 5. Materials and shaders
 
@@ -128,3 +130,37 @@ Numbers are for **one asset** in a world. VRChat's own budget is for the whole w
   [findastra/unity-assets-library](https://github.com/findastra/unity-assets-library). Astra merges it.
 - **Tool checks:** every step above is done, the version isn't already exported, and the package and manifest were
   written with matching checksums.
+
+---
+
+## Craft: make it look made, not generated
+
+Added 2026-10-19, after Astra said the first booth "still looks like rudimentary shapes" and asked for it to "look real
+and handcrafted, not computer generated". These are the habits prop artists use, and how the Liminal Doors booth
+(`Tools/Blender/make_phone_booth.py`) does each one. Model in Blender, headless and scripted, so every result can be
+rerun (Codex trick `blender-unity-assets`).
+
+1. **Work from a real reference.** Take proportions and the telling details from a real object, not from primitives.
+   The booth follows Sir Giles Gilbert Scott's K6 kiosk (1935): about 2.5 m tall, a domed roof, eight rows of
+   narrow-wide-narrow panes, crowns in the pediments
+   ([Falkirk museum record](https://collections.falkirk.gov.uk/objects/55188/kiosk-telephone),
+   [Kent listing](https://heritage.kent.gov.uk/Monument/MKE122847)). Scale may bend for VR (the booth keeps 1.3 m so
+   avatars fit); the details may not.
+2. **No razor edges.** Bevel every hard edge (a few millimetres, 1 to 3 segments) and use weighted normals, so edges
+   catch light like cast or machined parts. Pre-subdivide round parts before bevelling, or the bevels look artificial
+   and the baked maps suffer ([80.lv: radio receiver](https://80.lv/articles/prop-art-tips-creating-a-realistic-radio-receiver-in-blender-marmoset-toolbag/)).
+3. **Bake the light in.** Ambient occlusion from the whole asset (parts shade their neighbours), saved as the
+   occlusion map and used as the grime mask.
+4. **Put wear where real wear goes.** A curvature (edge) mask drives chipped paint and polished metal on edges; the
+   occlusion drives grime in corners; streaks run down vertical faces; tops fade in the sun. Keep it sparse: a few
+   flakes, not a pattern ([80.lv: vintage drill](https://80.lv/articles/creating-a-vintage-drill-in-zbrush-substance-3d-painter-marmoset/)).
+   Layer it in order: base, marks, wear, dirt, dust.
+5. **Use real surface scans for the fine detail.** CC0 scans for roughness breakup, scratches and fingerprints
+   ([ambientCG](https://ambientcg.com), CC0), box-projected so there are no seams. Download them only with the
+   owner's OK, and keep the zips out of git; only the baked textures go in the project.
+6. **Check each channel on its own.** Look at albedo, roughness and metallic separately before judging the whole: most
+   "CG look" comes from flat roughness.
+7. **One atlas per material group.** Join an atlas's parts into one mesh to unwrap and bake (separately unwrapped
+   parts overlap and paint over each other), then split them again with their own pivots (the door keeps its hinge).
+8. **Use a PBR shader that shows the bake.** Standard with albedo, metallic-smoothness, normal, occlusion and emission
+   maps; the world's reflection probe does the rest.

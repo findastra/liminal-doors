@@ -235,35 +235,6 @@ MonoBehaviour:
     note: 
     doneAt: 
     doneBy: 
-    details: 'FAIL: step ''Plan: name, version, budget'' isn''t done
-
-      FAIL:
-      step ''Provenance: who made it, from where, licence'' isn''t done
-
-      FAIL:
-      step ''Scale, pivot and facing'' isn''t done
-
-      FAIL: step ''Geometry:
-      triangles, normals, lightmap UVs'' isn''t done
-
-      FAIL: step ''Materials
-      and shaders'' isn''t done
-
-      FAIL: step ''Textures: size, compression,
-      mipmaps'' isn''t done
-
-      FAIL: step ''Colliders: simple, where people stand,
-      never above the surface'' isn''t done
-
-      FAIL: step ''Lighting: static,
-      emission, no realtime lights'' isn''t done
-
-      FAIL: step ''Effects: particles
-      capped, cheap, low overdraw'' isn''t done
-
-      FAIL: step ''Prefab: one clean,
-      self-contained prefab'' isn''t done
-
-      FAIL: step ''Review in the world:
-      renders and desktop test'' isn''t done'
+    details: 'FAIL: step ''Review in the world: renders and desktop test'' isn''t
+      done'
   exportedVersions: []

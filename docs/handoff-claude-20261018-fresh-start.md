@@ -80,3 +80,44 @@ for now; they get published to findastra/unity-unicorn once they're ready.
 3. The asset creator's previews and Stop 01/Render don't show bloom in the editor. The scene has active global glow
    volumes; VRChat's reference camera has the post-processing layer.
 4. The cloud sea shows stretched streaks at grazing angles in the middle distance; the glass fox; the phone.
+
+## 2026-10-19: the booth and payphone, handmade in Blender
+
+Astra: "this booth still looks like rudimentary shapes, it is no where near ready. I want to use those skills we
+researched to fix the phone and the booth to look real and handcrafted, not computer generated."
+
+- **No skill to install:** neither the plugin nor the skill catalog has a Blender or 3D-modelling skill. "The skills"
+  became prop-artist craft, written into the unity-asset-creator checklist as its new **Craft** section (v1.1.0 of
+  `Tools/unity-asset-creator/unity-asset-creator-checklist-20261018.md`, with sources).
+- **Downloads (Astra's OK in chat):** four CC0 ambientCG sets, 2K JPG, 81 MB: PaintedMetal002, Metal009, Smear002,
+  Scratches001. They stay outside git (scratchpad); only baked textures and `glass-smudge.png` are in the project.
+  The .blend files inside the zips were never opened.
+- **Model:** `Tools/Blender/make_phone_booth.py` (Blender 4.5.9, headless). It builds a K6 kiosk at the old booth's
+  1.3 m footprint (2.76 m tall) with:
+  - bevelled corner posts with recessed faces, narrow-wide-narrow glazing in eight rows, fielded kick panels;
+  - lit TELEPHONE signs on four sides, gilded crowns in arched pediments, a dome with a rolled eave;
+  - the door hinged on the -X post and open 80 degrees, with a brass pull and hinges;
+  - inside, a back board and shelf with a payphone: a die-cast housing, a chrome keypad with numbered buttons, an
+    instruction card, coin slots, the coin return, a hook switch, a handset with ear and mouth cups, and a coiled cord.
+  - 25,907 triangles in total.
+- **Bake (Cycles on the RX 9070 XT, about 2 minutes):** AO, an edge mask, and composed albedo, roughness, metallic,
+  emission and normal maps. Sparse chips on edges, grime in corners, rain streaks, sun fade, and scans for roughness,
+  scratches and fingerprints. Booth atlas 2048, payphone atlas 1024.
+- **Unity:**
+  - `LiminalDoors/Booth/Import Blender model` reads `Review/booth-blender/phone-booth.json` into `Booth/Model/*.asset`;
+  - Apply look sets up Standard PBR (Booth, Payphone) and Pink Glass, which now has optional fingerprints (`_Smudge`,
+    off by default);
+  - Build prefab adds wall and door colliders as well as the floor;
+  - Render close-ups writes `Review/booth-closeups/`.
+  - The Candy Paint booth materials were removed. The six Infinite Pole meshes stay only for LiminalStop01's fallback.
+- **Checks:** the asset creator passes steps 1-10 (notes refreshed). Desktop test at 01:24: this bundle in `--url=`,
+  "Finished entering world." at 01:24:40, no exceptions.
+- **Renders:** `docs/renders/stop-01-*.png`, `docs/renders/booth/booth-*.png` (close-ups) and
+  `docs/renders/assets/liminal-doors-phone-booth-v1.0.0-*.png`.
+- **Trap found:** Git Bash passes `/c/...` paths that contain spaces or apostrophes to native programs unconverted, so
+  Blender wrote one run into a stray `C:\c\` folder. Pass `cygpath -w` paths. Other sessions hit the same trap: `C:\c\` also
+  holds stray proxy-lake, token-canopy and open-star-test copies that aren't mine, so I left them.
+
+### Open (2026-10-19)
+1. Astra's review of the handmade booth (step 11), then the exports in the list above.
+2. Old items 2-4 above still stand.

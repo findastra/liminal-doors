@@ -2,21 +2,28 @@
 // Astra, 2026-10-18: "The phone booth needs to match the world around it. I want there to be sparkles swirling around
 // it." Her picks: hot pink with a butter-yellow glow (the floor plan's palette: hot pink / apricot / butter yellow,
 // concept plate 01), and gold and pink sparkles.
-// Shape: the six booth meshes taken from Astra's Infinite Pole. Everything else here is new: materials, the sparkle
-// texture (drawn by this script), the two particle systems and the prefab.
 //
-// Astra, later on 2026-10-18: "I think it all looks dull ... make our own shaders or something." So the booth now wears
-// our own Unity Stable shaders from the shaders-shop: Candy Paint (toon shade, sunset rim light, lacquer gloss, sky in the
-// clear coat, gold glitter flecks), Pink Glass (tinted, sky reflections, soft edge) and Sparkle (HDR glints for the bloom).
+// Astra, 2026-10-19: "this booth still looks like rudimentary shapes ... I want to use those skills we researched to fix
+// the phone and the booth to look real and handcrafted, not computer generated." So the shape is now modelled in Blender
+// (Tools/Blender/make_phone_booth.py): a K6 kiosk with bevelled cast-iron parts, narrow-wide-narrow glazing, lit
+// TELEPHONE signs, gilded crowns, a dome, a brass door pull, and a real payphone (keypad, card, coin slots, handset,
+// coiled cord). Its textures are baked there: ambient occlusion, edge wear, grime, rain streaks and sun fade over CC0
+// ambientCG scans (PaintedMetal002, Metal009, Smear002, Scratches001). Unity's Standard shader shows them (true PBR:
+// the sunset reflects in the paint, chrome and brass); the glass is Unity Stable Pink Glass with fingerprints.
+// The six Infinite Pole meshes in Meshes/ stay only for LiminalStop01's fallback.
 //
-// Menu: LiminalDoors/Booth/Apply shader look (Unity Stable) -> sets the booth materials (overwrites hand edits)
-//       LiminalDoors/Booth/Build prefab                     -> Assets/LiminalDoors/Booth/Phone Booth.prefab + its asset recipe
+// Menu: LiminalDoors/Booth/Import Blender model -> Model/*.asset meshes from Review/booth-blender/phone-booth.json,
+//                                                  and import settings for Textures/booth-*, payphone-*, glass-*
+//       LiminalDoors/Booth/Apply look           -> the booth's materials (overwrites hand edits)
+//       LiminalDoors/Booth/Build prefab         -> Assets/LiminalDoors/Booth/Phone Booth.prefab + its asset recipe
+using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityUnicorn.AssetCreator;
+using Object = UnityEngine.Object;
 
 public static class LiminalBooth
 {
@@ -25,19 +32,82 @@ public static class LiminalBooth
     const string RecipePath = Dir + "liminal-doors-phone-booth-asset-recipe.asset";
     const string SparkleTex = Dir + "Textures/booth-sparkle.png";
     const string SparkleMat = Dir + "Materials/Booth sparkles.mat";
-    static readonly string[] Parts = { "Booth body", "Booth sign", "Booth glass", "Payphone chrome", "Payphone face", "Payphone lights" };
+    const string ModelDir = Dir + "Model/";
+    const string TexDir = Dir + "Textures/";
+    const string ModelJson = "Review/booth-blender/phone-booth.json";   // written by Tools/Blender/make_phone_booth.py
 
-    // Astra, 2026-10-18 (asset-creator step 5): merge 7 materials to 5. The payphone housing wears the booth's hot pink and
-    // the payphone lights share the sign's butter-yellow glow; the prefab uses body, sign (glow), glass, payphone face, sparkles.
-    static string MaterialFor(string part) =>
-        part == "Booth body" || part == "Payphone chrome" ? "Booth paint" :
-        part == "Booth sign" || part == "Payphone lights" ? "Booth glow" :
-        part == "Booth glass" ? "Booth glass (pink)" : "Payphone face (candy)";
+    // The model's parts: mesh, material, parent, position, Y rotation, casts shadows. The door hangs on its hinge (the -X
+    // post's inner edge, at the outer face) and stands open 80 degrees, as in make_phone_booth.py (DOOR_HINGE, DOOR_OPEN).
+    static readonly (string mesh, string mat, string parent, Vector3 pos, float rotY, bool shadows)[] Parts =
+    {
+        ("Booth body", "Booth", "", Vector3.zero, 0f, true),
+        ("Booth glass", "Booth glass (pink)", "", Vector3.zero, 0f, false),
+        ("Booth door", "Booth", "", new Vector3(-.53f, 0f, .625f), -80f, true),
+        ("Booth door glass", "Booth glass (pink)", "Booth door", Vector3.zero, 0f, false),
+        ("Payphone", "Payphone", "", Vector3.zero, 0f, true),
+        ("Payphone handset", "Payphone", "", Vector3.zero, 0f, true),
+        ("Payphone cord", "Payphone", "", Vector3.zero, 0f, true),
+    };
+
+    [Serializable] class BlenderMesh { public string name, material, parent; public float[] position; public float rotationY; public float[] vertices, normals, tangents, uv; public int[] triangles; }
+    [Serializable] class BlenderFile { public string source; public BlenderMesh[] meshes; }
+
+    [MenuItem("LiminalDoors/Booth/Import Blender model")]
+    public static void ImportModel()
+    {
+        if (!File.Exists(ModelJson)) throw new Exception(ModelJson + " is missing: run Tools/Blender/make_phone_booth.py first");
+        var file = JsonUtility.FromJson<BlenderFile>(File.ReadAllText(ModelJson));
+        Directory.CreateDirectory(ModelDir);
+        foreach (var b in file.meshes)
+        {
+            var path = ModelDir + b.name + ".asset";
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path); bool isNew = mesh == null;
+            if (isNew) mesh = new Mesh();
+            mesh.Clear(); mesh.name = b.name;
+            int n = b.vertices.Length / 3;
+            var v = new Vector3[n]; var nn = new Vector3[n]; var t = new Vector4[n]; var uv = new Vector2[n];
+            for (int i = 0; i < n; i++)
+            {
+                v[i] = new Vector3(b.vertices[i * 3], b.vertices[i * 3 + 1], b.vertices[i * 3 + 2]);
+                nn[i] = new Vector3(b.normals[i * 3], b.normals[i * 3 + 1], b.normals[i * 3 + 2]);
+                t[i] = new Vector4(b.tangents[i * 4], b.tangents[i * 4 + 1], b.tangents[i * 4 + 2], b.tangents[i * 4 + 3]);
+                uv[i] = new Vector2(b.uv[i * 2], b.uv[i * 2 + 1]);
+            }
+            mesh.indexFormat = n > 65000 ? IndexFormat.UInt32 : IndexFormat.UInt16;
+            mesh.SetVertices(v); mesh.SetNormals(nn); mesh.SetTangents(t); mesh.SetUVs(0, uv);
+            mesh.SetTriangles(b.triangles, 0); mesh.RecalculateBounds();
+            if (!b.name.Contains("glass")) Unwrapping.GenerateSecondaryUVSet(mesh);   // lightmap UVs
+            if (isNew) AssetDatabase.CreateAsset(mesh, path); else EditorUtility.SetDirty(mesh);
+            Debug.Log("[Liminal] booth mesh " + b.name + ": " + b.triangles.Length / 3 + " triangles");
+        }
+        AssetDatabase.SaveAssets();
+        ConfigureTextures();
+    }
+
+    // Import settings for the baked textures: colour maps in sRGB, data maps linear, the normal maps as normal maps.
+    static void ConfigureTextures()
+    {
+        foreach (var path in Directory.GetFiles(TexDir, "*.png").Select(p => p.Replace('\\', '/')))
+        {
+            var name = Path.GetFileNameWithoutExtension(path);
+            if (!(name.StartsWith("booth-") || name.StartsWith("payphone-") || name.StartsWith("glass-")) || name == "booth-sparkle") continue;
+            var imp = (TextureImporter)AssetImporter.GetAtPath(path); if (imp == null) continue;
+            bool color = name.EndsWith("-albedo") || name.EndsWith("-emission");
+            imp.textureType = name.EndsWith("-normal") ? TextureImporterType.NormalMap : TextureImporterType.Default;
+            imp.sRGBTexture = color;
+            imp.alphaSource = name.EndsWith("-metallic-smoothness") ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
+            imp.mipmapEnabled = true; imp.wrapMode = name.StartsWith("glass-") ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
+            imp.anisoLevel = name.EndsWith("-albedo") || name.EndsWith("-normal") ? 4 : 1;
+            imp.maxTextureSize = name.StartsWith("payphone-") || name.EndsWith("-occlusion") || name.EndsWith("-emission") || name.StartsWith("glass-") ? 1024 : 2048;
+            imp.textureCompression = TextureImporterCompression.Compressed; imp.crunchedCompression = false;
+            imp.SaveAndReimport();
+        }
+    }
 
     static Material Mat(string name, string shader)
     {
         var path = Dir + "Materials/" + name + ".mat";
-        var sh = Shader.Find(shader); if (sh == null) throw new System.Exception("Shader '" + shader + "' isn't in this world (shaders-shop)");
+        var sh = Shader.Find(shader); if (sh == null) throw new Exception("Shader '" + shader + "' isn't in this world (shaders-shop)");
         var m = AssetDatabase.LoadAssetAtPath<Material>(path);
         if (m == null) { m = new Material(sh) { name = name }; AssetDatabase.CreateAsset(m, path); }
         else if (m.shader != sh) m.shader = sh;
@@ -45,48 +115,48 @@ public static class LiminalBooth
         return m;
     }
 
-    // The booth in the Unity Stable shaders (our own; lilToon and Poiyomi only switch features on through their own
-    // inspectors, so they can't be set up from a script). Candy Paint: hot pink lacquer with a warm sunset rim, gloss,
-    // sky in the clear coat and gold glitter flecks. Pink Glass: tinted glass with sky reflections and a soft edge.
-    [MenuItem("LiminalDoors/Booth/Apply shader look (Unity Stable)")]
-    public static void ApplyShaderLook()
+    static Texture2D Tex(string name) => AssetDatabase.LoadAssetAtPath<Texture2D>(TexDir + name + ".png") ?? throw new Exception("missing texture " + TexDir + name + ".png");
+
+    // Unity's Standard shader with the baked maps (metallic in R, smoothness in A of the metallic-smoothness map).
+    static Material Pbr(string name, string prefix, float emission)
     {
-        var butter = new Color(1f, .86f, .46f);
-        var paint = Mat("Booth paint", "Unity Stable/Candy Paint");
-        paint.SetColor("_Color", new Color(1f, .2f, .56f)); paint.SetColor("_ShadeColor", new Color(.8f, .38f, .68f));   // lighter shade: the sunset sun is behind the booth
-        paint.SetFloat("_ShadeStep", .42f); paint.SetFloat("_ShadeSoftness", .22f);
-        paint.SetColor("_RimColor", new Color(1.4f, .95f, .7f)); paint.SetFloat("_RimPower", 3f);
-        paint.SetColor("_GlossColor", new Color(1.6f, 1.5f, 1.45f)); paint.SetFloat("_GlossPower", 140f); paint.SetFloat("_CoatStrength", .35f);
-        paint.SetColor("_GlitterColor", new Color(2.6f, 2.1f, 1.1f)); paint.SetFloat("_GlitterDensity", 55f); paint.SetFloat("_GlitterAmount", .4f);
-        paint.SetFloat("_GlitterSharpness", 60f); paint.SetFloat("_GlitterTwinkle", 1.2f); paint.SetColor("_EmissionColor", new Color(.11f, .012f, .05f));
-        EditorUtility.SetDirty(paint);
+        var m = Mat(name, "Standard");
+        m.SetColor("_Color", Color.white); m.SetTexture("_MainTex", Tex(prefix + "-albedo"));
+        m.SetTexture("_MetallicGlossMap", Tex(prefix + "-metallic-smoothness")); m.SetFloat("_GlossMapScale", 1f); m.SetFloat("_SmoothnessTextureChannel", 0f);
+        m.EnableKeyword("_METALLICGLOSSMAP");
+        m.SetTexture("_BumpMap", Tex(prefix + "-normal")); m.SetFloat("_BumpScale", 1f); m.EnableKeyword("_NORMALMAP");
+        m.SetTexture("_OcclusionMap", Tex(prefix + "-occlusion")); m.SetFloat("_OcclusionStrength", 1f);
+        if (emission > 0)
+        {
+            m.SetTexture("_EmissionMap", Tex(prefix + "-emission")); m.SetColor("_EmissionColor", Color.white * emission);
+            m.EnableKeyword("_EMISSION"); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+        }
+        else { m.DisableKeyword("_EMISSION"); m.SetColor("_EmissionColor", Color.black); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack; }
+        EditorUtility.SetDirty(m);
+        return m;
+    }
 
-        var glow = Mat("Booth glow", "Unity Stable/Candy Paint");   // butter-yellow sign and payphone lights
-        glow.SetColor("_Color", new Color(1f, .93f, .66f)); glow.SetColor("_EmissionColor", butter * 2.4f);
-        glow.SetFloat("_GlitterAmount", 0f); glow.SetFloat("_CoatStrength", .1f);
-        EditorUtility.SetDirty(glow);
-
-        var face = Mat("Payphone face (candy)", "Unity Stable/Candy Paint");   // dark plum keypad with gloss
-        face.SetColor("_Color", new Color(.22f, .09f, .17f)); face.SetColor("_ShadeColor", new Color(.6f, .5f, .6f));
-        face.SetFloat("_GlitterAmount", 0f); face.SetColor("_RimColor", new Color(.6f, .35f, .5f)); face.SetFloat("_CoatStrength", .5f);
-        EditorUtility.SetDirty(face);
-
+    [MenuItem("LiminalDoors/Booth/Apply look")]
+    public static void ApplyLook()
+    {
+        Pbr("Booth", "booth", 2.0f);          // the butter-yellow signs glow past the bloom threshold
+        Pbr("Payphone", "payphone", 0f);
         var glass = Mat("Booth glass (pink)", "Unity Stable/Pink Glass");
-        glass.SetColor("_Tint", new Color(1f, .72f, .84f, .16f)); glass.SetFloat("_Reflection", .9f); glass.SetFloat("_ReflectionBlur", .5f);
+        glass.SetColor("_Tint", new Color(1f, .72f, .84f, .14f)); glass.SetFloat("_Reflection", .9f); glass.SetFloat("_ReflectionBlur", .5f);
         glass.SetColor("_EdgeGlow", new Color(1.2f, .5f, .8f)); glass.SetFloat("_EdgePower", 2.5f);
+        glass.SetTexture("_Smudge", Tex("glass-smudge")); glass.SetTextureScale("_Smudge", new Vector2(.9f, .9f)); glass.SetFloat("_SmudgeAmount", .6f);
         EditorUtility.SetDirty(glass);
-
-        // test materials from the lilToon / Mochie attempt, never shipped
-        foreach (var old in new[] { "Booth glass (Mochie)", "Payphone face (lilToon)" }) AssetDatabase.DeleteAsset(Dir + "Materials/" + old + ".mat");
-        AssetDatabase.DeleteAsset(Dir + "Textures/booth-candy-matcap.png");
+        // the candy-paint look this replaces, and the lilToon / Mochie test materials before it
+        foreach (var old in new[] { "Booth paint", "Booth glow", "Payphone face (candy)", "Booth glass (Mochie)", "Payphone face (lilToon)" })
+            AssetDatabase.DeleteAsset(Dir + "Materials/" + old + ".mat");
         AssetDatabase.SaveAssets();
-        Debug.Log("[Liminal] booth shader look applied (Unity Stable)");
+        Debug.Log("[Liminal] booth look applied (Blender bake + Standard)");
     }
 
     [MenuItem("LiminalDoors/Booth/Build prefab")]
     public static void BuildPrefab()
     {
-        ApplyShaderLook();
+        ApplyLook();
         EnsureSparkleTexture();
         var sparkle = EnsureSparkleMaterial();
 
@@ -95,16 +165,22 @@ public static class LiminalBooth
         {
             foreach (var p in Parts)
             {
-                var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(Dir + "Meshes/" + p + ".asset");
-                if (mesh.uv2 == null || mesh.uv2.Length == 0) { Unwrapping.GenerateSecondaryUVSet(mesh); EditorUtility.SetDirty(mesh); }   // lightmap UVs
-                var go = new GameObject(p); go.transform.SetParent(root.transform, false);
+                var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(ModelDir + p.mesh + ".asset") ?? throw new Exception("missing " + ModelDir + p.mesh + ".asset (Import Blender model first)");
+                var go = new GameObject(p.mesh);
+                go.transform.SetParent(p.parent == "" ? root.transform : root.transform.Find(p.parent), false);
+                go.transform.localPosition = p.pos; go.transform.localRotation = Quaternion.Euler(0f, p.rotY, 0f);
                 go.AddComponent<MeshFilter>().sharedMesh = mesh;
-                var r = go.AddComponent<MeshRenderer>(); r.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(Dir + "Materials/" + MaterialFor(p) + ".mat");
-                if (p == "Booth glass") r.shadowCastingMode = ShadowCastingMode.Off;
+                var r = go.AddComponent<MeshRenderer>(); r.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(Dir + "Materials/" + p.mat + ".mat");
+                if (!p.shadows) r.shadowCastingMode = ShadowCastingMode.Off;
                 GameObjectUtility.SetStaticEditorFlags(go, StaticEditorFlags.BatchingStatic | StaticEditorFlags.OccludeeStatic | StaticEditorFlags.OccluderStatic | StaticEditorFlags.ContributeGI | StaticEditorFlags.ReflectionProbeStatic);
             }
+            // where people stand (the plinth top, 8 cm up), the three glazed walls and the door, so nobody walks through
             var floor = new GameObject("Booth floor"); floor.transform.SetParent(root.transform, false);
-            var fc = floor.AddComponent<BoxCollider>(); fc.center = new Vector3(0, .02f, 0); fc.size = new Vector3(1.3f, .04f, 1.3f);
+            var fc = floor.AddComponent<BoxCollider>(); fc.center = new Vector3(0, .04f, 0); fc.size = new Vector3(1.4f, .08f, 1.4f);
+            var walls = new GameObject("Booth walls"); walls.transform.SetParent(root.transform, false);
+            foreach (var (c, s) in new[] { (new Vector3(0, 1.14f, -.6f), new Vector3(1.3f, 2.12f, .08f)), (new Vector3(-.6f, 1.14f, 0), new Vector3(.08f, 2.12f, 1.3f)), (new Vector3(.6f, 1.14f, 0), new Vector3(.08f, 2.12f, 1.3f)) })
+            { var bc = walls.AddComponent<BoxCollider>(); bc.center = c; bc.size = s; }
+            var dc = root.transform.Find("Booth door").gameObject.AddComponent<BoxCollider>(); dc.center = new Vector3(.53f, 1.05f, -.025f); dc.size = new Vector3(1.06f, 1.94f, .05f);
 
             Swirl(root.transform, sparkle);
             BaseGlow(root.transform, sparkle);
@@ -115,6 +191,40 @@ public static class LiminalBooth
         finally { Object.DestroyImmediate(root); }
         EnsureRecipe();
         Debug.Log("[Liminal] booth prefab written: " + PrefabPath);
+    }
+
+    // Close-ups of the booth in the open scene (its own sky and light) for review: the payphone, a crown and sign, the
+    // door pull. Positions are in the booth's (or the door's) own space.
+    [MenuItem("LiminalDoors/Booth/Render close-ups")]
+    public static void RenderCloseUps()
+    {
+        var booth = GameObject.Find("Phone booth") ?? throw new Exception("no 'Phone booth' in the open scene");
+        var t = booth.transform; var door = t.Find("Booth door");
+        var shots = new (string name, Transform space, Vector3 pos, Vector3 look, float fov)[]
+        {
+            ("payphone", t, new Vector3(.16f, 1.55f, .32f), new Vector3(-.01f, 1.37f, -.49f), 42f),
+            ("crown-and-sign", t, new Vector3(.38f, 1.95f, 1.85f), new Vector3(0f, 2.28f, .66f), 30f),
+            ("door-pull", door, new Vector3(.62f, 1.3f, .62f), new Vector3(1.03f, 1.1f, .036f), 38f),
+            ("handset-and-cord", t, new Vector3(.42f, 1.25f, -.08f), new Vector3(.08f, 1.22f, -.48f), 38f),
+        };
+        const string dir = "Review/booth-closeups/";
+        Directory.CreateDirectory(dir);
+        var go = new GameObject("close-up camera") { hideFlags = HideFlags.HideAndDontSave };
+        var cam = go.AddComponent<Camera>(); cam.nearClipPlane = .02f; cam.farClipPlane = 3000f; cam.allowHDR = true; cam.clearFlags = CameraClearFlags.Skybox;
+        var rt = new RenderTexture(1920, 1080, 24, RenderTextureFormat.ARGB32) { antiAliasing = 8 };
+        var tex = new Texture2D(1920, 1080, TextureFormat.RGB24, false);
+        try
+        {
+            cam.targetTexture = rt;
+            foreach (var s in shots)
+            {
+                go.transform.position = s.space.TransformPoint(s.pos); go.transform.LookAt(s.space.TransformPoint(s.look)); cam.fieldOfView = s.fov;
+                cam.Render(); RenderTexture.active = rt; tex.ReadPixels(new Rect(0, 0, 1920, 1080), 0, 0); tex.Apply();
+                File.WriteAllBytes(dir + "booth-" + s.name + ".png", tex.EncodeToPNG());
+            }
+        }
+        finally { RenderTexture.active = null; cam.targetTexture = null; Object.DestroyImmediate(go); Object.DestroyImmediate(rt); Object.DestroyImmediate(tex); }
+        Debug.Log("[Liminal] booth close-ups written to " + dir);
     }
 
     // Gold and pink sparkles that swirl up around the booth in a slow helix.
@@ -226,19 +336,22 @@ public static class LiminalBooth
         if (r == null) { r = ScriptableObject.CreateInstance<AssetRecipe>(); NewRecipe(r); AssetDatabase.CreateAsset(r, RecipePath); }
         r.prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
         r.maxMaterials = 5; r.maxParticles = 400;   // Astra, 2026-10-18: merge to 5 materials; more and brighter sparkles (300 + 60 base glow)
-        r.changelog = "1.0.0: first version. Hot pink candy paint (Unity Stable Candy Paint: toon shade, sunset rim light, lacquer gloss, gold glitter flecks), butter-yellow glowing sign, pink glass with sky reflections (Unity Stable Pink Glass), gold and pink sparkles swirling up around it (Unity Stable Sparkle), gold base glow.";
+        // 2026-10-19, the handmade rebuild: a hero prop for PC worlds, modelled with bevels and real detail (about 26k
+        // triangles) and baked to a 2048 booth atlas and a 1024 payphone atlas
+        r.maxTriangles = 30000; r.maxTextureSize = 2048;
+        r.description = "The pink K6 phone booth at the start of Liminal Doors: a bevelled cast-iron kiosk in hot pink enamel with chipped edges and weathering, lit butter-yellow TELEPHONE signs, gilded crowns, a brass door pull, pink glass with fingerprints, and a payphone inside with a chrome keypad, handset and coiled cord. Gold and pink sparkles swirl up around it.";
+        r.source = "Modelled in Blender by Tools/Blender/make_phone_booth.py after Sir Giles Gilbert Scott's K6 kiosk (proportions only); textures baked there from CC0 ambientCG scans; sparkles and prefab made in Liminal Doors";
+        r.attribution = "Surface scans: ambientCG.com PaintedMetal002, Metal009, Smear002, Scratches001 (CC0; credit not required)";
+        r.changelog = "1.0.0: first version. Handmade K6 booth modelled in Blender (bevels, recessed posts, narrow-wide-narrow glazing, lit TELEPHONE signs, gilded crowns, dome, brass pull); baked ambient occlusion, edge wear, grime, rain streaks and sun fade over CC0 scans; Standard PBR materials; payphone with chrome keypad, instruction card, coin slots, handset and coiled cord; pink glass with fingerprints (Unity Stable Pink Glass); gold and pink sparkles swirling up around it (Unity Stable Sparkle); gold base glow.";
         EditorUtility.SetDirty(r); AssetDatabase.SaveAssets();
     }
 
     static void NewRecipe(AssetRecipe r)
     {
         r.id = "liminal-doors-phone-booth"; r.displayName = "Liminal Doors phone booth"; r.kind = "prop"; r.version = "1.0.0";
-        r.description = "The pink phone booth at the start of Liminal Doors: hot pink with a butter-yellow glowing sign and warm pink-lit glass, with gold and pink sparkles swirling up around it and a soft gold glow at its base.";
         r.forPC = true; r.forAndroid = false; r.moves = false;
         r.prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
         r.creator = "Astra (built with Claude)";
-        r.source = "Booth shape from Astra's Infinite Pole (her own world); materials, sparkles and prefab made in Liminal Doors";
         r.license = "own-work"; r.publicOk = true;
-        r.changelog = "1.0.0: first version. Hot pink look, glowing sign, swirling gold and pink sparkles, gold base glow.";
     }
 }
