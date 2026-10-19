@@ -20,9 +20,15 @@ Pole is kept on the branch `claude/stop-01-pink-booth-20261018`.
 
 | # | Animal | Stop | Status |
 |---|---|---|---|
-| 01 | Fox | Pink Booth | Plain booth with a floor and the spawn inside. Booth changes, clouds, sky, fox and doors to come |
+| 01 | Fox | Pink Booth (Pinkscape) | The handmade K6 booth with the spawn inside. The glass fox to come |
+| 02 | Hare | Faraway Field | Tall pink frond grass that sways and parts as you walk, a sparkling dusk sky, door portals. The glass hare to come |
+| 03 | Axolotl | Pool After Closing | A tiled pool hall: caustics, underwater windows, a violet skylight, the pink double door. The glass axolotl to come |
 
 All stops live in one scene, `Assets/LiminalDoors/Scenes/Liminal Doors.unity`; stop 01 is its root `Stop 01 - Fox - Pink Booth`.
+**LiminalDoors > World > Build all** rebuilds stops 02 and 03 and wires every door; renders are in `docs/renders/`.
+
+![Stop 02: the Faraway Field](docs/renders/stop-02-01-arrival-view.jpg)
+![Stop 03: Pool After Closing](docs/renders/stop-03-01-arrival-view.jpg)
 
 ## Working in it
 

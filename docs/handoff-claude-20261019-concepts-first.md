@@ -1,6 +1,9 @@
 # Handoff: concepts first, Unity on hold (Claude, 2026-10-19)
 
 status: open. **No Unity edits until Astra says the concepts all look good.**
+Exceptions Astra made since: the booth fixes (b94f276), and on 2026-10-19 "do the next 2 levels", which covered stops 02
+and 03 and items 3 and 4 below for those stops (see `handoff-claude-20261019-stops-02-03.md`). Items 1 and 2, for stop
+01, are still open.
 
 Astra, 2026-10-19: "save the unity changes for later, we are gonna make sure these concepts all look good before
 editing the unity world any longer."

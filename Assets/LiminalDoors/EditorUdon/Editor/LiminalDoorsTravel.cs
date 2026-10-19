@@ -14,6 +14,8 @@
 //       LiminalDoors/World/Door trip test (play mode) -> ClientSim walks the trip; Review/world-doors/trip-test.md
 // Fresh base (2026-10-18): stop 01's sky is the fresh "Plain Sky", and Build all is stop 01's door anchors, stop 02's Build
 // and Wire doors (stop 01 only gets its anchors added, never rebuilt). Only compiled once the VRChat SDK has set its UDON define (a brand-new project compiles once without it).
+// 2026-10-19: stop 03 (Pool After Closing) joins Build all; Wire doors also puts a LiminalGrassPush on every
+// "Grass push (player)" marker (stop 02's grass bends away from you); the trip test works for any number of stops.
 #if UDON
 using System;
 using System.Collections.Generic;
@@ -38,6 +40,8 @@ public static class LiminalDoorsTravel
     const string StartSky = "Assets/LiminalDoors/Materials/Plain Sky.mat";   // stop 01's sky only if the scene has none (see SkyFor)
     const string Out = "Review/world-doors";
     const float SlotGap = 2600f;   // stops must be farther apart than the camera's far clip (2500 m)
+    const string PushMarker = "Grass push (player)";
+    static readonly string[] Programs = { "LiminalTraveler", "LiminalDoor", "LiminalGrassPush" };
 
     static LiminalDoorsTravel() { EditorApplication.playModeStateChanged += OnPlayMode; }
 
@@ -47,7 +51,7 @@ public static class LiminalDoorsTravel
     public static void MakePrograms()
     {
         var r = new List<string> { "# Door scripts", "Run " + Now(), "" };
-        foreach (var name in new[] { "LiminalTraveler", "LiminalDoor" })
+        foreach (var name in Programs)
         {
             string cs = ScriptDir + "/" + name + ".cs", asset = ScriptDir + "/" + name + ".asset";
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(cs);
@@ -64,7 +68,7 @@ public static class LiminalDoorsTravel
         }
         AssetDatabase.SaveAssets();
         UdonSharpCompilerV1.CompileSync(new UdonSharpCompileOptions { IsEditorBuild = true });
-        foreach (var name in new[] { "LiminalTraveler", "LiminalDoor" })
+        foreach (var name in Programs)
         {
             var prog = AssetDatabase.LoadAssetAtPath<UdonSharpProgramAsset>(ScriptDir + "/" + name + ".asset");
             r.Add("- " + name + ": " + (prog != null && prog.SerializedProgramAsset != null ? "compiled program `" + AssetDatabase.GetAssetPath(prog.SerializedProgramAsset) + "`" : "NOT COMPILED (see the console)"));
@@ -89,6 +93,7 @@ public static class LiminalDoorsTravel
         {
             var go = t.gameObject; Remove(t); if (go != null && go.name == TravelName) UnityEngine.Object.DestroyImmediate(go); removed++;
         }
+        foreach (var g in Resources.FindObjectsOfTypeAll<LiminalGrassPush>().Where(g => g != null && g.gameObject.scene == scene).ToList()) { Remove(g); removed++; }
         if (removed > 0) r.Add("Removed the previous wiring (" + removed + " parts).");
 
         var travelGo = new GameObject(TravelName);
@@ -122,6 +127,14 @@ public static class LiminalDoorsTravel
                 r.Add("- " + s.name + ": " + (door.back ? "arrival door (the way back)" : "forward door (random)") + " `" + Path(t) + "`, box " + V(Vector3.Scale(box.size, t.lossyScale)) + " m at " + V(t.TransformPoint(box.center)));
             }
             r.Add("  - arrive at " + V(traveler.arrivals[i].position) + ", come back to " + V(traveler.returns[i].position) + ", sky " + (traveler.skies[i] != null ? traveler.skies[i].name : "unchanged"));
+            foreach (var m in s.GetComponentsInChildren<Transform>(true).Where(t => t.name == PushMarker))
+            {
+                var push = m.gameObject.AddUdonSharpComponent<LiminalGrassPush>();
+                UdonSharpEditorUtility.CopyProxyToUdon(push);
+                var pb = UdonSharpEditorUtility.GetBackingUdonBehaviour(push);
+                if (pb == null || pb.programSource == null) problems.Add(Path(m) + ": the grass push has no compiled Udon program (run World/Make door scripts)");
+                r.Add("  - grass push `" + Path(m) + "`: the grass bends away from you here");
+            }
         }
 
         // checks: nobody lands inside a door (a player is ~0.3 m wide and 1.8 m tall), stops far apart, spawn outside every stop
@@ -153,7 +166,9 @@ public static class LiminalDoorsTravel
         r.Insert(4, "");
         if (problems.Count > 0) { r.Add(""); r.Add("## Problems"); r.AddRange(problems.Select(p => "- " + p)); }
         r.Add("");
-        r.Add("Stop 01 is the start and is never picked at random. With only stop 02 besides it, the rose door has nowhere new to go, so it leads back to the booth (and the way back starts over) until stop 03 exists.");
+        r.Add("Stop 01 is the start and is never picked at random. " + (stops.Count <= 2
+            ? "With only stop 02 besides it, the rose door has nowhere new to go, so it leads back to the booth (and the way back starts over)."
+            : "Forward doors pick among the other " + (stops.Count - 1) + " stops, never the one you're in."));
         Write("report.md", r);
         if (problems.Count > 0) Debug.LogWarning("[Liminal] Door wiring: " + problems.Count + " problem(s), see " + Out + "/report.md");
     }
@@ -166,6 +181,7 @@ public static class LiminalDoorsTravel
         {
             Step(r, "LiminalDoors/Stop 01/Add door anchors", () => Find(Root("Stop 01"), "Forward door trigger") != null);   // never Stop 01/Build: it would replace the booth being made
             Step(r, "LiminalDoors/Stop 02/Build stop", () => Root("Stop 02") != null);
+            Step(r, "LiminalDoors/Stop 03/Build stop", () => Root("Stop 03") != null);
             Wire();
             r.Add("OK   LiminalDoors/World/Wire doors (see report.md)");
             r.Add(""); r.Add("Done. Scene: `" + SceneManager.GetActiveScene().path + "`");
@@ -213,6 +229,8 @@ public static class LiminalDoorsTravel
 
     static int passed, failed;
     static Material startSky;   // the scene's sky as play mode starts, which is stop 01's
+    static GameObject tripA, tripB;   // the stops the random doors picked on this run
+    static readonly List<GameObject> visited = new List<GameObject>();
 
     static void Tick()
     {
@@ -231,33 +249,50 @@ public static class LiminalDoorsTravel
         bool Near(Vector3 a, Vector3 b) => Vector3.Distance(a, b) < 1.0f;
         void Check(string what, bool ok) { if (ok) passed++; else failed++; log.Add((ok ? "PASS " : "FAIL ") + what + " (" + At() + ")"); }
         void Enter(Transform trigger) { var box = trigger.GetComponent<BoxCollider>(); me.TeleportTo(trigger.TransformPoint(box.center) - Vector3.up * 0.9f, trigger.rotation); }
-        var s1 = stops[0]; var s2 = stops[1];
+        // forward doors are random, so each check asks "which stop am I on now?" and follows that stop's doors
+        var s1 = stops[0];
+        GameObject On() { var on = stops.Where(x => x.activeSelf).ToList(); return on.Count == 1 ? on[0] : null; }
+        string Short(GameObject s) => s == null ? "none (or several)" : s.name.Substring(0, 7);
+        var cur = On();
         switch (step)
         {
             case 0:
-                passed = failed = 0; startSky = RenderSettings.skybox;
-                Check("starts in the pink booth with only stop 01 switched on", s1.activeSelf && stops.Skip(1).All(x => !x.activeSelf) && Near(me.GetPosition(), Pt(s1, "Arrival point").position));
+                passed = failed = 0; startSky = RenderSettings.skybox; visited.Clear(); tripA = tripB = null;
+                Check("starts in the pink booth with only stop 01 switched on", cur == s1 && Near(me.GetPosition(), Pt(s1, "Arrival point").position));
                 Enter(Trig(s1, "Forward door trigger")); break;
             case 1:
-                Check("stepping out of the booth door lands you at stop 02's arrival point, stop 01 off", s2.activeSelf && !s1.activeSelf && Near(me.GetPosition(), Pt(s2, "Arrival point").position));
-                Check("the sky is stop 02's", RenderSettings.skybox != null && RenderSettings.skybox == SkyFor(s2));
-                Enter(Trig(s2, "Arrival door trigger")); break;
+                tripA = cur;
+                Check("stepping out of the booth door lands you at another stop's arrival point (" + Short(cur) + "), stop 01 off", cur != null && cur != s1 && Near(me.GetPosition(), Pt(cur, "Arrival point").position));
+                Check("the sky is that stop's", cur != null && RenderSettings.skybox != null && RenderSettings.skybox == SkyFor(cur));
+                if (cur != null) { visited.Add(cur); Enter(Trig(cur, "Arrival door trigger")); }
+                break;
             case 2:
-                Check("stop 02's arrival door takes you back into the booth", s1.activeSelf && !s2.activeSelf && Near(me.GetPosition(), Pt(s1, "Return point").position));
+                Check("its arrival door takes you back into the booth", cur == s1 && Near(me.GetPosition(), Pt(s1, "Return point").position));
                 Check("the sky is stop 01's again", RenderSettings.skybox != null && RenderSettings.skybox == startSky);
                 Enter(Trig(s1, "Forward door trigger")); break;
             case 3:
-                Check("out through the booth door again: stop 02", s2.activeSelf && Near(me.GetPosition(), Pt(s2, "Arrival point").position));
-                Enter(Trig(s2, "Forward door trigger")); break;
+                tripA = cur;
+                Check("out through the booth door again: " + Short(cur), cur != null && cur != s1 && Near(me.GetPosition(), Pt(cur, "Arrival point").position));
+                if (cur != null) { visited.Add(cur); Enter(Trig(cur, "Forward door trigger")); }
+                break;
             case 4:
-                Check(stops.Count == 2 ? "the rose door, with nowhere new yet, leads back to the booth" : "the rose door leads on to another stop",
-                      stops.Count == 2 ? s1.activeSelf && Near(me.GetPosition(), Pt(s1, "Return point").position) : !s2.activeSelf);
-                Enter(Trig(s1, "Forward door trigger")); break;
+                tripB = cur;
+                if (stops.Count == 2) Check("the rose door, with nowhere new yet, leads back to the booth", cur == s1 && Near(me.GetPosition(), Pt(s1, "Return point").position));
+                else
+                {
+                    Check("its forward door leads on to a different stop (" + Short(tripA) + " -> " + Short(cur) + ")", cur != null && cur != s1 && cur != tripA && Near(me.GetPosition(), Pt(cur, "Arrival point").position));
+                    Check("the sky is " + Short(cur) + "'s", cur != null && RenderSettings.skybox == SkyFor(cur));
+                    if (cur != null) visited.Add(cur);
+                }
+                if (stops.Count > 2 && cur != null && cur != s1) Enter(Trig(cur, "Arrival door trigger")); else Enter(Trig(s1, "Forward door trigger"));
+                break;
             case 5:
-                Check("out to stop 02 once more", s2.activeSelf);
+                if (stops.Count > 2) Check("its way-back door returns you to where you came from (" + Short(tripA) + "), in front of its forward door", cur == tripA && tripA != null && Near(me.GetPosition(), Pt(tripA, "Return point").position));
+                else Check("out to stop 02 once more", cur != null && cur != s1);
                 me.Respawn(); break;
             case 6:
-                Check("a respawn (falling off) puts you back in the booth with stop 01 on", s1.activeSelf && !s2.activeSelf);
+                Check("a respawn (falling off) puts you back in the booth with stop 01 on", cur == s1);
+                log.Add(""); log.Add("Stops visited on this run: " + string.Join(", ", visited.Distinct().Select(Short)) + " (forward doors are random).");
                 Finish(null); return;
         }
         step++; next = now + 1.6;   // the traveler ignores doors for 0.75 s after a trip

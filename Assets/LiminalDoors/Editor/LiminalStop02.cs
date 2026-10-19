@@ -14,6 +14,19 @@
 // in front of the pale arrival door (the way back) facing the rise; the rose door beyond it is the forward door.
 // Doors are only geometry and named trigger boxes here; LiminalDoorsTravel (LiminalDoors/World/Wire doors) wires them.
 //
+//
+// 2026-10-19, Astra: "focus on the grass for the first level. make it look like the grass in the Pink Universe world.
+// Also get the sparkles in the background from that world." (and before: "need to work on the grass physics and
+// texture. make it taller. make it interesting."). Our own version of that look, nothing taken from the world:
+// - the grass is now ~45k tufts of tall leafy fronds (two crossed cards each, 0.6-1.5 m) drawn from a frond atlas this
+//   script paints, deep rose at the root to pale pink-white at the tip (LiminalDoors/Frond Grass);
+// - it sways in travelling gusts, flutters per tuft, and bends away from you as you walk through (the "Grass push
+//   (player)" marker gets a LiminalGrassPush from World/Wire doors);
+// - the sky has a twinkling sparkle layer, big four-point glints and a faint nebula over the sunset, and sparkles drift
+//   in the distance and just over the grass;
+// - doorway lights are portals that fill the opening (LiminalDoorKit.Portal).
+// The lone tree and the sword of the Pink Universe world (Steven Universe's) are deliberately not here.
+//
 // Menu: LiminalDoors/Stop 02/Build stop            -> replaces only the Stop 02 root in the world scene
 //       LiminalDoors/Stop 02/Rebuild field meshes  -> generates the ground, grass and path again, then builds
 //       LiminalDoors/Stop 02/Render review shots   -> Review/stop-02-render/*.png + report.md
@@ -37,7 +50,9 @@ public static class LiminalStop02
     public const string SkyMaterial = "Assets/LiminalDoors/Materials/Stop 02 Sky.mat";
     const string GenDir = "Assets/LiminalDoors/Stop 02";
     const string GroundMeshPath = GenDir + "/Field ground.asset";
-    const string GrassMeshPath = GenDir + "/Field grass.asset";
+    const string GrassMeshPath = GenDir + "/Field fronds.asset";
+    const string OldGrassMeshPath = GenDir + "/Field grass.asset";   // the 2026-10-18 single-triangle blades
+    const string FrondAtlasPath = GenDir + "/Frond atlas.png";
     const string PathMaskPath = GenDir + "/Field path mask.png";
     const string MatDir = "Assets/LiminalDoors/Materials";
     const string ReviewDir = "Review/stop-02-render";
@@ -54,6 +69,7 @@ public static class LiminalStop02
         new Vector2(3.6f, 21f), new Vector2(5.0f, 26f), new Vector2(5.5f, 30.3f)
     };
     static readonly Vector3 SunDir = new Vector3(0.12f, 0.04f, 1f);   // low, just behind the rose door
+    static readonly Vector2 Opening = new Vector2(0.9f, 2.24f);       // inside the door frame: posts at +-0.45, sill 0.06, lintel 2.30
 
     // ---------------------------------------------------------------- terrain
 
@@ -119,63 +135,163 @@ public static class LiminalStop02
 
     // ---------------------------------------------------------------- grass and wildflowers
 
-    class Tile { public List<Vector3> v = new List<Vector3>(); public List<Color> c = new List<Color>(); public List<Vector2> uv = new List<Vector2>(); }
-
-    static List<Mesh> BuildGrass(out int blades, out int flowers)
+    // The frond atlas: four leafy pink-grass fronds side by side (256 x 512 px each), painted here from signed
+    // distances so the edges are clean at any size. RGB is leaf shading (lighter toward each leaflet's tip, a darker
+    // midrib), A is coverage. The shader colours it (root to tip) and cuts it out.
+    struct Frond { public float x, angle, height, bend, leaf; public int pairs; public Frond(float x, float a, float h, float b, int p, float l) { this.x = x; angle = a; height = h; bend = b; pairs = p; leaf = l; } }
+    static readonly Frond[][] FrondKinds =
     {
-        var rnd = new System.Random(20261018);
+        new[] { new Frond(128, 0, 500, 18, 7, 1.0f) },                                                     // one tall frond
+        new[] { new Frond(128, 0, 470, -22, 6, 1.15f) },                                                   // one broad frond
+        new[] { new Frond(118, -9, 470, -10, 5, 0.85f), new Frond(138, 11, 430, 12, 5, 0.8f) },             // a pair
+        new[] { new Frond(128, 0, 360, 8, 5, 1.0f), new Frond(112, -16, 300, -14, 4, 0.8f), new Frond(144, 15, 320, 14, 4, 0.8f) },   // a low bunch
+    };
+
+    static Vector2 StemAt(Frond f, float s)
+    {
+        float a = f.angle * Mathf.Deg2Rad;
+        return new Vector2(f.x + Mathf.Sin(a) * f.height * s + f.bend * s * s, 4f + Mathf.Cos(a) * f.height * s);
+    }
+
+    static Texture2D BuildFrondAtlas()
+    {
+        const int W = 256, Hh = 512, N = 4;
+        var px = new Color32[W * N * Hh];
+        for (int k = 0; k < N; k++)
+        {
+            // shapes: stem segments (capsules) and leaflets (tapered ellipses), each with a bounding box
+            var caps = new List<(Vector2 a, Vector2 b, float ra, float rb)>();
+            var leaves = new List<(Vector2 c, Vector2 dir, float len, float wid)>();
+            foreach (var f in FrondKinds[k])
+            {
+                const int seg = 12;
+                for (int i = 0; i < seg; i++)
+                {
+                    float s0 = i / (float)seg, s1 = (i + 1) / (float)seg;
+                    caps.Add((StemAt(f, s0), StemAt(f, s1), Mathf.Lerp(3.6f, 1.2f, s0), Mathf.Lerp(3.6f, 1.2f, s1)));
+                }
+                for (int p = 0; p < f.pairs; p++)
+                {
+                    for (int side = -1; side <= 1; side += 2)
+                    {
+                        float s = Mathf.Lerp(0.2f, 0.9f, p / (float)Mathf.Max(1, f.pairs - 1)) + (side > 0 ? 0.035f : 0f);
+                        var at = StemAt(f, s); var tan = (StemAt(f, s + 0.01f) - at).normalized;
+                        float ang = side * Mathf.Lerp(52f, 34f, s) * Mathf.Deg2Rad;
+                        var dir = new Vector2(tan.x * Mathf.Cos(ang) - tan.y * Mathf.Sin(ang), tan.x * Mathf.Sin(ang) + tan.y * Mathf.Cos(ang));   // the stem's tangent turned out to one side
+                        float len = (36f + 74f * (1f - s)) * f.leaf, wid = len * 0.24f;
+                        leaves.Add((at + dir * (len * 0.5f), dir, len * 0.5f, wid * 0.5f));
+                    }
+                }
+                var top = StemAt(f, 1f); var tt = (top - StemAt(f, 0.97f)).normalized;
+                leaves.Add((top + tt * 24f * f.leaf, tt, 28f * f.leaf, 7f * f.leaf));
+            }
+            for (int y = 0; y < Hh; y++)
+                for (int x = 0; x < W; x++)
+                {
+                    var q = new Vector2(x + 0.5f, y + 0.5f);
+                    float cov = 0f, shade = 0f;
+                    foreach (var c in caps)
+                    {
+                        var ab = c.b - c.a; float t = Mathf.Clamp01(Vector2.Dot(q - c.a, ab) / ab.sqrMagnitude);
+                        float d = Vector2.Distance(q, c.a + ab * t) - Mathf.Lerp(c.ra, c.rb, t);
+                        float a = Mathf.Clamp01(0.5f - d);
+                        if (a > cov) { cov = a; shade = 0.62f; }
+                    }
+                    foreach (var l in leaves)
+                    {
+                        var r = q - l.c;
+                        if (Mathf.Abs(r.x) > l.len + 2f || Mathf.Abs(r.y) > l.len + 2f) continue;
+                        float along = Vector2.Dot(r, l.dir), across = l.dir.x * r.y - l.dir.y * r.x;
+                        float u = along / l.len;
+                        float wEff = l.wid * (u > 0f ? 1f - 0.6f * u * u : 1f - 0.25f * u * u);   // pointed tip, rounder base
+                        float e = Mathf.Sqrt(Sq(along / l.len) + Sq(across / Mathf.Max(0.5f, wEff)));
+                        float d = (e - 1f) * Mathf.Min(l.len, Mathf.Max(0.5f, wEff));
+                        float a = Mathf.Clamp01(0.5f - d);
+                        if (a > 0f && a >= cov * 0.98f)
+                        {
+                            float sh = 0.74f + 0.26f * Mathf.Clamp01(u * 0.5f + 0.5f);
+                            if (Mathf.Abs(across) < 1.1f && u > -0.8f) sh *= 0.86f;   // midrib
+                            shade = cov > 0f ? Mathf.Lerp(shade, sh, a) : sh; cov = Mathf.Max(cov, a);
+                        }
+                    }
+                    byte s8 = (byte)Mathf.RoundToInt(255f * Mathf.Clamp01(shade));
+                    px[k * W + x + y * W * N] = new Color32(s8, s8, s8, (byte)Mathf.RoundToInt(255f * cov));
+                }
+        }
+        var tex = new Texture2D(W * N, Hh, TextureFormat.RGBA32, false, true);
+        tex.SetPixels32(px); tex.Apply();
+        File.WriteAllBytes(FrondAtlasPath, tex.EncodeToPNG());
+        UnityEngine.Object.DestroyImmediate(tex);
+        AssetDatabase.ImportAsset(FrondAtlasPath, ImportAssetOptions.ForceUpdate);
+        var ti = (TextureImporter)AssetImporter.GetAtPath(FrondAtlasPath);
+        ti.sRGBTexture = false; ti.alphaIsTransparency = true; ti.mipmapEnabled = true;
+        ti.mipMapsPreserveCoverage = true; ti.alphaTestReferenceValue = 0.42f;
+        ti.wrapMode = TextureWrapMode.Clamp; ti.filterMode = FilterMode.Trilinear; ti.anisoLevel = 4;
+        ti.textureCompression = TextureImporterCompression.CompressedHQ;
+        ti.SaveAndReimport();
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(FrondAtlasPath);
+    }
+
+    class Tile { public List<Vector3> v = new List<Vector3>(), root = new List<Vector3>(); public List<Color> c = new List<Color>(); public List<Vector2> uv = new List<Vector2>(); public List<int> tri = new List<int>(); }
+
+    // Tufts: two crossed cards of one frond each, standing on the ground. Dense where you walk, thinning toward the
+    // horizon, none on the path, in the doorways or under the stone; shorter at the path's edge.
+    static List<Mesh> BuildFronds(out int tufts)
+    {
+        var rnd = new System.Random(20261019);
         Func<float> R = () => (float)rnd.NextDouble();
         var tiles = new Dictionary<Vector2Int, Tile>();
         var center = new Vector2(3f, 15f);
-        const float cell = 0.2f, dense = 26f, outer = 72f;
-        blades = 0; flowers = 0;
-        Color baseA = new Color(0.09f, 0.15f, 0.12f), baseB = new Color(0.14f, 0.21f, 0.16f);
-        Color tipA = new Color(0.50f, 0.62f, 0.52f), tipB = new Color(0.67f, 0.75f, 0.65f), rose = new Color(0.80f, 0.62f, 0.67f);
-        Color white = new Color(0.95f, 0.94f, 0.97f), lavender = new Color(0.63f, 0.50f, 0.87f);
+        const float cell = 0.3f, dense = 26f, outer = 72f, inset = 0.004f;
+        Color[] tints = { new Color(1f, 1f, 1f), new Color(1f, 0.92f, 0.97f), new Color(0.97f, 0.9f, 1f), new Color(0.99f, 0.85f, 0.92f), new Color(0.88f, 0.84f, 1f) };
+        tufts = 0;
         for (float gz = center.y - outer; gz < center.y + outer; gz += cell)
             for (float gx = center.x - outer; gx < center.x + outer; gx += cell)
             {
                 float x = gx + R() * cell, z = gz + R() * cell;
                 float r = Vector2.Distance(new Vector2(x, z), center);
                 if (r > outer) continue;
-                float perM2 = Mathf.Lerp(22f, 5f, Smooth(dense, dense + 10f, r)) * (1f - Smooth(outer - 12f, outer, r));
+                float perM2 = Mathf.Lerp(9f, 1.6f, Smooth(dense, dense + 12f, r)) * (1f - Smooth(outer - 14f, outer, r));
                 if (R() > perM2 * cell * cell) continue;
                 float pd = PathDist(x, z), pw = PathWidth(x, z);
-                if (pd < pw + 0.05f) continue;
-                if (Vector2.Distance(new Vector2(x, z), RoseDoorAt) < 0.8f || Vector2.Distance(new Vector2(x, z), ArrivalDoorAt) < 0.8f) continue;
-                if (Sq((x - StoneAt.x) / 1.55f) + Sq((z - StoneAt.y) / 1.1f) < 1f) continue;
+                if (pd < pw + 0.12f) continue;
+                if (Vector2.Distance(new Vector2(x, z), RoseDoorAt) < 0.95f || Vector2.Distance(new Vector2(x, z), ArrivalDoorAt) < 0.95f) continue;
+                if (Sq((x - StoneAt.x) / 1.65f) + Sq((z - StoneAt.y) / 1.2f) < 1f) continue;
 
-                float hgt = (0.35f + 0.5f * R()) * (0.75f + 0.6f * Fbm(x * 0.08f, z * 0.08f));
-                if (pd < pw + 0.6f) hgt *= 0.55f;
-                float w = 0.025f + 0.025f * R();
-                float kind = R();
-                Color tip = Color.Lerp(tipA, tipB, R());
-                if (kind < 0.022f) { tip = white; hgt *= 0.7f; flowers++; }
-                else if (kind < 0.042f) { tip = lavender; hgt *= 1.1f; w *= 1.5f; flowers++; }
-                else if (kind < 0.15f) tip = rose;
-                Color bas = Color.Lerp(baseA, baseB, R());
-
-                float ang = R() * Mathf.PI * 2f;
-                var side = new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang)) * (w * 0.5f);
+                float hgt = (0.62f + 0.55f * R()) * (0.8f + 0.5f * Fbm(x * 0.07f, z * 0.07f));
+                if (pd < pw + 0.7f) hgt *= 0.6f;
+                float wid = hgt * 0.5f * (0.9f + 0.3f * R());
+                float pick = R(); int kind = pick < 0.35f ? 0 : pick < 0.65f ? 1 : pick < 0.85f ? 2 : 3;
+                float u0 = kind * 0.25f + inset, u1 = (kind + 1) * 0.25f - inset;
+                var tint = tints[Mathf.Min(tints.Length - 1, (int)(R() * tints.Length))];
+                tint.a = R();   // the tuft's own sway phase
+                float yaw = R() * Mathf.PI;
                 float la = R() * Mathf.PI * 2f;
-                var lean = new Vector3(Mathf.Cos(la), 0f, Mathf.Sin(la)) * (0.15f * hgt) + new Vector3(0.8f, 0f, 0.6f) * (0.08f * hgt);
-                var p = new Vector3(x, H(x, z) - 0.02f, z);
+                var lean = new Vector3(Mathf.Cos(la), 0f, Mathf.Sin(la)) * (0.12f * hgt) + new Vector3(0.8f, 0f, 0.6f) * (0.06f * hgt);
+                var p = new Vector3(x, H(x, z) - 0.03f, z);
 
                 var key = new Vector2Int(Mathf.FloorToInt(x / 24f), Mathf.FloorToInt(z / 24f));
                 if (!tiles.TryGetValue(key, out var t)) tiles[key] = t = new Tile();
-                t.v.Add(p - side); t.v.Add(p + side); t.v.Add(p + Vector3.up * hgt + lean);
-                t.c.Add(bas.linear); t.c.Add(bas.linear); t.c.Add(tip.linear);
-                t.uv.Add(new Vector2(0f, 0f)); t.uv.Add(new Vector2(1f, 0f)); t.uv.Add(new Vector2(0.5f, 1f));
-                blades++;
+                for (int card = 0; card < 2; card++)
+                {
+                    float a = yaw + card * Mathf.PI * 0.5f;
+                    var side = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a)) * (wid * 0.5f);
+                    int b0 = t.v.Count;
+                    t.v.Add(p - side); t.v.Add(p + side); t.v.Add(p - side + Vector3.up * hgt + lean); t.v.Add(p + side + Vector3.up * hgt + lean);
+                    t.uv.Add(new Vector2(u0, 0f)); t.uv.Add(new Vector2(u1, 0f)); t.uv.Add(new Vector2(u0, 1f)); t.uv.Add(new Vector2(u1, 1f));
+                    for (int i = 0; i < 4; i++) { t.c.Add(tint); t.root.Add(p); }
+                    t.tri.Add(b0); t.tri.Add(b0 + 2); t.tri.Add(b0 + 1); t.tri.Add(b0 + 1); t.tri.Add(b0 + 2); t.tri.Add(b0 + 3);
+                }
+                tufts++;
             }
         var meshes = new List<Mesh>();
         foreach (var kv in tiles.OrderBy(k => k.Key.y).ThenBy(k => k.Key.x))
         {
-            var t = kv.Value; var m = new Mesh { name = "Field grass " + kv.Key.x + "," + kv.Key.y, indexFormat = t.v.Count > 65000 ? IndexFormat.UInt32 : IndexFormat.UInt16 };
-            m.SetVertices(t.v); m.SetColors(t.c); m.SetUVs(0, t.uv);
-            m.SetTriangles(Enumerable.Range(0, t.v.Count).ToArray(), 0);
+            var t = kv.Value; var m = new Mesh { name = "Field fronds " + kv.Key.x + "," + kv.Key.y, indexFormat = t.v.Count > 65000 ? IndexFormat.UInt32 : IndexFormat.UInt16 };
+            m.SetVertices(t.v); m.SetColors(t.c); m.SetUVs(0, t.uv); m.SetUVs(1, t.root);
+            m.SetTriangles(t.tri, 0);
             m.RecalculateBounds();
-            var b = m.bounds; b.Expand(new Vector3(0.8f, 0.4f, 0.8f)); m.bounds = b;   // room for the wind bend
+            var b = m.bounds; b.Expand(new Vector3(1.4f, 0.6f, 1.4f)); m.bounds = b;   // room for the wind and the push
             meshes.Add(m);
         }
         return meshes;
@@ -195,16 +311,24 @@ public static class LiminalStop02
 
         // materials
         var sky = Mat(SkyMaterial, "LiminalDoors/Evening Sky");
-        sky.SetColor("_Top", new Color(0.38f, 0.30f, 0.68f)); sky.SetColor("_Middle", new Color(0.72f, 0.52f, 0.86f));
-        sky.SetColor("_Horizon", new Color(1f, 0.74f, 0.62f)); sky.SetColor("_Ground", new Color(0.60f, 0.48f, 0.66f));
-        sky.SetColor("_Streaks", new Color(1f, 0.86f, 0.92f)); sky.SetFloat("_StreakAmount", 0.6f);
-        sky.SetColor("_SunColor", new Color(1f, 0.86f, 0.66f)); sky.SetVector("_SunDir", new Vector4(SunDir.x, SunDir.y, SunDir.z, 0));
-        bool reuse = File.Exists(GroundMeshPath) && File.Exists(GrassMeshPath) && File.Exists(PathMaskPath);
+        // a dusk that turns to a sparkling violet overhead (2026-10-19), still warm at the sunset
+        sky.SetColor("_Top", new Color(0.22f, 0.12f, 0.40f)); sky.SetColor("_Middle", new Color(0.60f, 0.34f, 0.78f));
+        sky.SetColor("_Horizon", new Color(1f, 0.70f, 0.66f)); sky.SetColor("_Ground", new Color(0.62f, 0.42f, 0.66f));
+        sky.SetColor("_Streaks", new Color(1f, 0.84f, 0.94f)); sky.SetFloat("_StreakAmount", 0.35f);
+        sky.SetColor("_SunColor", new Color(1f, 0.84f, 0.70f)); sky.SetVector("_SunDir", new Vector4(SunDir.x, SunDir.y, SunDir.z, 0));
+        sky.SetColor("_StarColor", new Color(1.8f, 1.45f, 2.0f)); sky.SetFloat("_StarAmount", 1f); sky.SetFloat("_GlintAmount", 0.85f);
+        sky.SetColor("_Nebula", new Color(0.66f, 0.30f, 0.74f)); sky.SetFloat("_NebulaAmount", 0.5f);
+        bool reuse = File.Exists(GroundMeshPath) && File.Exists(GrassMeshPath) && File.Exists(PathMaskPath) && File.Exists(FrondAtlasPath);
         var mask = reuse ? AssetDatabase.LoadAssetAtPath<Texture2D>(PathMaskPath) : BuildPathMask();
+        var atlas = reuse ? AssetDatabase.LoadAssetAtPath<Texture2D>(FrondAtlasPath) : BuildFrondAtlas();
+        var haze = new Color(0.92f, 0.62f, 0.84f);
         var ground = Mat(MatDir + "/Stop 02 Field Ground.mat", "LiminalDoors/Field Ground");
         ground.SetTexture("_PathMask", mask); ground.SetVector("_PathRect", new Vector4(-32f, -8f, 64f, 0f));
-        var grass = Mat(MatDir + "/Stop 02 Field Grass.mat", "LiminalDoors/Field Grass");
-        foreach (var m in new[] { ground, grass }) { m.SetVector("_SunDir", new Vector4(SunDir.x, SunDir.y, SunDir.z, 0)); }
+        ground.SetColor("_Grass", new Color(0.44f, 0.15f, 0.36f)); ground.SetColor("_GrassLight", new Color(0.84f, 0.44f, 0.74f));
+        ground.SetColor("_Path", new Color(0.72f, 0.52f, 0.62f));
+        var grass = Mat(MatDir + "/Stop 02 Frond Grass.mat", "LiminalDoors/Frond Grass");
+        grass.SetTexture("_MainTex", atlas);
+        foreach (var m in new[] { ground, grass }) { m.SetVector("_SunDir", new Vector4(SunDir.x, SunDir.y, SunDir.z, 0)); m.SetColor("_FadeColor", haze); }
         var roseFrame = Mat(MatDir + "/Stop 02 Rose Door.mat", "LiminalDoors/Soft Lit");
         roseFrame.SetColor("_Color", new Color(0.93f, 0.40f, 0.58f)); roseFrame.SetColor("_Emission", new Color(0.18f, 0.03f, 0.08f));
         roseFrame.SetVector("_LightDir", new Vector4(-SunDir.x, 0.5f, -SunDir.z, 0));   // lit from the field side, toward you
@@ -213,30 +337,37 @@ public static class LiminalStop02
         paleFrame.SetVector("_LightDir", new Vector4(SunDir.x, 0.5f, SunDir.z, 0));
         var stoneMat = Mat(MatDir + "/Stop 02 Flat Stone.mat", "LiminalDoors/Soft Lit");
         // warm grey, lit from above the sun side; a cooler, flatter stone read as a puddle in the first renders
-        stoneMat.SetColor("_Color", new Color(0.68f, 0.62f, 0.62f)); stoneMat.SetColor("_Emission", Color.black);
+        stoneMat.SetColor("_Color", new Color(0.70f, 0.56f, 0.66f)); stoneMat.SetColor("_Emission", Color.black);   // mauve: grey read green among the pink fronds
         stoneMat.SetVector("_LightDir", new Vector4(-0.75f, 0.4f, 0.5f, 0)); stoneMat.SetFloat("_Ambient", 0.22f);
-        var roseLight = Mat(MatDir + "/Stop 02 Rose Doorway Light.mat", "LiminalDoors/Soft Glow");
-        roseLight.SetColor("_Color", new Color(1f, 0.55f, 0.72f) * 1.6f);
+        // doorway portals that fill the opening (0.9 x 2.24 m inside the frame), and the motes rising in front
+        var roseLight = LiminalDoorKit.PortalMat(MatDir + "/Stop 02 Rose Portal.mat", new Color(1.5f, 0.62f, 0.95f), new Color(0.85f, 0.25f, 0.62f), new Color(2.4f, 1.3f, 1.9f), Opening);
         var roseMotes = Mat(MatDir + "/Stop 02 Rose Motes.mat", "LiminalDoors/Soft Glow");
         roseMotes.SetColor("_Color", new Color(1f, 0.62f, 0.78f) * 2.4f);
-        var goldLight = Mat(MatDir + "/Stop 02 Way Back Light.mat", "LiminalDoors/Soft Glow");
-        goldLight.SetColor("_Color", new Color(1f, 0.80f, 0.45f) * 1.2f);
+        var goldLight = LiminalDoorKit.PortalMat(MatDir + "/Stop 02 Way Back Portal.mat", new Color(1.5f, 1.05f, 0.55f), new Color(0.9f, 0.5f, 0.32f), new Color(2.3f, 1.8f, 1.1f), Opening);
         var goldMotes = Mat(MatDir + "/Stop 02 Way Back Motes.mat", "LiminalDoors/Soft Glow");
         goldMotes.SetColor("_Color", new Color(1f, 0.82f, 0.5f) * 1.8f);
+        var skySparkle = Mat(MatDir + "/Stop 02 Sky Sparkles.mat", "LiminalDoors/Soft Glow");
+        skySparkle.SetColor("_Color", new Color(1.7f, 1.3f, 2.0f) * 1.6f); skySparkle.SetFloat("_Softness", 2.4f);
+        var fieldSparkle = Mat(MatDir + "/Stop 02 Field Sparkles.mat", "LiminalDoors/Soft Glow");
+        fieldSparkle.SetColor("_Color", new Color(1.6f, 1.2f, 1.7f) * 1.4f); fieldSparkle.SetFloat("_Softness", 2.2f);
+        foreach (var retired in new[] { MatDir + "/Stop 02 Field Grass.mat", MatDir + "/Stop 02 Rose Doorway Light.mat", MatDir + "/Stop 02 Way Back Light.mat" })
+            if (File.Exists(retired)) AssetDatabase.DeleteAsset(retired);   // the 2026-10-18 blades and the oval doorway glows
 
         // meshes
-        Mesh groundMesh; List<Mesh> grassMeshes; int groundVerts, blades, flowers = -1;
+        Mesh groundMesh; List<Mesh> grassMeshes; int groundVerts, blades;
+        bool fresh = !reuse;
         if (reuse)
         {
             groundMesh = AssetDatabase.LoadAssetAtPath<Mesh>(GroundMeshPath); groundVerts = groundMesh.vertexCount;
             grassMeshes = AssetDatabase.LoadAllAssetsAtPath(GrassMeshPath).OfType<Mesh>().OrderBy(m => m.name, StringComparer.Ordinal).ToList();
-            blades = grassMeshes.Sum(m => m.vertexCount) / 3;
+            blades = grassMeshes.Sum(m => m.vertexCount) / 8;
         }
         else
         {
             groundMesh = BuildGround(out groundVerts);
             Replace(GroundMeshPath, groundMesh);
-            grassMeshes = BuildGrass(out blades, out flowers);
+            grassMeshes = BuildFronds(out blades);
+            AssetDatabase.DeleteAsset(OldGrassMeshPath);
             AssetDatabase.DeleteAsset(GrassMeshPath);
             AssetDatabase.CreateAsset(grassMeshes[0], GrassMeshPath);
             foreach (var m in grassMeshes.Skip(1)) AssetDatabase.AddObjectToAsset(m, GrassMeshPath);
@@ -254,7 +385,7 @@ public static class LiminalStop02
         groundGo.AddComponent<MeshRenderer>().sharedMaterial = ground;
         groundGo.AddComponent<MeshCollider>().sharedMesh = groundMesh;
 
-        var grassRoot = new GameObject("Long grass and wildflowers");
+        var grassRoot = new GameObject("Tall pink fronds");
         grassRoot.transform.SetParent(stop.transform, false);
         foreach (var m in grassMeshes)
         {
@@ -273,6 +404,22 @@ public static class LiminalStop02
         var hare = new GameObject("Hare hiding spot (glass hare: later pass)");
         hare.transform.SetParent(stop.transform, false);
         hare.transform.localPosition = new Vector3(StoneAt.x + 1.0f, H(StoneAt.x + 1.0f, StoneAt.y + 0.35f) + 0.05f, StoneAt.y + 0.35f);
+
+        // the grass parts for you: World/Wire doors puts a LiminalGrassPush (U#) on this marker
+        var push = new GameObject("Grass push (player)"); push.transform.SetParent(stop.transform, false);
+
+        // sparkles: a slow drift of them far out over the field, against the sky, and a fine glitter just over the grass
+        var skyS = new GameObject("Sky sparkles"); skyS.transform.SetParent(stop.transform, false);
+        skyS.transform.localPosition = new Vector3(3f, 42f, 70f);
+        var sps = LiminalDoorKit.Motes(skyS, skySparkle, 70f, new Vector3(320f, 60f, 260f), 0.05f, 0.9f, 600);
+        var sm = sps.main; sm.startLifetime = new ParticleSystem.MinMaxCurve(3f, 6.5f);
+        var ssz = sps.sizeOverLifetime; ssz.enabled = true;
+        ssz.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.15f, 1f), new Keyframe(0.3f, 0.35f), new Keyframe(0.5f, 1f), new Keyframe(0.7f, 0.4f), new Keyframe(1f, 0f)));
+        var fieldS = new GameObject("Field sparkles"); fieldS.transform.SetParent(stop.transform, false);
+        fieldS.transform.localPosition = new Vector3(3f, H(3f, 15f) + 1.3f, 15f);
+        var fps = LiminalDoorKit.Motes(fieldS, fieldSparkle, 22f, new Vector3(26f, 1.4f, 36f), 0.04f, 0.045f, 300);
+        var fsz = fps.sizeOverLifetime; fsz.enabled = true;
+        fsz.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.25f, 1f), new Keyframe(0.5f, 0.3f), new Keyframe(0.75f, 1f), new Keyframe(1f, 0f)));
 
         // doors: you face the rise when you arrive; the rose door's front looks back down the path at you
         float roseYaw = Mathf.Atan2(RoseDoorAt.x - ArrivalAt.x, RoseDoorAt.y - ArrivalAt.y) * Mathf.Rad2Deg;
@@ -293,7 +440,8 @@ public static class LiminalStop02
 
         float crest = Enumerable.Range(0, 60).Select(i => H(4f, 10f + i * 0.5f)).Max();
         report.Add("- Slot: " + Origin + " (3 km from stop 01). Ground: " + groundVerts + " vertices, 400 m square, walkable MeshCollider on the visible ground.");
-        report.Add("- Grass: " + blades + " blades in " + grassMeshes.Count + " tiles" + (flowers >= 0 ? " (" + flowers + " white or lavender wildflowers)" : " (reused from the last generation)") + ", none on the path, the doorways or under the stone.");
+        report.Add("- Grass: " + blades + " tall pink frond tufts (two crossed cards each, " + grassMeshes.Sum(m => m.vertexCount) + " vertices) in " + grassMeshes.Count + " tiles" + (fresh ? ", generated now" : ", reused from the last generation") + "; none on the path, the doorways or under the stone. Atlas `" + FrondAtlasPath + "`.");
+        report.Add("- Sparkles: sky layer on in `" + SkyMaterial + "`; particles: Sky sparkles (max 600), Field sparkles (max 300). Grass push marker for LiminalGrassPush.");
         report.Add("- Rise: crest " + crest.ToString("0.00") + " m above the arrival spot; rose door base at " + H(RoseDoorAt.x, RoseDoorAt.y).ToString("0.00") + " m, " + Vector2.Distance(ArrivalAt, RoseDoorAt).ToString("0.0") + " m from where you arrive.");
         report.Add("- Arrival point " + arrival.transform.position.ToString("F2") + " facing the rose door; return point " + ret.transform.position.ToString("F2") + " in front of the rose door, facing back down the path.");
         report.Add("- Sky: `" + SkyMaterial + "` (LiminalDoors/Evening Sky); the door system switches it on when you arrive.");
@@ -339,11 +487,7 @@ public static class LiminalStop02
         Box(hinge.transform, "Door leaf", new Vector3(0.45f, 1.12f, 0f), new Vector3(0.88f, 2.16f, 0.05f), leaf);
         Box(hinge.transform, "Knob", new Vector3(0.78f, 1.05f, -0.045f), new Vector3(0.05f, 0.05f, 0.05f), frame);
 
-        var glow = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        UnityEngine.Object.DestroyImmediate(glow.GetComponent<Collider>());
-        glow.name = "Doorway light"; glow.transform.SetParent(door.transform, false);
-        glow.transform.localPosition = new Vector3(0f, 1.12f, 0.02f); glow.transform.localScale = new Vector3(1.05f, 2.4f, 1f);
-        var gr = glow.GetComponent<MeshRenderer>(); gr.sharedMaterial = light; gr.shadowCastingMode = ShadowCastingMode.Off;
+        LiminalDoorKit.Portal(door.transform, 0.06f, Opening, light);   // fills the opening between the posts, sill to lintel
 
         var m = new GameObject("Rising motes"); m.transform.SetParent(door.transform, false);
         m.transform.localPosition = new Vector3(0f, 0.9f, -0.15f);
@@ -453,9 +597,13 @@ public static class LiminalStop02
                 ("04-birds-eye", L(3f, 48f, 8f), L(3f, 0f, 16f), 60f),
                 ("05-way-back-door-and-stone", L(1.2f, 1.6f, 11f), paleC - Vector3.up * 0.4f, 58f),
                 ("06-over-the-field", L(5.6f, 1.7f, 27f), L(30f, 2f, 140f), 60f),
+                ("07-walking-through", L(-4.4f, 1.75f, 10.2f), L(-3.6f, 0.2f, 13.2f), 62f),   // the grass parts around someone standing at (-3.6, 13.2)
+                ("08-sparkle-sky", L(3f, 1.6f, 6f), L(-20f, 40f, 80f), 70f),
             };
             foreach (var s in shots)
             {
+                var feet = L(-3.6f, 0f, 13.2f);
+                Shader.SetGlobalVector("_UdonLiminalPlayer", s.name.StartsWith("07") ? new Vector4(feet.x, feet.y, feet.z, 1f) : Vector4.zero);
                 camGo.transform.position = s.pos;
                 camGo.transform.rotation = Quaternion.LookRotation(s.look - s.pos, Vector3.up);
                 cam.fieldOfView = s.fov;
@@ -469,6 +617,7 @@ public static class LiminalStop02
             UnityEngine.Object.DestroyImmediate(camGo);
             foreach (var o in others) o.SetActive(true);
             RenderSettings.skybox = oldSky;
+            Shader.SetGlobalVector("_UdonLiminalPlayer", Vector4.zero);
         }
         var rs = stop.GetComponentsInChildren<Renderer>(true);
         report.AppendLine();

@@ -17,7 +17,16 @@
     "asset-creator": {"name": "Unity Asset Creator", "does": "The step-by-step checklist the booth was made with.", "path": "Assets/UnityAssetCreator/Editor", "tree": true},
     "unity-stable": {"name": "Unity Stable shaders", "does": "Our own shaders: Handmade PBR, Pink Glass, Sparkle, Sunset Sky, Cloud Sea, Cloud Puff, Candy Paint.", "path": "Assets/ShadersShop/UnityStable", "tree": true},
     "stop-02-builder": {"name": "Stop 02 builder", "does": "Builds Faraway Field: the ground, grass, sky and doors.", "path": "Assets/LiminalDoors/Editor/LiminalStop02.cs"},
-    "field-shaders": {"name": "Faraway Field shaders", "does": "Field Grass, Field Ground, Evening Sky, Soft Lit and Soft Glow.", "path": "Assets/LiminalDoors/Shaders", "tree": true},
+    "field-shaders": {"name": "Faraway Field shaders", "does": "Field Ground, Soft Lit and Soft Glow (the ground, the doors and stone, the motes and sparkles).", "path": "Assets/LiminalDoors/Shaders", "tree": true},
+    "frond-grass": {"name": "Frond Grass shader", "does": "Tall pink leafy fronds: wind gusts, a flutter per tuft, and bending away from you as you walk through (2026-10-19, after Pink Universe's look).", "path": "Assets/LiminalDoors/Shaders/FrondGrass.shader"},
+    "grass-push": {"name": "Grass push", "does": "Tells the grass where your feet are each frame, so it parts for you (Udon).", "path": "Assets/LiminalDoors/Scripts/LiminalGrassPush.cs"},
+    "sparkle-sky": {"name": "Evening Sky with sparkles", "does": "Dusk gradient, cloud streaks, a low sun, and a twinkling sparkle layer with big four-point glints and a faint nebula.", "path": "Assets/LiminalDoors/Shaders/EveningSky.shader"},
+    "door-kit": {"name": "Door kit and portals", "does": "Shared door pieces; the portal fills the whole doorway, sill to lintel (Astra: \"the door portals need to fill up the square\").", "path": "Assets/LiminalDoors/Editor/LiminalDoorKit.cs"},
+    "portal-shader": {"name": "Portal shader", "does": "A luminous veil with slow swirls, rising threads and a bright rim at the frame.", "path": "Assets/LiminalDoors/Shaders/Portal.shader"},
+    "stop-03-builder": {"name": "Stop 03 builder", "does": "Builds Pool After Closing: the tiled hall, the pool and its steps, windows, skylight, ladder and both doors.", "path": "Assets/LiminalDoors/Editor/LiminalStop03.cs"},
+    "pool-tile": {"name": "Pool Tile shader", "does": "World-space tiles with grout and caustic light that wanders under and over the water.", "path": "Assets/LiminalDoors/Shaders/PoolTile.shader"},
+    "pool-water": {"name": "Pool Water shader", "does": "Clear turquoise water with slow ripples, glancing pink reflections and glints.", "path": "Assets/LiminalDoors/Shaders/PoolWater.shader"},
+    "pool-window": {"name": "Underwater window and skylight shader", "does": "Deep water through the windows (light shafts, caustics, rising bubbles) and the violet water overhead.", "path": "Assets/LiminalDoors/Shaders/PoolWindow.shader"},
     "door-system": {"name": "Door system", "does": "Forward doors go somewhere random; the door you arrive by keeps the real way back.", "path": "Assets/LiminalDoors/Scripts/LiminalTraveler.cs"},
     "door-wiring": {"name": "Door wiring and trip test", "does": "Connects every door and walks a test trip through them.", "path": "Assets/LiminalDoors/EditorUdon/Editor/LiminalDoorsTravel.cs"},
     "world-glow": {"name": "Liminal Glow", "does": "Our own bloom, so doors and motes glow.", "path": "Assets/LiminalDoors/Editor/LiminalWorldGlow.cs"},
@@ -27,9 +36,10 @@
     "world-spawn-tool": {"name": "world-spawn-tool", "does": "Unity Unicorn's first steps for a new world: the public repo and the profile link.", "repo": "findastra/unity-unicorn", "ref": "main", "path": "scripts/world-spawn-tool", "tree": true}
   },
   "every_floor": ["codex-image", "floor-cutter", "redline-sheet", "contact-sheet", "web-pictures"],
-  "whole_world": ["door-system", "door-wiring", "world-glow", "desktop-test", "agent-queue", "shaders-shop", "world-spawn-tool"],
+  "whole_world": ["door-system", "door-wiring", "door-kit", "portal-shader", "world-glow", "desktop-test", "agent-queue", "shaders-shop", "world-spawn-tool"],
   "floors": {
     "1": ["stop-01-builder", "stop-01-sky", "booth-builder", "blender-booth", "asset-creator", "unity-stable"],
-    "2": ["stop-02-builder", "field-shaders"]
+    "2": ["stop-02-builder", "frond-grass", "grass-push", "sparkle-sky", "field-shaders"],
+    "3": ["stop-03-builder", "pool-tile", "pool-water", "pool-window"]
   }
 }
