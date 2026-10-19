@@ -9,7 +9,7 @@ The plates were made with OpenAI Codex's built-in image generation on 2026-10-15
   originality check (`../docs/originality-check-20261019.md`) found them copied from other creators' VRChat worlds
   (Crystals Absence by Arkîe, Astral Bounds by Vectriel). Floor numbers are kept, so the collection skips 34, 35 and 37.
 - `floors-contact-sheet-20261019.png`: all 34 at a glance.
-- `liminal-doors-redline-sheet-20261019.jpg`: the same layout at full size (3098 x 3374 px) for redlines in Procreate. The Concept Atlas's "Export all 34 for redlines" button saves this file; the + on each card makes a sheet of just the floors you pick. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.
+- `liminal-doors-redline-sheet-20261019.jpg`: the same layout at full size (3098 x 3374 px) for redlines in Procreate. The Concept Atlas's "Export all 34 for redlines" button saves this file; the + on each card makes a sheet of just the floors you pick. Labels read "NN place animal", as on the page. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.
 
 To change a floor, replace its file with your edit. A new date in the name (for example `-20261019`) keeps the original next to it.
 
