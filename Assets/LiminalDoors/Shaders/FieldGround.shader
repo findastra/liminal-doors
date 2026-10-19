@@ -6,7 +6,7 @@ Shader "LiminalDoors/Field Ground" {
   _GrassLight("Ground, lighter patches", Color) = (0.42,0.5,0.4,1)
   _Path("Path", Color) = (0.66,0.54,0.56,1)
   _PathMask("Path mask", 2D) = "black" {}
-  _PathRect("Path mask area (x0, z0, size)", Vector) = (-32,-8,64,0)
+  _PathRect("Path mask area (x0, z0, width, length)", Vector) = (-32,-8,64,64)
   _WindDir("Wind direction (xy)", Vector) = (0.8,0.6,0,0)
   _WindScale("Wind bands per metre", Float) = 0.035
   _WindSpeed("Wind speed", Float) = 1.1
@@ -41,7 +41,8 @@ Shader "LiminalDoors/Field Ground" {
     float n = FieldNoise(p * 0.15) * 0.6 + FieldNoise(p * 0.7) * 0.4;
     float3 c = lerp(_Grass.rgb, _GrassLight.rgb, n);
     c *= 1 + 0.12 * WindBand(p);
-    float m = tex2D(_PathMask, (p - _PathRect.xy) / _PathRect.z).r;
+    float2 pu = (p - _PathRect.xy) / max(_PathRect.zw, 0.001);
+    float m = tex2D(_PathMask, pu).r * step(0, pu.x) * step(pu.x, 1) * step(0, pu.y) * step(pu.y, 1);
     c = lerp(c, _Path.rgb * (0.85 + 0.3 * FieldNoise(p * 2.3)), m);
     float3 l = normalize(float3(_SunDir.x, 0.6, _SunDir.z));
     c *= 0.8 + 0.3 * saturate(dot(normalize(i.normal), l) * 0.5 + 0.5);

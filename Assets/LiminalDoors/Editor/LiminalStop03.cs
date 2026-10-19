@@ -8,6 +8,11 @@
 // and the skylight (Pool Window), two doors with portals that fill their openings (LiminalDoorKit), bubbles and motes.
 // The glass axolotl is a later pass; its hiding spot is marked.
 //
+// 2026-10-19, Astra: "they are lacking the liminal (weird) factor. like the pool should be 10x longer and the door
+// more glittery." So the pool is now 220 m long in a 235 m hall: the same columns, lamps, windows, ladders and
+// skylights repeat down its whole length and melt into a warm haze, with the pink door glowing at the far end. The
+// doors are glitter paint (LiminalDoors/Glitter Paint) with sparkling portals and a halo of glitter around them.
+//
 // The stop sits in its own slot, 6 km from stop 01. You arrive just inside the pale way-back door, facing down the hall;
 // the pink double door at the far end is the forward door. LiminalDoorsTravel (World/Wire doors) wires both.
 //
@@ -35,9 +40,13 @@ public static class LiminalStop03
     const string BuildReport = "Review/stop-03-build/report.md";
 
     // the hall, in stop-local metres: floor at y 0, x across (-7..7), z along (0 = the way-back door, 32 = the pink door)
-    const float HallX = 7f, HallZ = 32f, HallY = 6f, WallT = 0.3f;
-    const float PoolX0 = -4f, PoolX1 = 4.5f, PoolZ0 = 5f, PoolZ1 = 27f, PoolDepth = 1.4f, WaterY = -0.12f;
-    static readonly float[] ColumnZ = { 4.5f, 10.5f, 16.5f, 22.5f, 28.5f };
+    const float HallX = 7f, HallZ = 235f, HallY = 6f, WallT = 0.3f;
+    const float PoolX0 = -4f, PoolX1 = 4.5f, PoolZ0 = 5f, PoolZ1 = 225f, PoolDepth = 1.4f, WaterY = -0.12f;
+    static readonly float[] ColumnZ = Enumerable.Range(0, 39).Select(i => 4.5f + i * 6f).Where(z => z < HallZ - 2.5f).ToArray();
+    static readonly float[] SkylightZ = { 20f, 50f, 80f, 110f, 140f, 170f, 200f };   // centres; each 6 x 10 m
+    static readonly float[] LadderZ = { 12.2f, 57.2f, 102.2f, 147.2f, 192.2f };
+    static readonly Color Haze = new Color(0.94f, 0.70f, 0.64f);
+    const float HazeStart = 18f, HazeEnd = 200f;
     static readonly Vector2 WayBackOpening = new Vector2(0.9f, 2.24f);   // like stop 02's doors: sill 0.06, lintel 2.30
     static readonly Vector2 PinkOpening = new Vector2(1.9f, 2.6f);       // the double door, from the floor
     static readonly Vector3 LampDir = new Vector3(0.2f, 0.9f, -0.3f);
@@ -65,6 +74,7 @@ public static class LiminalStop03
             m.SetColor("_Color", a); m.SetColor("_Color2", b); m.SetColor("_Grout", grout); m.SetFloat("_TileSize", size);
             m.SetVector("_LightDir", LampDir); m.SetFloat("_WaterLevel", WaterY);
             m.SetFloat("_CausticAbove", 0f); m.SetFloat("_Sheen", 0f);
+            Hazy(m);
             return m;
         }
         var wall = Tile("Wall tiles", new Color(0.96f, 0.72f, 0.58f), new Color(0.92f, 0.65f, 0.53f), new Color(0.70f, 0.52f, 0.46f), 0.2f);
@@ -82,28 +92,34 @@ public static class LiminalStop03
         ceiling.SetColor("_Warm", Color.black); ceiling.SetFloat("_CausticAbove", 0.7f); ceiling.SetColor("_CausticColor", new Color(1.0f, 0.62f, 1.15f));
         ceiling.SetVector("_LightDir", new Vector3(0f, -1f, 0f));
         var water = K.Mat(MatDir + "/Pool water.mat", "LiminalDoors/Pool Water");
-        water.SetVector("_LightDir", LampDir);
+        water.SetVector("_LightDir", LampDir); Hazy(water);
         var window = K.Mat(MatDir + "/Underwater window.mat", "LiminalDoors/Pool Window");
-        window.SetFloat("_Mode", 0f); window.SetVector("_Size", new Vector4(4.4f, 3.4f, 0, 0));
+        window.SetFloat("_Mode", 0f); window.SetVector("_Size", new Vector4(4.4f, 3.4f, 0, 0)); Hazy(window);
         var skylight = K.Mat(MatDir + "/Skylight water.mat", "LiminalDoors/Pool Window");
         skylight.SetFloat("_Mode", 1f); skylight.SetColor("_Top", new Color(1.3f, 0.55f, 1.4f)); skylight.SetColor("_Bottom", new Color(0.45f, 0.18f, 0.65f));
-        skylight.SetColor("_Light", new Color(1.6f, 1.1f, 1.9f)); skylight.SetVector("_Size", new Vector4(6f, 10f, 0, 0));
+        skylight.SetColor("_Light", new Color(1.6f, 1.1f, 1.9f)); skylight.SetVector("_Size", new Vector4(6f, 10f, 0, 0)); Hazy(skylight);
         Material Lit(string name, Color c, Color glow, float ambient = 0.55f)
         {
             var m = K.Mat(MatDir + "/" + name + ".mat", "LiminalDoors/Soft Lit");
             m.SetColor("_Color", c); m.SetColor("_Emission", glow); m.SetVector("_LightDir", LampDir); m.SetFloat("_Ambient", ambient);
+            Hazy(m);
             return m;
         }
         var frame = Lit("Window frames", new Color(0.93f, 0.87f, 0.83f), new Color(0.05f, 0.04f, 0.04f));
         var chrome = Lit("Ladder chrome", new Color(0.86f, 0.89f, 0.94f), new Color(0.14f, 0.13f, 0.16f), 0.4f);
         var sconce = Lit("Sconce", new Color(1f, 0.86f, 0.62f), new Color(1.7f, 1.05f, 0.5f));
-        var pinkFrame = Lit("Pink door frame", new Color(0.98f, 0.33f, 0.55f), new Color(0.55f, 0.06f, 0.20f));
-        var pinkLeaf = Lit("Pink door leaves", new Color(0.95f, 0.38f, 0.58f), new Color(0.14f, 0.01f, 0.05f));
+        // the doors: glitter paint, sparkling portals (no haze on these, so the pink door shines all the way down the hall)
+        var pinkFrame = K.GlitterMat(MatDir + "/Pink door frame.mat", new Color(0.98f, 0.33f, 0.55f), new Color(0.6f, 0.07f, 0.22f), new Color(3.2f, 1.8f, 2.6f), LampDir, 0.6f);
+        var pinkLeaf = K.GlitterMat(MatDir + "/Pink door leaves.mat", new Color(0.95f, 0.38f, 0.58f), new Color(0.2f, 0.02f, 0.07f), new Color(3.0f, 1.9f, 2.6f), LampDir, 0.5f);
         var pinkPane = Lit("Pink door panes", new Color(0.55f, 0.20f, 0.38f), new Color(0.35f, 0.10f, 0.25f));
-        var paleFrame = Lit("Way back door frame", new Color(0.86f, 0.80f, 0.90f), new Color(0.05f, 0.04f, 0.06f));
+        var paleFrame = K.GlitterMat(MatDir + "/Way back door frame.mat", new Color(0.92f, 0.84f, 0.70f), new Color(0.12f, 0.08f, 0.03f), new Color(3.0f, 2.4f, 1.3f), LampDir, 0.55f);
         var backing = Lit("Doorway backing", new Color(0.12f, 0.05f, 0.12f), Color.black, 0.8f);
         var pinkPortal = K.PortalMat(MatDir + "/Pink door portal.mat", new Color(1.6f, 0.55f, 1.0f), new Color(0.9f, 0.22f, 0.62f), new Color(2.6f, 1.2f, 1.9f), PinkOpening);
+        pinkPortal.SetFloat("_Glitter", 1f); pinkPortal.SetColor("_GlitterColor", new Color(3.2f, 2.4f, 3.0f));
         var goldPortal = K.PortalMat(MatDir + "/Way back portal.mat", new Color(1.5f, 1.05f, 0.55f), new Color(0.9f, 0.5f, 0.32f), new Color(2.3f, 1.8f, 1.1f), WayBackOpening);
+        goldPortal.SetFloat("_Glitter", 0.8f); goldPortal.SetColor("_GlitterColor", new Color(3.2f, 2.6f, 1.5f));
+        var pinkGlitter = K.Mat(MatDir + "/Pink door glitter.mat", "LiminalDoors/Soft Glow"); pinkGlitter.SetColor("_Color", new Color(1.8f, 1.1f, 1.6f) * 2.2f); pinkGlitter.SetFloat("_Softness", 2.6f);
+        var goldGlitter = K.Mat(MatDir + "/Way back glitter.mat", "LiminalDoors/Soft Glow"); goldGlitter.SetColor("_Color", new Color(1.8f, 1.4f, 0.8f) * 2.0f); goldGlitter.SetFloat("_Softness", 2.6f);
         var pinkMotes = K.Mat(MatDir + "/Pink door motes.mat", "LiminalDoors/Soft Glow"); pinkMotes.SetColor("_Color", new Color(1f, 0.6f, 0.8f) * 2.4f);
         var goldMotes = K.Mat(MatDir + "/Way back motes.mat", "LiminalDoors/Soft Glow"); goldMotes.SetColor("_Color", new Color(1f, 0.82f, 0.5f) * 1.8f);
         var bubbleMat = K.Mat(MatDir + "/Bubbles.mat", "LiminalDoors/Soft Glow"); bubbleMat.SetColor("_Color", new Color(0.7f, 1.4f, 1.5f)); bubbleMat.SetFloat("_Softness", 0.8f);
@@ -136,7 +152,11 @@ public static class LiminalStop03
         Slab(cop, "Coping far", PoolX0, PoolX1, 0f, 0.05f, PoolZ1, PoolZ1 + rimT, coping, false);
         const int steps = 6; const float stepD = 0.45f;
         for (int k = 1; k < steps; k++)
+        {
             Slab(walk, "Pool step " + k, PoolX0, PoolX0 + 2.4f, floorY, -PoolDepth * k / steps, PoolZ0 + stepD * (k - 1), PoolZ0 + stepD * k, pool);
+            // and the same steps up again at the far right corner, 220 m on, by the pink door
+            Slab(walk, "Pool step far " + k, PoolX1 - 2.4f, PoolX1, floorY, -PoolDepth * k / steps, PoolZ1 - stepD * k, PoolZ1 - stepD * (k - 1), pool);
+        }
 
         // walls: tiles inside, openings for the windows (left), the way-back door (near) and the pink door (far)
         var walls = Child(hall, "Walls");
@@ -148,18 +168,24 @@ public static class LiminalStop03
         WallAlongX(walls, "Wall near", -WallT, 0f, new List<(float, float, float, float)> { (-WayBackOpening.x * 0.5f, WayBackOpening.x * 0.5f, 0f, 0.06f + WayBackOpening.y) }, wall);
         WallAlongX(walls, "Wall far", HallZ, HallZ + WallT, new List<(float, float, float, float)> { (-PinkOpening.x * 0.5f, PinkOpening.x * 0.5f, 0f, PinkOpening.y) }, wall);
 
-        // ceiling with the skylight well over the far half of the pool
-        const float skyX0 = -3f, skyX1 = 3f, skyZ0 = 14f, skyZ1 = 24f, wellH = 1f;
+        // ceiling with a skylight well every 30 m, each one the same rippling violet water
+        const float skyX0 = -3f, skyX1 = 3f, skyLen = 10f, wellH = 1f;
         var ceil = Child(hall, "Ceiling");
-        Slab(ceil, "Ceiling near", -HallX - WallT, HallX + WallT, HallY, HallY + 0.3f, -WallT, skyZ0, ceiling, false);
-        Slab(ceil, "Ceiling far", -HallX - WallT, HallX + WallT, HallY, HallY + 0.3f, skyZ1, HallZ + WallT, ceiling, false);
-        Slab(ceil, "Ceiling left", -HallX - WallT, skyX0, HallY, HallY + 0.3f, skyZ0, skyZ1, ceiling, false);
-        Slab(ceil, "Ceiling right", skyX1, HallX + WallT, HallY, HallY + 0.3f, skyZ0, skyZ1, ceiling, false);
-        Slab(ceil, "Skylight well left", skyX0 - 0.2f, skyX0, HallY, HallY + wellH, skyZ0, skyZ1, ceiling, false);
-        Slab(ceil, "Skylight well right", skyX1, skyX1 + 0.2f, HallY, HallY + wellH, skyZ0, skyZ1, ceiling, false);
-        Slab(ceil, "Skylight well near", skyX0, skyX1, HallY, HallY + wellH, skyZ0 - 0.2f, skyZ0, ceiling, false);
-        Slab(ceil, "Skylight well far", skyX0, skyX1, HallY, HallY + wellH, skyZ1, skyZ1 + 0.2f, ceiling, false);
-        K.Quad(ceil, "Skylight (water overhead)", new Vector3((skyX0 + skyX1) * 0.5f, HallY + wellH - 0.02f, (skyZ0 + skyZ1) * 0.5f), Quaternion.Euler(-90f, 0f, 0f), new Vector2(skyX1 - skyX0, skyZ1 - skyZ0), skylight);
+        float cz = -WallT;
+        foreach (var sz in SkylightZ)
+        {
+            float skyZ0 = sz - skyLen * 0.5f, skyZ1 = sz + skyLen * 0.5f, tag = sz;
+            Slab(ceil, "Ceiling " + tag.ToString("0") + " before", -HallX - WallT, HallX + WallT, HallY, HallY + 0.3f, cz, skyZ0, ceiling, false);
+            Slab(ceil, "Ceiling " + tag.ToString("0") + " left", -HallX - WallT, skyX0, HallY, HallY + 0.3f, skyZ0, skyZ1, ceiling, false);
+            Slab(ceil, "Ceiling " + tag.ToString("0") + " right", skyX1, HallX + WallT, HallY, HallY + 0.3f, skyZ0, skyZ1, ceiling, false);
+            Slab(ceil, "Skylight " + tag.ToString("0") + " well left", skyX0 - 0.2f, skyX0, HallY, HallY + wellH, skyZ0, skyZ1, ceiling, false);
+            Slab(ceil, "Skylight " + tag.ToString("0") + " well right", skyX1, skyX1 + 0.2f, HallY, HallY + wellH, skyZ0, skyZ1, ceiling, false);
+            Slab(ceil, "Skylight " + tag.ToString("0") + " well near", skyX0, skyX1, HallY, HallY + wellH, skyZ0 - 0.2f, skyZ0, ceiling, false);
+            Slab(ceil, "Skylight " + tag.ToString("0") + " well far", skyX0, skyX1, HallY, HallY + wellH, skyZ1, skyZ1 + 0.2f, ceiling, false);
+            K.Quad(ceil, "Skylight " + tag.ToString("0") + " (water overhead)", new Vector3((skyX0 + skyX1) * 0.5f, HallY + wellH - 0.02f, sz), Quaternion.Euler(-90f, 0f, 0f), new Vector2(skyX1 - skyX0, skyLen), skylight);
+            cz = skyZ1;
+        }
+        Slab(ceil, "Ceiling end", -HallX - WallT, HallX + WallT, HallY, HallY + 0.3f, cz, HallZ + WallT, ceiling, false);
 
         // columns with warm sconces
         var cols = Child(hall, "Columns");
@@ -182,17 +208,19 @@ public static class LiminalStop03
             K.Box(wins, "Mullion " + zc.ToString("0.0"), new Vector3(x + 0.04f, yc, zc), new Vector3(0.12f, hgt, 0.08f), frame);
         }
 
-        // the ladder: two chrome rails curving over the coping on the left, three rungs under the water
-        var ladder = Child(hall, "Ladder");
-        const float ladZ = 12.2f;
-        foreach (var dz in new[] { -0.28f, 0.28f })
+        // ladders every 45 m: two chrome rails curving over the coping on the left, three rungs under the water
+        foreach (var ladZ in LadderZ)
         {
-            Rod(ladder, "Rail down " + dz, new Vector3(PoolX0 + 0.22f, -1.15f, ladZ + dz), new Vector3(PoolX0 + 0.22f, 0.55f, ladZ + dz), 0.025f, chrome);
-            Rod(ladder, "Rail bend " + dz, new Vector3(PoolX0 + 0.22f, 0.55f, ladZ + dz), new Vector3(PoolX0 - 0.1f, 0.85f, ladZ + dz), 0.025f, chrome);
-            Rod(ladder, "Rail over " + dz, new Vector3(PoolX0 - 0.1f, 0.85f, ladZ + dz), new Vector3(PoolX0 - 0.55f, 0.6f, ladZ + dz), 0.025f, chrome);
-            Rod(ladder, "Rail foot " + dz, new Vector3(PoolX0 - 0.55f, 0.6f, ladZ + dz), new Vector3(PoolX0 - 0.6f, 0.04f, ladZ + dz), 0.025f, chrome);
+            var ladder = Child(hall, "Ladder " + ladZ.ToString("0"));
+            foreach (var dz in new[] { -0.28f, 0.28f })
+            {
+                Rod(ladder, "Rail down " + dz, new Vector3(PoolX0 + 0.22f, -1.15f, ladZ + dz), new Vector3(PoolX0 + 0.22f, 0.55f, ladZ + dz), 0.025f, chrome);
+                Rod(ladder, "Rail bend " + dz, new Vector3(PoolX0 + 0.22f, 0.55f, ladZ + dz), new Vector3(PoolX0 - 0.1f, 0.85f, ladZ + dz), 0.025f, chrome);
+                Rod(ladder, "Rail over " + dz, new Vector3(PoolX0 - 0.1f, 0.85f, ladZ + dz), new Vector3(PoolX0 - 0.55f, 0.6f, ladZ + dz), 0.025f, chrome);
+                Rod(ladder, "Rail foot " + dz, new Vector3(PoolX0 - 0.55f, 0.6f, ladZ + dz), new Vector3(PoolX0 - 0.6f, 0.04f, ladZ + dz), 0.025f, chrome);
+            }
+            for (int r = 0; r < 3; r++) Rod(ladder, "Rung " + r, new Vector3(PoolX0 + 0.16f, -0.95f + r * 0.35f, ladZ - 0.28f), new Vector3(PoolX0 + 0.16f, -0.95f + r * 0.35f, ladZ + 0.28f), 0.02f, chrome);
         }
-        for (int r = 0; r < 3; r++) Rod(ladder, "Rung " + r, new Vector3(PoolX0 + 0.16f, -0.95f + r * 0.35f, ladZ - 0.28f), new Vector3(PoolX0 + 0.16f, -0.95f + r * 0.35f, ladZ + 0.28f), 0.02f, chrome);
 
         // the water
         K.Quad(hall, "Pool water", new Vector3((PoolX0 + PoolX1) * 0.5f, WaterY, (PoolZ0 + PoolZ1) * 0.5f), Quaternion.Euler(90f, 0f, 0f), new Vector2(PoolX1 - PoolX0, PoolZ1 - PoolZ0), water);
@@ -217,6 +245,7 @@ public static class LiminalStop03
         var pp = K.Portal(pink, 0f, PinkOpening, pinkPortal); pp.transform.localPosition += new Vector3(0f, 0f, -WallT * 0.5f + 0.01f);
         var pm = new GameObject("Rising motes"); pm.transform.SetParent(pink, false); pm.transform.localPosition = new Vector3(0f, 1.0f, -0.45f);
         K.Motes(pm, pinkMotes, 26f, new Vector3(1.9f, 2.0f, 0.6f));
+        K.GlitterHalo(pink, pinkGlitter, new Vector3(0f, 1.5f, -0.8f), new Vector3(3.4f, 3.2f, 1.6f), 90f, 700);
         K.Trigger(pink, "Forward door trigger", new Vector3(0f, 1.15f, -WallT * 0.5f), new Vector3(1.7f, 2.2f, 0.36f));
 
         // the pale way-back door behind you as you arrive
@@ -231,6 +260,7 @@ public static class LiminalStop03
         var bp = K.Portal(back, 0.06f, WayBackOpening, goldPortal); bp.transform.localPosition += new Vector3(0f, 0f, WallT * 0.5f - 0.01f);
         var bm = new GameObject("Rising motes"); bm.transform.SetParent(back, false); bm.transform.localPosition = new Vector3(0f, 0.9f, 0.45f);
         K.Motes(bm, goldMotes, 10f, new Vector3(1.0f, 1.8f, 0.5f));
+        K.GlitterHalo(back, goldGlitter, new Vector3(0f, 1.3f, 0.7f), new Vector3(2.0f, 2.6f, 1.0f), 45f, 400);
         K.Trigger(back, "Arrival door trigger", new Vector3(0f, 1.05f, 0f), new Vector3(0.84f, 2.05f, 0.36f));
 
         // ---- where you land, the axolotl's spot, bubbles and motes
@@ -239,15 +269,15 @@ public static class LiminalStop03
         var ret = new GameObject("Return point"); ret.transform.SetParent(stop.transform, false);
         ret.transform.localPosition = new Vector3(0f, 0f, HallZ - 1.8f); ret.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
         var axo = new GameObject("Axolotl hiding spot (glass axolotl: later pass)"); axo.transform.SetParent(stop.transform, false);
-        axo.transform.localPosition = new Vector3(PoolX1 - 0.5f, floorY + 0.05f, PoolZ1 - 0.6f);
+        axo.transform.localPosition = new Vector3(PoolX1 - 0.7f, floorY + 0.05f, 131f);   // halfway down, where nobody looks
 
         var bub = new GameObject("Bubbles"); bub.transform.SetParent(stop.transform, false);
         bub.transform.localPosition = new Vector3((PoolX0 + PoolX1) * 0.5f, floorY + 0.6f, (PoolZ0 + PoolZ1) * 0.5f);
-        var bps = K.Motes(bub, bubbleMat, 7f, new Vector3(PoolX1 - PoolX0 - 0.6f, 1.0f, PoolZ1 - PoolZ0 - 0.6f), 0.3f, 0.07f, 120);
+        var bps = K.Motes(bub, bubbleMat, 60f, new Vector3(PoolX1 - PoolX0 - 0.6f, 1.0f, PoolZ1 - PoolZ0 - 0.6f), 0.3f, 0.07f, 700);
         var bmain = bps.main; bmain.startLifetime = new ParticleSystem.MinMaxCurve(2.5f, 4f);
         var dust = new GameObject("Hall motes"); dust.transform.SetParent(stop.transform, false);
         dust.transform.localPosition = new Vector3(0f, 2.5f, HallZ * 0.5f);
-        K.Motes(dust, dustMat, 10f, new Vector3(12f, 4f, 28f), 0.03f, 0.03f, 150);
+        K.Motes(dust, dustMat, 60f, new Vector3(12f, 4f, HallZ - 4f), 0.03f, 0.03f, 800);
 
         LiminalWorldGlow.AddStopVolume(stop.transform);
 
@@ -257,7 +287,8 @@ public static class LiminalStop03
         int boxes = walk.GetComponentsInChildren<BoxCollider>().Length + walls.GetComponentsInChildren<BoxCollider>().Length + cols.GetComponentsInChildren<BoxCollider>().Length;
         report.Add("- Slot: " + Origin + " (6 km from stop 01). Hall " + (HallX * 2) + " x " + HallZ + " m, " + HallY + " m high; pool " + (PoolX1 - PoolX0) + " x " + (PoolZ1 - PoolZ0) + " m, " + PoolDepth + " m deep, water at " + WaterY + " m, " + (steps - 1) + " steps down at the near left corner.");
         report.Add("- Walkable and solid: " + boxes + " box colliders (deck, pool floor, steps, rim, walls, columns). The water has no collider: you can walk on the pool floor.");
-        report.Add("- " + windowsZ.Count + " underwater windows on the left wall, a " + (skyX1 - skyX0) + " x " + (skyZ1 - skyZ0) + " m skylight of rippling violet water, " + (ColumnZ.Length * 2) + " columns with sconces, a ladder.");
+        report.Add("- Repeating down the hall: " + windowsZ.Count + " underwater windows on the left wall, " + SkylightZ.Length + " skylights of rippling violet water (" + (skyX1 - skyX0) + " x " + skyLen + " m), " + (ColumnZ.Length * 2) + " columns with sconces, " + LadderZ.Length + " ladders; steps at both ends of the pool. Warm haze from " + HazeStart + " m to " + HazeEnd + " m.");
+        report.Add("- Glitter: both doors in LiminalDoors/Glitter Paint, sparkling portals, a glitter halo at each door.");
         report.Add("- Doors: the pink double door (forward, portal " + PinkOpening.x + " x " + PinkOpening.y + " m) at the far end; the pale way-back door (portal " + WayBackOpening.x + " x " + WayBackOpening.y + " m) behind the arrival point.");
         report.Add("- Arrival point " + arrival.transform.position.ToString("F2") + " facing the pink door; return point " + ret.transform.position.ToString("F2") + " in front of it, facing back.");
         report.Add("- Sky: `" + SkyMaterial + "`, seen only past the doorways.");
@@ -269,6 +300,8 @@ public static class LiminalStop03
     // ---------------------------------------------------------------- building blocks
 
     static Transform Child(Transform parent, string name) { var t = new GameObject(name).transform; t.SetParent(parent, false); return t; }
+
+    static void Hazy(Material m) { m.SetColor("_HazeColor", Haze); m.SetFloat("_HazeStart", HazeStart); m.SetFloat("_HazeEnd", HazeEnd); }
 
     // an axis-aligned box from (x0, y0, z0) to (x1, y1, z1), stop-local
     static GameObject Slab(Transform parent, string name, float x0, float x1, float y0, float y1, float z0, float z1, Material mat, bool solid = true)
@@ -347,13 +380,15 @@ public static class LiminalStop03
             Vector3 L(float x, float y, float z) => stop.transform.TransformPoint(x, y, z);
             var shots = new (string name, Vector3 pos, Vector3 look, float fov)[]
             {
-                ("01-arrival-view", L(0f, 1.6f, 1.8f), L(0.3f, 1.2f, 32f), 62f),
+                ("01-arrival-view", L(0f, 1.6f, 1.8f), L(0.3f, 1.2f, HallZ), 62f),
                 ("02-pool-from-the-steps", L(-5.2f, 1.7f, 3.4f), L(1.5f, -0.8f, 20f), 64f),
                 ("03-windows", L(3.2f, 1.7f, 9f), L(-7f, 2.4f, 16f), 66f),
                 ("04-skylight", L(-1.2f, 1.6f, 13f), L(0f, 7f, 19.5f), 70f),
-                ("05-pink-door", L(1.2f, 1.6f, 27.6f), L(0f, 1.3f, 32f), 58f),
-                ("06-wide-from-the-corner", L(6f, 4.6f, 1.2f), L(-1f, -0.8f, 22f), 72f),
+                ("05-pink-door", L(1.2f, 1.6f, HallZ - 4.4f), L(0f, 1.3f, HallZ), 58f),
+                ("06-wide-from-the-corner", L(6f, 4.6f, 1.2f), L(-1f, -0.8f, 40f), 72f),
                 ("07-way-back-door", L(0.4f, 1.6f, 6.5f), L(0f, 1.2f, 0f), 58f),
+                ("08-halfway", L(-5.6f, 1.6f, 117f), L(0f, 1.2f, HallZ), 62f),
+                ("09-looking-back-from-the-pink-door", L(5.6f, 1.7f, HallZ - 3f), L(0f, 1.0f, 0f), 62f),
             };
             foreach (var s in shots)
             {

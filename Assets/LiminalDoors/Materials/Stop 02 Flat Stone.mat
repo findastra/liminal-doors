@@ -26,8 +26,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _Ambient: 0.22
+    - _HazeEnd: 0
+    - _HazeStart: 0
     m_Colors:
-    - _Color: {r: 0.7, g: 0.56, b: 0.66, a: 1}
-    - _Emission: {r: 0, g: 0, b: 0, a: 1}
+    - _Color: {r: 0.82, g: 0.58, b: 0.74, a: 1}
+    - _Emission: {r: 0.06, g: 0.02, b: 0.05, a: 1}
+    - _HazeColor: {r: 0.95, g: 0.72, b: 0.65999997, a: 1}
     - _LightDir: {r: -0.75, g: 0.4, b: 0.5, a: 0}
   m_BuildTextureStacks: []

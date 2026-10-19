@@ -39,7 +39,7 @@ Material:
     - _Grass: {r: 0.44, g: 0.15, b: 0.36, a: 1}
     - _GrassLight: {r: 0.84, g: 0.44, b: 0.74, a: 1}
     - _Path: {r: 0.72, g: 0.52, b: 0.62, a: 1}
-    - _PathRect: {r: -32, g: -8, b: 64, a: 0}
-    - _SunDir: {r: 0.12, g: 0.04, b: 1, a: 0}
+    - _PathRect: {r: -20, g: -10, b: 40, a: 330}
+    - _SunDir: {r: 0.55, g: 0.05, b: 1, a: 0}
     - _WindDir: {r: 0.8, g: 0.6, b: 0, a: 0}
   m_BuildTextureStacks: []

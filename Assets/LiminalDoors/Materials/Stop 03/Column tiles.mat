@@ -28,6 +28,8 @@ Material:
     - _Ambient: 0.6
     - _CausticAbove: 0
     - _GroutWidth: 0.06
+    - _HazeEnd: 200
+    - _HazeStart: 18
     - _Sheen: 0
     - _TileSize: 0.2
     - _WaterLevel: -0.12
@@ -36,6 +38,7 @@ Material:
     - _Color: {r: 0.93, g: 0.66, b: 0.54, a: 1}
     - _Color2: {r: 0.89, g: 0.6, b: 0.5, a: 1}
     - _Grout: {r: 0.66, g: 0.47, b: 0.42, a: 1}
+    - _HazeColor: {r: 0.94, g: 0.7, b: 0.64, a: 1}
     - _LightDir: {r: 0.2, g: 0.9, b: -0.3, a: 0}
     - _SheenColor: {r: 1.2, g: 0.7, b: 0.9, a: 1}
     - _Underwater: {r: 0.24999997, g: 0.85, b: 0.92, a: 1}

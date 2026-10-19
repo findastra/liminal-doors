@@ -11,6 +11,9 @@ Shader "LiminalDoors/Portal" {
   _Size("Opening size (m)", Vector) = (0.9,2.24,0,0)
   _Opacity("Opacity", Range(0,1)) = 0.86
   _Speed("Swirl speed", Float) = 0.35
+  // 2026-10-19, Astra: "the door more glittery": sparkles that blink on and off across the veil
+  [HDR] _GlitterColor("Glitter colour", Color) = (3,2.4,3,1)
+  _Glitter("Glitter", Range(0,1)) = 0
  }
  SubShader {
   Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True" }
@@ -21,7 +24,7 @@ Shader "LiminalDoors/Portal" {
    #pragma fragment frag
    #pragma multi_compile_instancing
    #include "UnityCG.cginc"
-   float4 _Color, _Deep, _Rim, _Size; float _Opacity, _Speed;
+   float4 _Color, _Deep, _Rim, _Size, _GlitterColor; float _Opacity, _Speed, _Glitter;
    struct appdata { float4 vertex:POSITION; float2 uv:TEXCOORD0; UNITY_VERTEX_INPUT_INSTANCE_ID };
    struct v2f { float4 pos:SV_POSITION; float2 uv:TEXCOORD0; UNITY_VERTEX_OUTPUT_STEREO };
    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
@@ -48,6 +51,20 @@ Shader "LiminalDoors/Portal" {
     c *= 0.85 + 0.25 * smoothstep(0.0, 0.6, m.y) * (1 - smoothstep(1.6, 2.4, m.y));
     float rim = exp(-edge / 0.035) + 0.35 * exp(-edge / 0.12);
     c += _Rim.rgb * rim;
+    if (_Glitter > 0) {
+     for (int k = 0; k < 2; k++) {
+      float2 g = m * (26.0 + k * 17.0) + float2(k * 3.7, -t * (0.6 + k * 0.5));   // drifting slowly up
+      float2 cell = floor(g), f = frac(g) - 0.5;
+      float r = Hash(cell + k * 11.3);
+      if (r > 0.82) {
+       float2 off = (float2(Hash(cell + 5.1), Hash(cell + 8.9)) - 0.5) * 0.5;
+       float dd = length(f - off);
+       float star = saturate(1 - dd * 4.5) + exp(-abs(f.x - off.x) * 40) * exp(-abs(f.y - off.y) * 6) * 0.4 + exp(-abs(f.y - off.y) * 40) * exp(-abs(f.x - off.x) * 6) * 0.4;
+       float tw = saturate(sin(_Time.y * (2.5 + r * 6.0) + r * 77.0) * 2.0 - 0.6);
+       c += _GlitterColor.rgb * star * tw * _Glitter;
+      }
+     }
+    }
     float a = saturate(_Opacity + rim * 0.5);
     return half4(c * a, a);
    }

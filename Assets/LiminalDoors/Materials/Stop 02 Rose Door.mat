@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Stop 02 Rose Door
-  m_Shader: {fileID: 4800000, guid: 583df11b87e223c4980170b2f17f8100, type: 3}
+  m_Shader: {fileID: 4800000, guid: fe0bcabe1e8cb5a419d508509d576054, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -26,8 +26,15 @@ Material:
     m_Ints: []
     m_Floats:
     - _Ambient: 0.55
+    - _Density: 0.6
+    - _FleckSize: 0.012
+    - _HazeEnd: 0
+    - _HazeStart: 0
+    - _Sharpness: 18
     m_Colors:
     - _Color: {r: 0.93, g: 0.4, b: 0.58, a: 1}
-    - _Emission: {r: 0.18, g: 0.03, b: 0.08, a: 1}
-    - _LightDir: {r: -0.12, g: 0.5, b: -1, a: 0}
+    - _Emission: {r: 0.32, g: 0.05, b: 0.14, a: 1}
+    - _GlitterColor: {r: 3.2, g: 1.9, b: 2.7, a: 1}
+    - _HazeColor: {r: 0.95, g: 0.72, b: 0.65999997, a: 1}
+    - _LightDir: {r: -0.55, g: 0.5, b: -1, a: 0}
   m_BuildTextureStacks: []

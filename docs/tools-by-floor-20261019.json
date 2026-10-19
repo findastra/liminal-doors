@@ -22,7 +22,8 @@
     "grass-push": {"name": "Grass push", "does": "Tells the grass where your feet are each frame, so it parts for you (Udon).", "path": "Assets/LiminalDoors/Scripts/LiminalGrassPush.cs"},
     "sparkle-sky": {"name": "Evening Sky with sparkles", "does": "Dusk gradient, cloud streaks, a low sun, and a twinkling sparkle layer with big four-point glints and a faint nebula.", "path": "Assets/LiminalDoors/Shaders/EveningSky.shader"},
     "door-kit": {"name": "Door kit and portals", "does": "Shared door pieces; the portal fills the whole doorway, sill to lintel (Astra: \"the door portals need to fill up the square\").", "path": "Assets/LiminalDoors/Editor/LiminalDoorKit.cs"},
-    "portal-shader": {"name": "Portal shader", "does": "A luminous veil with slow swirls, rising threads and a bright rim at the frame.", "path": "Assets/LiminalDoors/Shaders/Portal.shader"},
+    "portal-shader": {"name": "Portal shader", "does": "A luminous veil with slow swirls, rising threads, a bright rim at the frame, and blinking glitter.", "path": "Assets/LiminalDoors/Shaders/Portal.shader"},
+    "glitter-paint": {"name": "Glitter Paint shader", "does": "Door paint full of tiny mirror flecks that flash as you move and twinkle (Astra: \"the door more glittery\").", "path": "Assets/LiminalDoors/Shaders/GlitterPaint.shader"},
     "stop-03-builder": {"name": "Stop 03 builder", "does": "Builds Pool After Closing: the tiled hall, the pool and its steps, windows, skylight, ladder and both doors.", "path": "Assets/LiminalDoors/Editor/LiminalStop03.cs"},
     "pool-tile": {"name": "Pool Tile shader", "does": "World-space tiles with grout and caustic light that wanders under and over the water.", "path": "Assets/LiminalDoors/Shaders/PoolTile.shader"},
     "pool-water": {"name": "Pool Water shader", "does": "Clear turquoise water with slow ripples, glancing pink reflections and glints.", "path": "Assets/LiminalDoors/Shaders/PoolWater.shader"},
@@ -36,7 +37,7 @@
     "world-spawn-tool": {"name": "world-spawn-tool", "does": "Unity Unicorn's first steps for a new world: the public repo and the profile link.", "repo": "findastra/unity-unicorn", "ref": "main", "path": "scripts/world-spawn-tool", "tree": true}
   },
   "every_floor": ["codex-image", "floor-cutter", "redline-sheet", "contact-sheet", "web-pictures"],
-  "whole_world": ["door-system", "door-wiring", "door-kit", "portal-shader", "world-glow", "desktop-test", "agent-queue", "shaders-shop", "world-spawn-tool"],
+  "whole_world": ["door-system", "door-wiring", "door-kit", "portal-shader", "glitter-paint", "world-glow", "desktop-test", "agent-queue", "shaders-shop", "world-spawn-tool"],
   "floors": {
     "1": ["stop-01-builder", "stop-01-sky", "booth-builder", "blender-booth", "asset-creator", "unity-stable"],
     "2": ["stop-02-builder", "frond-grass", "grass-push", "sparkle-sky", "field-shaders"],

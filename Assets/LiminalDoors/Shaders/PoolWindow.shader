@@ -10,6 +10,9 @@ Shader "LiminalDoors/Pool Window" {
   _Size("Pane size (m)", Vector) = (4,3.2,0,0)
   _Mode("0 = window, 1 = skylight", Float) = 0
   _Bubbles("Bubbles", Range(0,1)) = 1
+  _HazeColor("Haze colour", Color) = (0.95,0.72,0.66,1)
+  _HazeStart("Haze start (m)", Float) = 0
+  _HazeEnd("Haze full (m, 0 = off)", Float) = 0
  }
  SubShader {
   Tags { "RenderType"="Opaque" "Queue"="Geometry" }
@@ -60,7 +63,7 @@ Shader "LiminalDoors/Pool Window" {
      c = lerp(_Bottom.rgb, _Top.rgb, wave);
      c += _Light.rgb * Caustics(p * 0.55, t * 0.7) * 0.9;
     }
-    return half4(c, 1);
+    return half4(PoolHaze(c, i.world), 1);
    }
    ENDCG
   }

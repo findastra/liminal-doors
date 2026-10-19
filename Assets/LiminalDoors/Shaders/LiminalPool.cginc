@@ -28,6 +28,16 @@ float Caustics(float2 p, float t)
     return saturate(c);
 }
 
+// 2026-10-19 (Astra: "the pool should be 10x longer"): the hall melts into a warm haze far down its length, so it
+// seems to go on and on. Off while _HazeEnd <= _HazeStart.
+float4 _HazeColor; float _HazeStart, _HazeEnd;
+float3 PoolHaze(float3 c, float3 world)
+{
+    if (_HazeEnd <= _HazeStart) return c;
+    float f = saturate((distance(world, _WorldSpaceCameraPos) - _HazeStart) / (_HazeEnd - _HazeStart));
+    return lerp(c, _HazeColor.rgb, f * (2 - f) * 0.92);
+}
+
 // tile coordinates for a world position on a face with this normal
 float2 TileUV(float3 world, float3 n)
 {

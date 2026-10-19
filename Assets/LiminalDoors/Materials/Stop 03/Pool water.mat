@@ -26,8 +26,11 @@ Material:
     m_Ints: []
     m_Floats:
     - _Clarity: 0.6
+    - _HazeEnd: 200
+    - _HazeStart: 18
     m_Colors:
     - _Glint: {r: 2, g: 1.8, b: 1.9, a: 1}
+    - _HazeColor: {r: 0.94, g: 0.7, b: 0.64, a: 1}
     - _LightDir: {r: 0.2, g: 0.9, b: -0.3, a: 0}
     - _Reflect: {r: 1.1, g: 0.55, b: 0.85, a: 1}
     - _Shallow: {r: 0.19999996, g: 0.78, b: 0.86, a: 1}

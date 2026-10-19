@@ -71,6 +71,34 @@ from VRChat's public API.
   - 0 exceptions and no Udon errors.
 - Renders: `docs/renders/stop-02-0[1-8]-*.jpg` and `stop-03-0[1-7]-*.jpg`.
 
+## The liminal pass (same day)
+
+Astra: "they are lacking the liminal (weird) factor. like the pool should be 10x longer and the door more glittery.
+same with the other paths."
+
+- **Stop 03: the pool is 10x longer.**
+  - The pool is 220 m (hall 14 x 235 m). The same columns and sconces (76), underwater windows (37), skylights (7)
+    and ladders (5) repeat all the way down.
+  - There are steps at both ends.
+  - A warm haze runs from 18 to 200 m, so the hall seems to go on and on. The pink door glows at the far end.
+  - The axolotl's spot moved halfway down.
+- **Stop 02: the path is 10x longer.**
+  - The path winds 307 m through 58,782 frond tufts (the grass runs along it, out to 30 m).
+  - The valley ground is 400 x 540 m.
+  - The sun moved off to the right, and a faint pink light shaft stands over the rose door, so from the arrival door it
+    is a tiny beacon on the horizon.
+  - The stone is rosier.
+- **Glittery doors, in both stops:**
+  - Frames and leaves are `LiminalDoors/Glitter Paint` (tiny mirror flecks that flash as you move and twinkle).
+  - The portals sparkle (`_Glitter`).
+  - Each door has a glitter halo (`LiminalDoorKit.GlitterHalo`).
+- **Optional haze**, off unless set: `Pool Tile`, `Pool Water`, `Pool Window` and `Soft Lit` now have one.
+  `Field Ground` takes a path rectangle.
+- **Checks:**
+  - Wire doors: 3 stops, 5 doors, all PASS.
+  - Trip test: 10/10 PASS (booth -> 02 -> booth -> 02 -> 03 -> back to 02's far door -> respawn).
+  - Desktop test 11:26: a 22.1 MB bundle entered the world, with 0 exceptions.
+
 ## Open
 
 1. Astra's review of both stops.

@@ -8,6 +8,9 @@ Shader "LiminalDoors/Pool Water" {
   [HDR] _Glint("Glints", Color) = (2.0,1.8,1.9,1)
   _Clarity("See-through (0..1)", Range(0,1)) = 0.6
   _LightDir("Lamp direction", Vector) = (0.2,0.9,-0.3,0)
+  _HazeColor("Haze colour", Color) = (0.95,0.72,0.66,1)
+  _HazeStart("Haze start (m)", Float) = 0
+  _HazeEnd("Haze full (m, 0 = off)", Float) = 0
  }
  SubShader {
   Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True" }
@@ -41,7 +44,8 @@ Shader "LiminalDoors/Pool Water" {
     c += _Glint.rgb * pow(saturate(dot(n, hlf)), 220) * 0.8;
     c += _Shallow.rgb * Caustics(p * 0.8, t) * 0.18;
     float a = saturate(lerp(1 - _Clarity, 0.95, fres));
-    return half4(c, a);
+    float hz = _HazeEnd > _HazeStart ? saturate((distance(i.world, _WorldSpaceCameraPos) - _HazeStart) / (_HazeEnd - _HazeStart)) : 0;
+    return half4(PoolHaze(c, i.world), lerp(a, 1, hz));   // far off the water turns to haze too, not see-through
    }
    ENDCG
   }

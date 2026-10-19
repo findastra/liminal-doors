@@ -26,9 +26,12 @@ Material:
     m_Ints: []
     m_Floats:
     - _Bubbles: 1
+    - _HazeEnd: 200
+    - _HazeStart: 18
     - _Mode: 0
     m_Colors:
     - _Bottom: {r: 0.05, g: 0.25, b: 0.55, a: 1}
+    - _HazeColor: {r: 0.94, g: 0.7, b: 0.64, a: 1}
     - _Light: {r: 0.9, g: 1.6, b: 1.6, a: 1}
     - _Size: {r: 4.4, g: 3.4, b: 0, a: 0}
     - _Top: {r: 0.55, g: 1.6, b: 1.7, a: 1}

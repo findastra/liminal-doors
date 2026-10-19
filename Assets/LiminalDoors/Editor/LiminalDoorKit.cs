@@ -32,6 +32,27 @@ public static class LiminalDoorKit
         return m;
     }
 
+    // glitter paint for a door's frame and leaves (Astra, 2026-10-19: "the door more glittery")
+    public static Material GlitterMat(string path, Color paint, Color glow, Color glitter, Vector3 lightDir, float density = 0.55f)
+    {
+        var m = Mat(path, "LiminalDoors/Glitter Paint");
+        m.SetColor("_Color", paint); m.SetColor("_Emission", glow); m.SetColor("_GlitterColor", glitter);
+        m.SetFloat("_Density", density); m.SetVector("_LightDir", lightDir);
+        return m;
+    }
+
+    // a cloud of twinkling glitter hanging around a door, thickest at the doorway
+    public static ParticleSystem GlitterHalo(Transform door, Material mat, Vector3 center, Vector3 box, float rate = 60f, int max = 500)
+    {
+        var go = new GameObject("Glitter halo"); go.transform.SetParent(door, false); go.transform.localPosition = center;
+        var ps = Motes(go, mat, rate, box, 0.06f, 0.05f, max);
+        var main = ps.main; main.startLifetime = new ParticleSystem.MinMaxCurve(2.5f, 5f);
+        var sz = ps.sizeOverLifetime; sz.enabled = true;
+        sz.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.12f, 1f), new Keyframe(0.25f, 0.2f), new Keyframe(0.4f, 1f), new Keyframe(0.55f, 0.25f), new Keyframe(0.7f, 1f), new Keyframe(1f, 0f)));
+        var noise = ps.noise; noise.strength = 0.15f; noise.frequency = 0.8f;
+        return ps;
+    }
+
     public static GameObject Box(Transform parent, string name, Vector3 at, Vector3 size, Material mat, bool solid = false)
     {
         var b = GameObject.CreatePrimitive(PrimitiveType.Cube);

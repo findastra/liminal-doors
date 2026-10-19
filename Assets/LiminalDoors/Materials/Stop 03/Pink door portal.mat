@@ -25,11 +25,13 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _Glitter: 1
     - _Opacity: 0.86
     - _Speed: 0.35
     m_Colors:
     - _Color: {r: 1.6, g: 0.55, b: 1, a: 1}
     - _Deep: {r: 0.9, g: 0.22, b: 0.62, a: 1}
+    - _GlitterColor: {r: 3.2, g: 2.4, b: 3, a: 1}
     - _Rim: {r: 2.6, g: 1.2, b: 1.9, a: 1}
     - _Size: {r: 1.9, g: 2.6, b: 0, a: 0}
   m_BuildTextureStacks: []

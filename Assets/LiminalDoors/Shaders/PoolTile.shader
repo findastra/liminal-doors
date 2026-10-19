@@ -18,6 +18,9 @@ Shader "LiminalDoors/Pool Tile" {
   _CausticAbove("Caustics above the water (0 = none)", Range(0,1)) = 0
   _Sheen("Wet sheen", Range(0,1)) = 0
   [HDR] _SheenColor("Sheen colour", Color) = (1.2,0.7,0.9,1)
+  _HazeColor("Haze colour", Color) = (0.95,0.72,0.66,1)
+  _HazeStart("Haze start (m)", Float) = 0
+  _HazeEnd("Haze full (m, 0 = off)", Float) = 0
  }
  SubShader {
   Tags { "RenderType"="Opaque" "Queue"="Geometry" }
@@ -72,7 +75,7 @@ Shader "LiminalDoors/Pool Tile" {
      float streak = PoolNoise(float2(i.world.x * 0.35, i.world.z * 2.4)) * 0.6 + 0.4;
      c += _SheenColor.rgb * fres * streak * _Sheen * (1 - grout * 0.5);
     }
-    return fixed4(c, 1);
+    return fixed4(PoolHaze(c, i.world), 1);
    }
    ENDCG
   }
