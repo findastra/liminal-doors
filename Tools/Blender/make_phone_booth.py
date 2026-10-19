@@ -136,7 +136,7 @@ C_DOME, K_DOME, A_DOME = 2.74, 0.4758, 0.68
 def zdome(x, y): return C_DOME - K_DOME * (x * x + y * y)
 FACES = {'front': (0, 1, 0), 'back': (0, -1, 0), 'left': (-1, 0, 0), 'right': (1, 0, 0)}
 
-def glazed_panel(group, M, glass_group=None):
+def glazed_panel(group, M, glass_group=None, phone_panel=False):
     G = group
     box_m(G, 'paint', (-IN, IN, W0, W1, FLOOR, 0.32), M)                                        # bottom rail (kick panel)
     box_m(G, 'paint', (-0.44, 0.44, W1, W1 + 0.009, 0.13, 0.27), M, bevel=0.004, segs=1)               # fielded panel, outside
@@ -150,11 +150,19 @@ def glazed_panel(group, M, glass_group=None):
     for k in range(7):
         vc = 0.32 + (k + 1) * cell + k * 0.024 + 0.012
         box_m(G, 'paint', (-0.472, 0.472, 0.583, 0.617, vc - 0.012, vc + 0.012), M, bevel=0.004, segs=1)
+    if phone_panel:
+        # the wide middle column is a solid panel the payphone is fixed to, with a raised field inside (the phone's
+        # backboard, built into the wall) and a fielded panel outside, so it reads as part of the cabinetwork
+        box_m(G, 'paint', (-0.224, 0.224, 0.581, 0.619, 0.32, 1.94), M)
+        box_m(G, 'paint', (-0.205, 0.205, 0.548, 0.581, 0.66, 1.86), M, bevel=0.008, segs=2)
+        box_m(G, 'paint', (-0.19, 0.19, 0.619, 0.626, 0.40, 1.86), M, bevel=0.004, segs=1)
     if glass_group:
-        def pane(bm):
-            vs = [bm.verts.new(Vector(p)) for p in ((-0.47, 0.6, 0.32), (0.47, 0.6, 0.32), (0.47, 0.6, 1.94), (-0.47, 0.6, 1.94))]
-            bm.faces.new(vs)
-        add_bm(glass_group, 'glass', pane, M=M, smooth=False)
+        spans = ((-0.47, -0.223), (0.223, 0.47)) if phone_panel else ((-0.47, 0.47),)
+        for u0, u1 in spans:
+            def pane(bm, u0=u0, u1=u1):
+                vs = [bm.verts.new(Vector(p)) for p in ((u0, 0.6, 0.32), (u1, 0.6, 0.32), (u1, 0.6, 1.94), (u0, 0.6, 1.94))]
+                bm.faces.new(vs)
+            add_bm(glass_group, 'glass', pane, M=M, smooth=False)
 
 def frieze_and_pediment(n):
     M = face_frame(n); G = 'Booth body'
@@ -222,7 +230,7 @@ def build_booth():
     box(G, 'paint', -0.70, 0.70, -0.70, 0.70, 2.20, 2.23, bevel=0.008)                          # cornice
     box(G, 'paint', -0.685, 0.685, -0.685, 0.685, 2.23, 2.26, bevel=0.008)
     for name in ('back', 'left', 'right'):
-        glazed_panel(G, face_frame(FACES[name]), glass_group='Booth glass')
+        glazed_panel(G, face_frame(FACES[name]), glass_group='Booth glass', phone_panel=name == 'back')
     for n in FACES.values(): frieze_and_pediment(n)
     def dome(bm):   # shallow dome: z = c - k (x^2 + y^2), a little thickness under it
         n, a = 16, A_DOME + 0.02; grid = []
@@ -235,14 +243,6 @@ def build_booth():
         faces = [bm.faces.new((grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i])) for j in range(n) for i in range(n)]
         extrude_closed(bm, faces, (0, 0, -0.035))
     add_bm(G, 'paint', dome, bevel=0.006, segs=2)
-    # inside: the board the payphone hangs on, and a directory shelf
-    box(G, 'board', -0.25, 0.27, -0.572, -0.548, 0.70, 1.86, bevel=0.006)
-    box(G, 'board', -0.32, 0.34, -0.575, -0.37, 0.78, 0.805, bevel=0.006)
-    for x in (-0.24, 0.26):
-        def bracket(bm, x=x):
-            vs = [bm.verts.new(Vector(p)) for p in ((x - 0.008, -0.574, 0.78), (x - 0.008, -0.40, 0.78), (x - 0.008, -0.574, 0.68))]
-            extrude_closed(bm, [bm.faces.new(vs)], (0.016, 0, 0))
-        add_bm(G, 'board', bracket, bevel=0.003, segs=1)
 
 DOOR_HINGE = Vector((-IN, W1, 0)); DOOR_OPEN = 80.0
 def build_door():
@@ -492,8 +492,8 @@ def edge_shader(m, radius):
     em = nb.node('ShaderNodeEmission'); nb.link(e, em.inputs['Color']); nb.link(em.outputs[0], nb.out.inputs['Surface'])
 
 PALETTE = {
-    'paint': dict(base=(1.0, 0.25, 0.59), alt=(1.0, 0.40, 0.55), fade=(1.0, 0.52, 0.73), grime=(0.40, 0.15, 0.27),
-                  edge=(1.0, 0.47, 0.70), primer=(0.62, 0.13, 0.22), bare=(0.22, 0.21, 0.22), rough=0.2, chip=0.85),
+    'paint': dict(base=(1.0, 0.25, 0.59), alt=(1.0, 0.40, 0.55), fade=(1.0, 0.52, 0.73), grime=(0.34, 0.11, 0.22),
+                  edge=(1.0, 0.47, 0.70), primer=(0.62, 0.13, 0.22), bare=(0.22, 0.21, 0.22), rough=0.2, chip=1.0),
     'board': dict(base=(0.58, 0.20, 0.38), alt=(0.62, 0.26, 0.40), fade=(0.66, 0.30, 0.46), grime=(0.28, 0.10, 0.18),
                   edge=(0.72, 0.36, 0.52), primer=(0.45, 0.10, 0.18), bare=(0.22, 0.21, 0.22), rough=0.42, chip=0.35),
 }
@@ -509,30 +509,31 @@ def compose(m, ao_img, edge_img):
     out = {}
     if k in PALETTE:
         P = PALETTE[k]
-        var = nb.remap(nb.noise(2.6, 3.0), 0.3, 0.7, 0.93, 1.05)
-        col = nb.mix(lin(P['base']), lin(P['alt']), nb.remap(nb.noise(0.9, 2.0), 0.35, 0.7, 0.0, 0.35))
+        var = nb.remap(nb.noise(2.6, 3.0), 0.3, 0.7, 0.88, 1.07)
+        col = nb.mix(lin(P['base']), lin(P['alt']), nb.remap(nb.noise(0.9, 2.0), 0.35, 0.7, 0.0, 0.5))
         col = nb.mul_color(col, var)
-        lum = nb.remap(nb.bw(nb.boxtex(scan('PaintedMetal002', 'Color'), 1.4)), 0.15, 0.75, 0.95, 1.03)
+        lum = nb.remap(nb.bw(nb.boxtex(scan('PaintedMetal002', 'Color'), 1.4)), 0.15, 0.75, 0.9, 1.05)
         col = nb.mul_color(col, lum)
-        col = nb.mix(col, lin(P['fade']), nb.math('MULTIPLY', nb.remap(nz, 0.5, 1.0, 0.0, 1.0, smooth=True), 0.35))
+        col = nb.mix(col, lin(P['fade']), nb.math('MULTIPLY', nb.remap(nz, 0.5, 1.0, 0.0, 1.0, smooth=True), 0.4))
         grime = nb.math('MULTIPLY', nb.math('POWER', cavity, 1.3), nb.remap(nb.noise(8.0, 4.0), 0.3, 0.7, 0.5, 1.0), clamp=True)
         streak = nb.remap(nb.noise(1.0, 3.0, stretch=(26.0, 26.0, 1.3)), 0.56, 0.74, 0.0, 1.0)
         streak = nb.math('MULTIPLY', streak, nb.remap(nz, -0.3, 0.0, 0.0, 1.0))   # vertical and overhung faces only
         streak = nb.math('MULTIPLY', streak, nb.remap(nz, 0.0, 0.4, 1.0, 0.0))
-        dirt = nb.math('MAXIMUM', nb.math('MULTIPLY', grime, 0.75), nb.math('MULTIPLY', streak, 0.3))
+        dirt = nb.math('MAXIMUM', nb.math('MULTIPLY', grime, 0.9), nb.math('MULTIPLY', streak, 0.45))
         col = nb.mix(col, lin(P['grime']), dirt)
-        col = nb.mix(col, lin(P['edge']), nb.math('MULTIPLY', edge, 0.35))
+        col = nb.mix(col, lin(P['edge']), nb.math('MULTIPLY', edge, 0.45))
         # chips: only on strong edges, and only where a high-contrast noise says so (a few small flakes, not a pattern)
-        flake = nb.remap(nb.noise(38.0, 6.0, rough=0.7), 0.56, 0.68, 0.0, 1.0)
+        flake = nb.remap(nb.noise(38.0, 6.0, rough=0.7), 0.5, 0.62, 0.0, 1.0)
         chip = nb.math('MULTIPLY', nb.math('MULTIPLY', nb.remap(edge, 0.45, 0.9, 0.0, 1.0), flake), P['chip'])
         bare = nb.math('MULTIPLY', chip, nb.remap(nb.noise(70.0, 4.0), 0.6, 0.72, 0.0, 1.0))
         col = nb.mix(col, lin(P['primer']), chip); col = nb.mix(col, lin(P['bare']), bare)
-        col = nb.mix(col, lin((1.0, 0.72, 0.84)), nb.math('MULTIPLY', scr, 0.22))
+        col = nb.mix(col, lin((1.0, 0.72, 0.84)), nb.math('MULTIPLY', scr, 0.3))
         rs = nb.remap(nb.bw(nb.boxtex(scan('PaintedMetal002', 'Roughness'), 1.4)), 0.0, 1.0, -0.08, 0.14)
         rough = nb.math('ADD', P['rough'], rs)
         for x, w in ((dirt, 0.4), (chip, 0.3), (scr, 0.14), (smear, 0.08)): rough = nb.math('ADD', rough, nb.math('MULTIPLY', x, w))
         out['albedo'] = col; out['rough'] = nb.math('MINIMUM', nb.math('MAXIMUM', rough, 0.1), 0.9)
         out['metal'] = nb.math('MULTIPLY', bare, 0.6)
+        out['coat'] = nb.math('MULTIPLY', nb.math('SUBTRACT', 1.0, chip), nb.math('SUBTRACT', 1.0, nb.math('MULTIPLY', dirt, 0.6)))
         out['height'] = nb.math('SUBTRACT', nb.math('MULTIPLY', nb.bw(nb.boxtex(scan('PaintedMetal002', 'Displacement'), 1.4)), 0.6), nb.math('MULTIPLY', scr, 0.25))
     elif k in ('brass', 'gold'):
         base, tarn = ((0.96, 0.74, 0.40), (0.40, 0.29, 0.15)) if k == 'brass' else ((1.0, 0.80, 0.40), (0.52, 0.34, 0.14))
@@ -580,6 +581,7 @@ def compose(m, ao_img, edge_img):
         out['albedo'] = nb.mix(lin((0.94, 0.91, 0.83)), lin((0.84, 0.76, 0.58)), nb.math('MULTIPLY', cavity, 0.8))
         out['rough'] = nb.val(0.62); out['metal'] = nb.val(0.0); out['height'] = nb.val(0.0)
     if 'emit' not in out: out['emit'] = nb.val(0.0)
+    if 'coat' not in out: out['coat'] = nb.val({'sign': 0.8, 'ink': 0.8, 'black': 0.5, 'card': 0.35, 'cardink': 0.35}.get(k, 0.0))
     m['_nb'] = True
     return nb, out
 
@@ -630,7 +632,7 @@ def bake_atlas(prefix, objs, res, glass):
     bake(objs, mats, edge, 'EMIT', 16)
     comp = {m.name: compose(m, ao, edge) for m in mats}
     imgs = {}
-    for ch, color in (('albedo', True), ('rough', False), ('metal', False), ('emit', True)):
+    for ch, color in (('albedo', True), ('rough', False), ('metal', False), ('coat', False), ('emit', True)):
         if ch == 'emit' and prefix != 'booth': continue
         img = new_img(prefix + '-' + ch, res, color)
         for m in mats: show(comp[m.name][0], comp[m.name][1][ch])
@@ -639,7 +641,7 @@ def bake_atlas(prefix, objs, res, glass):
     for m in mats: show(comp[m.name][0], None, normal=comp[m.name][1]['height'])
     bake(objs, mats, nrm, 'NORMAL', 4); imgs['normal'] = nrm
     for g in glass: g.hide_render = False
-    # write Unity's textures: albedo, metallic (R) + smoothness (A), normal, occlusion, emission
+    # write Unity's textures: albedo, metallic (R) + clear coat (G) + edges (B) + smoothness (A), normal, occlusion, emission
     save(imgs['albedo'], os.path.join(TEXOUT, prefix + '-albedo.png'))
     save(nrm, os.path.join(TEXOUT, prefix + '-normal.png'))
     save(ao, os.path.join(TEXOUT, prefix + '-occlusion.png'))
@@ -648,7 +650,9 @@ def bake_atlas(prefix, objs, res, glass):
     import numpy as np
     met = np.empty(res * res * 4, np.float32); imgs['metal'].pixels.foreach_get(met)
     rou = np.empty(res * res * 4, np.float32); imgs['rough'].pixels.foreach_get(rou)
-    px = met.copy(); px[3::4] = 1.0 - rou[0::4]
+    coa = np.empty(res * res * 4, np.float32); imgs['coat'].pixels.foreach_get(coa)
+    edg = np.empty(res * res * 4, np.float32); edge.pixels.foreach_get(edg)
+    px = met.copy(); px[1::4] = coa[0::4]; px[2::4] = edg[0::4]; px[3::4] = 1.0 - rou[0::4]
     ms.pixels.foreach_set(px); ms.alpha_mode = 'STRAIGHT'; save(ms, os.path.join(TEXOUT, prefix + '-metallic-smoothness.png'))
     return imgs, ao, mats
 
