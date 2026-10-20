@@ -10,7 +10,7 @@ The plates were made with OpenAI Codex's built-in image generation on 2026-10-15
   (Crystals Absence by Arkîe, Astral Bounds by Vectriel). Floor numbers are kept, so the collection skips 34, 35 and 37.
 - **Floor 01 repainted 2026-10-20 (Astra):** "Get rid of the grass in the first floor. I just want it to be clouds
   instead. No green grass, no regular grass, just all clouds." The grass tufts and the wet stone path around the booth
-  are painted out with the picture's own cloud sea (`tools/CloudFloor-20261020.cs`); the booth now rises out of the
+  are painted out with the picture's own cloud sea (`tools/cloud-floor-20261020.cs`); the booth now rises out of the
   clouds. The grassy original is in git history and on plate 1, so `cut-floors.ps1` would bring it back: keep the 20261020 file.
 - `floors-contact-sheet-20261019.png`: all 34 at a glance.
 - `liminal-doors-redline-sheet-20261019.jpg`: the same layout at full size (3098 x 3374 px) for redlines in Procreate. The Concept Atlas's "Export all 34 for redlines" button saves this file; the + on each card makes a sheet of just the floors you pick. Labels read "NN place animal", as on the page. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.

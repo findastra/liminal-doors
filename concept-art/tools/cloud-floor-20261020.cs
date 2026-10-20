@@ -1,7 +1,7 @@
 // Floor 01 picture: the grass and the wet stone path under the booth become clouds (Astra, 2026-10-20:
 // "Get rid of the grass in the first floor. I just want it to be clouds instead."). The new clouds are the picture's
 // own cloud sea, taken from both sides of the booth and enlarged (nearer clouds look bigger), so the style stays Codex's.
-// Run (PowerShell): Add-Type -ReferencedAssemblies System.Drawing -Path CloudFloor-20261020.cs;
+// Run (PowerShell): Add-Type -ReferencedAssemblies System.Drawing -Path cloud-floor-20261020.cs;
 //   [CloudFloor]::Run("<grassy 01 png>", "<out png>", "01")   (made for 01-fox-pinkscape-20261015.png, 510 x 500 px)
 using System;
 using System.Drawing;
