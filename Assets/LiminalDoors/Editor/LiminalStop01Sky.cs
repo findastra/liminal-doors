@@ -85,6 +85,13 @@ public static class LiminalStop01Sky
             for (int k = 0; k < puffs.Length; k++)
                 Part(nearRoot.transform, "Puff " + (k + 1), cumulus[k % 3], near, new Vector3(puffs[k].x, SeaHeight - .05f, puffs[k].z), new Vector3(puffs[k].s * .45f, puffs[k].s * .32f, puffs[k].s * .42f), true)
                     .transform.localRotation = Quaternion.Euler(0, k * 47f, 0);
+            // 1.1.0, the door side too, so the booth stands in clouds all the way round (Astra, 2026-10-20: "Get rid of the
+            // grass in the first floor. I just want it to be clouds instead ... just all clouds"). Lower than the others, about
+            // shin high: the doorway is the forward door's trigger, so you are sent on as you step into them.
+            var front = new (float x, float z, float s)[] { (-.35f, 1.05f, .9f), (.4f, 1.2f, .8f), (-.95f, .95f, .85f), (1f, .75f, .9f), (.05f, 1.65f, .75f), (-.65f, 1.8f, .7f), (.8f, 1.6f, .7f), (1.6f, .45f, .8f), (-1.65f, .15f, .9f), (1.75f, -.6f, .8f) };
+            for (int k = 0; k < front.Length; k++)
+                Part(nearRoot.transform, "Puff " + (puffs.Length + k + 1), cumulus[(k + 1) % 3], near, new Vector3(front[k].x, SeaHeight - .1f, front[k].z), new Vector3(front[k].s * .45f, front[k].s * .28f, front[k].s * .42f), true)
+                    .transform.localRotation = Quaternion.Euler(0, 20f + k * 61f, 0);
 
             var probeGo = new GameObject("Sunset reflections"); probeGo.transform.SetParent(root.transform, false); probeGo.transform.localPosition = new Vector3(0, 1.4f, 0);
             var probe = probeGo.AddComponent<ReflectionProbe>();
@@ -250,6 +257,12 @@ public static class LiminalStop01Sky
             r.maxTriangles = 30000; r.maxMaterials = 4; r.maxTextureSize = 1024; r.maxParticles = 0;
             r.changelog = "1.0.0: first version. Sunset Sky dome, Cloud Sea (parallax billows, soft self-shadow, sun glow, haze), 14 cumulus, 8 booth puffs, sunset reflection probe.";
             AssetDatabase.CreateAsset(r, RecipePath);
+        }
+        if (r.version == "1.0.0")   // 2026-10-20: ten more puffs on the door side; their triangles need a higher cap
+        {
+            r.version = "1.1.0"; r.maxTriangles = 45000;
+            r.description = "Stop 1's world: a sunset sky (lavender, pink, apricot, butter-yellow horizon, a low sun) over a sea of rolling pink clouds with cumulus rising out of it, puffs all the way round the booth (door side too) and a reflection probe for the sunset.";
+            r.changelog = "1.1.0 (2026-10-20): 10 more puffs, on the door side, so the booth stands in clouds all the way round (Astra: \"just all clouds\"); triangle cap 30000 -> 45000.\n" + r.changelog;
         }
         r.prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
         EditorUtility.SetDirty(r); AssetDatabase.SaveAssets();

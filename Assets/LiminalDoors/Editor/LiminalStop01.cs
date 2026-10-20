@@ -278,6 +278,25 @@ public static class LiminalStop01
         Debug.Log("[Liminal] Stop 01 renders written to " + ReviewDir);
     }
 
+    // A realtime probe renders over the next editor frames; until it has, every reflection (the payphone's chrome, the
+    // crowns) renders black. This re-renders the probes, waits until each says it has finished, then renders the shots.
+    [MenuItem("LiminalDoors/Stop 01/Render (after reflections)")]
+    public static void RenderAfterReflections()
+    {
+        var jobs = UnityEngine.Object.FindObjectsOfType<ReflectionProbe>().Where(p => p.mode == ReflectionProbeMode.Realtime)
+            .Select(p => (probe: p, id: p.RenderProbe())).ToList();
+        double give = EditorApplication.timeSinceStartup + 20;
+        EditorApplication.CallbackFunction wait = null;
+        wait = () =>
+        {
+            if (jobs.Any(j => !j.probe.IsFinishedRendering(j.id)) && EditorApplication.timeSinceStartup < give) { SceneView.RepaintAll(); return; }
+            EditorApplication.update -= wait;
+            Debug.Log("[Liminal] " + jobs.Count + " reflection probes rendered" + (EditorApplication.timeSinceStartup >= give ? " (gave up waiting after 20 s)" : ""));
+            Render();
+        };
+        EditorApplication.update += wait;
+    }
+
     static void RenderTo(Camera cam, int w, int h, string file)
     {
         var rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB) { antiAliasing = 8 };

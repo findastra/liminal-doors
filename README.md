@@ -7,7 +7,7 @@ first door opens on Astra's pink phone booth, alone above a sea of pink clouds. 
 The world's caretaker pet is **Door Dormouse** (pet program #82, The Threshold). The floor plan, concept book and idea
 inbox were drafted by Codex on 2026-10-15/16.
 
-![Stop 01: the booth, still plain](docs/renders/stop-01-01-door.png)
+![Doorspace 01, Pinkscape Fox: the pink booth standing in clouds](docs/renders/stop-01-01-door.png)
 
 ## Fresh start (2026-10-18)
 
@@ -27,7 +27,7 @@ in the Scene view only; *Show all* brings them back. Ctrl+Shift+] and Ctrl+Shift
 
 | # | Doorspace | Status |
 |---|---|---|
-| 01 | Pinkscape Fox | The handmade K6 booth with the spawn inside. The glass fox to come |
+| 01 | Pinkscape Fox | The handmade K6 booth with the spawn inside, standing in pink clouds all the way round; all clouds, no grass (2026-10-20). The glass fox to come |
 | 02 | Faraway Field Hare | A 300 m path through tall pink frond grass that sways and parts as you walk, a sparkling dusk sky. The glass hare to come |
 | 03 | Pool After Closing Axolotl | A 220 m tiled pool hall: caustics, underwater windows, a violet skylight, the pink double door. The glass axolotl to come |
 | 04 | Last Laundrette Raccoon | First pass (2026-10-19), from its concept. The glass raccoon to come |

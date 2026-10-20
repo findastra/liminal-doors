@@ -34,6 +34,7 @@
     "desktop-test": {"name": "Desktop test", "does": "Runs the VRChat SDK's Build & Test without uploading.", "path": "Assets/LiminalDoors/EditorUdon/Editor/LiminalDesktopTest.cs"},
     "agent-queue": {"name": "Agent queue", "does": "Lets Claude drive the open Unity editor safely.", "path": "Assets/LiminalDoors/Editor/LiminalAgentQueue.cs"},
     "shaders-shop": {"name": "Shaders Shop", "does": "Installs and keeps a ledger of the world's shaders.", "path": "Assets/ShadersShop/Editor", "tree": true},
+    "cloud-floor": {"name": "Cloud floor repaint", "does": "Painted the grass and the stone path out of floor 01's picture with its own cloud sea (Astra, 2026-10-20: \"just all clouds\").", "path": "concept-art/tools/CloudFloor-20261020.cs"},
     "world-spawn-tool": {"name": "world-spawn-tool", "does": "Unity Unicorn's first steps for a new world: the public repo and the profile link.", "repo": "findastra/unity-unicorn", "ref": "main", "path": "scripts/world-spawn-tool", "tree": true},
     "doorspace-kit": {"name": "Doorspace kit", "does": "Rooms, fields, doors, rain, snow, motes and skies for a Doorspace, then bakes its still parts into one mesh per material so the scene stays small; balls use a light 187-vertex sphere (2026-10-19).", "path": "Assets/LiminalDoors/Editor/LiminalDoorspaceKit.cs"},
     "doorspace-builders": {"name": "Doorspace builders 04-36", "does": "One builder per Doorspace, each from its concept; builds, rewires and renders them, and keeps the Hierarchy labelled 'Doorspace NN · Place Animal' in order (LiminalDoorspaces.cs with A, B and C).", "path": "Assets/LiminalDoors/Editor/LiminalDoorspaces.cs"},
@@ -44,7 +45,7 @@
   "every_floor": ["codex-image", "floor-cutter", "redline-sheet", "contact-sheet", "web-pictures"],
   "whole_world": ["door-system", "door-wiring", "door-kit", "portal-shader", "glitter-paint", "world-glow", "desktop-test", "agent-queue", "shaders-shop", "world-spawn-tool", "doorspaces-window"],
   "floors": {
-    "1": ["stop-01-builder", "stop-01-sky", "booth-builder", "blender-booth", "asset-creator", "unity-stable"],
+    "1": ["cloud-floor", "stop-01-builder", "stop-01-sky", "booth-builder", "blender-booth", "asset-creator", "unity-stable"],
     "2": ["stop-02-builder", "frond-grass", "grass-push", "sparkle-sky", "field-shaders"],
     "3": ["stop-03-builder", "pool-tile", "pool-water", "pool-window"],
     "4": ["doorspace-builders", "doorspace-kit", "sparkle-sky", "field-shaders", "pool-tile", "pool-window"],

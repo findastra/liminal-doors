@@ -15,15 +15,16 @@ MonoBehaviour:
   id: liminal-doors-stop-01-sky
   displayName: Liminal Doors stop 1 sunset sky and cloud sea
   kind: sky
-  version: 1.0.0
+  version: 1.1.0
   description: 'Stop 1''s world: a sunset sky (lavender, pink, apricot, butter-yellow
     horizon, a low sun) over a sea of rolling pink clouds with cumulus rising out
-    of it, small puffs around the booth and a reflection probe for the sunset.'
+    of it, puffs all the way round the booth (door side too) and a reflection probe
+    for the sunset.'
   forPC: 1
   forAndroid: 0
   moves: 0
   prefab: {fileID: 6257996877450586152, guid: fc5965b435ce7f645a72efbd477b5d64, type: 3}
-  maxTriangles: 30000
+  maxTriangles: 45000
   maxMaterials: 4
   maxTextureSize: 1024
   maxParticles: 0
@@ -33,7 +34,11 @@ MonoBehaviour:
   license: own-work
   attribution: 
   publicOk: 1
-  changelog: '1.0.0: first version. Sunset Sky dome, Cloud Sea (parallax billows,
+  changelog: '1.1.0 (2026-10-20): 10 more puffs, on the door side, so the booth stands
+    in clouds all the way round (Astra: "just all clouds"); triangle cap 30000 ->
+    45000.
+
+    1.0.0: first version. Sunset Sky dome, Cloud Sea (parallax billows,
     soft self-shadow, sun glow, haze), 14 cumulus, 8 booth puffs, sunset reflection
     probe.'
   steps:
