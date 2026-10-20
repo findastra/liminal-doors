@@ -84,7 +84,10 @@ public static class LiminalDoorsTravel
         var scene = OpenWorld();
         var r = new List<string> { "# Door wiring", "Run " + Now() + " in `" + scene.path + "`", "" };
         var stops = Stops(scene);
-        if (stops.Count == 0 || !stops[0].name.StartsWith("Stop 01")) throw new Exception("The world has no Stop 01 root.");
+        if (stops.Count == 0 || NumberOf(stops[0]) != 1) throw new Exception("The world has no Doorspace 01 (Stop 01) root.");
+        // stop 01's sky as the door travel already knows it, before the old wiring goes (a render or the Doorspaces window
+        // may have left another Doorspace's sky in the scene)
+        homeSky = Resources.FindObjectsOfTypeAll<LiminalTraveler>().Where(t => t != null && t.gameObject.scene == scene && t.skies != null && t.skies.Length > 0).Select(t => t.skies[0]).FirstOrDefault(s => s != null);
 
         // rerun: take the old wiring out (proxies and their backing UdonBehaviours)
         int removed = 0;
@@ -179,9 +182,10 @@ public static class LiminalDoorsTravel
         var r = new List<string> { "# Build all", "Run " + Now(), "" };
         try
         {
-            Step(r, "LiminalDoors/Stop 01/Add door anchors", () => Find(Root("Stop 01"), "Forward door trigger") != null);   // never Stop 01/Build: it would replace the booth being made
-            Step(r, "LiminalDoors/Stop 02/Build stop", () => Root("Stop 02") != null);
-            Step(r, "LiminalDoors/Stop 03/Build stop", () => Root("Stop 03") != null);
+            Step(r, "LiminalDoors/Stop 01/Add door anchors", () => Find(Root(1), "Forward door trigger") != null);   // never Stop 01/Build: it would replace the booth being made
+            Step(r, "LiminalDoors/Stop 02/Build stop", () => Root(2) != null);
+            Step(r, "LiminalDoors/Stop 03/Build stop", () => Root(3) != null);
+            Step(r, "LiminalDoors/Doorspaces/Build Doorspaces 04-36", () => Root(4) != null);
             Wire();
             r.Add("OK   LiminalDoors/World/Wire doors (see report.md)");
             r.Add(""); r.Add("Done. Scene: `" + SceneManager.GetActiveScene().path + "`");
@@ -245,14 +249,14 @@ public static class LiminalDoorsTravel
         if (stops.Count < 2) { Finish("Fewer than two stops in the world."); return; }
         Transform Trig(GameObject s, string n) => s.GetComponentsInChildren<Transform>(true).First(t => t.name == n);
         Transform Pt(GameObject s, string n) => s.transform.Find(n);
-        string At() => "on " + string.Join(", ", stops.Where(x => x.activeSelf).Select(x => x.name.Substring(0, 7))) + " at " + V(me.GetPosition());
+        string At() => "on " + string.Join(", ", stops.Where(x => x.activeSelf).Select(x => "Doorspace " + NumberOf(x).ToString("00"))) + " at " + V(me.GetPosition());
         bool Near(Vector3 a, Vector3 b) => Vector3.Distance(a, b) < 1.0f;
         void Check(string what, bool ok) { if (ok) passed++; else failed++; log.Add((ok ? "PASS " : "FAIL ") + what + " (" + At() + ")"); }
         void Enter(Transform trigger) { var box = trigger.GetComponent<BoxCollider>(); me.TeleportTo(trigger.TransformPoint(box.center) - Vector3.up * 0.9f, trigger.rotation); }
         // forward doors are random, so each check asks "which stop am I on now?" and follows that stop's doors
         var s1 = stops[0];
         GameObject On() { var on = stops.Where(x => x.activeSelf).ToList(); return on.Count == 1 ? on[0] : null; }
-        string Short(GameObject s) => s == null ? "none (or several)" : s.name.Substring(0, 7);
+        string Short(GameObject s) => s == null ? "none (or several)" : "Doorspace " + NumberOf(s).ToString("00");
         var cur = On();
         switch (step)
         {
@@ -318,10 +322,14 @@ public static class LiminalDoorsTravel
         return scene;
     }
 
+    // roots named "Doorspace NN · Place Animal" (2026-10-19; the first three were "Stop NN - Animal - Place"), in number order
+    static readonly Regex StopName = new Regex(@"^(?:Stop|Doorspace) (\d\d)\b");
+    static int NumberOf(GameObject g) { var m = StopName.Match(g == null ? "" : g.name); return m.Success ? int.Parse(m.Groups[1].Value) : -1; }
     static List<GameObject> Stops(Scene scene) =>
-        scene.GetRootGameObjects().Where(g => Regex.IsMatch(g.name, @"^Stop \d\d - ")).OrderBy(g => g.name, StringComparer.Ordinal).ToList();
+        scene.GetRootGameObjects().Where(g => NumberOf(g) > 0).OrderBy(NumberOf).ToList();
 
-    static GameObject Root(string prefix) => SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(g => g.name.StartsWith(prefix + " - "));
+    static GameObject Root(int n) => SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(g => NumberOf(g) == n);
+    static Material homeSky;
 
     static Transform Find(GameObject root, string name) => root == null ? null : root.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == name);
 
@@ -334,16 +342,19 @@ public static class LiminalDoorsTravel
 
     static Material SkyFor(GameObject stop)
     {
-        if (stop.name.StartsWith("Stop 01"))
+        int n = NumberOf(stop);
+        if (n == 1)
         {
             // stop 01 is the start, so its sky is the scene's own (the booth session's sunset sky, 2026-10-18), read when
-            // the doors are wired; Stop 01's Build rewires after setting it. Another stop's sky there means a render or a
-            // test left it switched, so fall back.
+            // the doors are wired; Stop 01's Build rewires after setting it. The door travel's own stop 01 sky wins; another
+            // Doorspace's sky in the scene means a render, a test or the Doorspaces window left it switched, so fall back.
+            if (homeSky != null) return homeSky;
             var s = RenderSettings.skybox;
-            if (s != null && (!s.name.StartsWith("Stop ") || s.name.StartsWith("Stop 01"))) return s;
+            if (s != null && ((!s.name.StartsWith("Stop ") && !s.name.StartsWith("Doorspace ")) || s.name.StartsWith("Stop 01"))) return s;
             return AssetDatabase.LoadAssetAtPath<Material>(StartSky);
         }
-        return AssetDatabase.LoadAssetAtPath<Material>("Assets/LiminalDoors/Materials/Stop " + stop.name.Substring(5, 2) + " Sky.mat");
+        return AssetDatabase.LoadAssetAtPath<Material>("Assets/LiminalDoors/Materials/Stop " + n.ToString("00") + " Sky.mat")
+            ?? AssetDatabase.LoadAssetAtPath<Material>("Assets/LiminalDoors/Materials/Doorspace " + n.ToString("00") + "/Doorspace " + n.ToString("00") + " Sky.mat");
     }
 
     static void Remove(UdonSharpBehaviour b)

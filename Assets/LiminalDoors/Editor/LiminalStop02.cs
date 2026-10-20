@@ -48,7 +48,7 @@ using UnityEngine.SceneManagement;
 
 public static class LiminalStop02
 {
-    public const string StopName = "Stop 02 - Hare - Faraway Field";
+    public const string StopName = "Doorspace 02 · Faraway Field Hare";   // was "Stop 02 - Hare - Faraway Field" (Doorspaces, 2026-10-19)
     public static readonly Vector3 Origin = new Vector3(3000f, 0f, 0f);
     public const string SkyMaterial = "Assets/LiminalDoors/Materials/Stop 02 Sky.mat";
     const string GenDir = "Assets/LiminalDoors/Stop 02";
@@ -586,7 +586,7 @@ public static class LiminalStop02
         var arrival = stop.transform.Find("Arrival point");
 
         // look the way a visitor sees it: only this stop on, with its own sky
-        var others = scene.GetRootGameObjects().Where(g => g.name.StartsWith("Stop ") && g != stop && g.activeSelf).ToList();
+        var others = scene.GetRootGameObjects().Where(g => LiminalDoorspaces.IsDoorspace(g) && g != stop && g.activeSelf).ToList();
         var oldSky = RenderSettings.skybox;
         Directory.CreateDirectory(ReviewDir);
         var camGo = new GameObject("_review camera") { hideFlags = HideFlags.DontSave };

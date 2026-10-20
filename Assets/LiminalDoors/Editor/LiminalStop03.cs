@@ -32,7 +32,7 @@ using K = LiminalDoorKit;
 
 public static class LiminalStop03
 {
-    public const string StopName = "Stop 03 - Axolotl - Pool After Closing";
+    public const string StopName = "Doorspace 03 · Pool After Closing Axolotl";   // was "Stop 03 - Axolotl - Pool After Closing" (Doorspaces, 2026-10-19)
     public static readonly Vector3 Origin = new Vector3(6000f, 0f, 0f);
     public const string SkyMaterial = "Assets/LiminalDoors/Materials/Stop 03 Sky.mat";
     const string MatDir = "Assets/LiminalDoors/Materials/Stop 03";
@@ -361,7 +361,7 @@ public static class LiminalStop03
         if (scene.path != LiminalStop01.ScenePath) scene = EditorSceneManager.OpenScene(LiminalStop01.ScenePath, OpenSceneMode.Single);
         var stop = scene.GetRootGameObjects().FirstOrDefault(g => g.name == StopName);
         if (stop == null) throw new Exception("No " + StopName + "; run LiminalDoors/Stop 03/Build stop first.");
-        var others = scene.GetRootGameObjects().Where(g => g.name.StartsWith("Stop ") && g != stop && g.activeSelf).ToList();
+        var others = scene.GetRootGameObjects().Where(g => LiminalDoorspaces.IsDoorspace(g) && g != stop && g.activeSelf).ToList();
         var oldSky = RenderSettings.skybox;
         Directory.CreateDirectory(ReviewDir);
         var camGo = new GameObject("_review camera") { hideFlags = HideFlags.DontSave };

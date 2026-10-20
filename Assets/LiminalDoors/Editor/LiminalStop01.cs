@@ -24,7 +24,7 @@ using UnityEngine.SceneManagement;
 public static class LiminalStop01
 {
     public const string ScenePath = "Assets/LiminalDoors/Scenes/Liminal Doors.unity";
-    public const string StopName = "Stop 01 - Fox - Pink Booth";
+    public const string StopName = "Doorspace 01 · Pinkscape Fox";   // was "Stop 01 - Fox - Pink Booth" (Doorspaces, 2026-10-19)
     const string BoothPrefab = "Assets/LiminalDoors/Booth/Phone Booth.prefab";   // Astra's booth, when it's made
     const string MeshDir = "Assets/LiminalDoors/Booth/Meshes/";
     const string MatDir = "Assets/LiminalDoors/Booth/Materials/";
