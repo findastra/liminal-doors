@@ -1,0 +1,246 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0c5656f1c043464ca3cbd3dea5a2ff6, type: 3}
+  m_Name: liminal-doors-phone-booth-asset-recipe
+  m_EditorClassIdentifier: 
+  id: liminal-doors-phone-booth
+  displayName: Liminal Doors phone booth
+  kind: prop
+  version: 1.0.0
+  description: 'The pink K6 phone booth at the start of Liminal Doors: a bevelled
+    cast-iron kiosk in hot pink enamel with chipped edges and weathering, lit butter-yellow
+    TELEPHONE signs, gilded crowns, a brass door pull, pink glass with fingerprints,
+    and a payphone inside with a chrome keypad, handset and coiled cord. Gold and
+    pink sparkles swirl up around it.'
+  forPC: 1
+  forAndroid: 0
+  moves: 0
+  prefab: {fileID: 3133622112822875829, guid: f0a430abc6953124787b48dc69e07529, type: 3}
+  maxTriangles: 30000
+  maxMaterials: 5
+  maxTextureSize: 2048
+  maxParticles: 400
+  creator: Astra (built with Claude)
+  source: Modelled in Blender by Tools/Blender/make_phone_booth.py after Sir Giles
+    Gilbert Scott's K6 kiosk (proportions only); textures baked there from CC0 ambientCG
+    scans; sparkles and prefab made in Liminal Doors
+  license: own-work
+  attribution: 'Surface scans: ambientCG.com PaintedMetal002, Metal009, Smear002,
+    Scratches001 (CC0; credit not required)'
+  publicOk: 1
+  changelog: '1.0.0: first version. Handmade K6 booth modelled in Blender (bevels,
+    recessed posts, narrow-wide-narrow glazing, lit TELEPHONE signs, gilded crowns,
+    dome, brass pull); baked ambient occlusion, edge wear, grime, rain streaks and
+    sun fade over CC0 scans; our own Unity Stable/Handmade PBR (clear coat, world-space
+    scan detail); the payphone on a panel built into the back wall, with chrome keypad,
+    instruction card, coin slots, handset and coiled cord; pink glass with fingerprints
+    (Unity Stable Pink Glass); gold and pink sparkles swirling up around it (Unity
+    Stable Sparkle); gold base glow.'
+  steps:
+  - id: plan
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: 'Astra, 2026-10-19: make the booth and phone look real and handcrafted,
+      then fix the weird board and the flat look. Hero prop for PC: 30k triangles,
+      2048 px booth atlas; 5 materials, 400 particles as she chose'
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: liminal-doors-phone-booth v1.0.0 (prop) for PC; budget 30000 triangles,
+      5 materials, 2048 px, 400 particles
+  - id: provenance
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: modelled by Tools/Blender/make_phone_booth.py after the K6 kiosk (proportions
+      only); baked from CC0 ambientCG scans PaintedMetal002, Metal009, Smear002,
+      Scratches001 (downloaded with Astra's OK in chat), which also give the tiling
+      detail maps; our own Unity Stable shaders
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'creator: Astra (built with Claude); source: Modelled in Blender by
+      Tools/Blender/make_phone_booth.py after Sir Giles Gilbert Scott''s K6 kiosk
+      (proportions only); textures baked there from CC0 ambientCG scans; sparkles
+      and prefab made in Liminal Doors; licence: own-work; public: yes'
+  - id: scale-pivot
+    done: 1
+    version: 1.0.0
+    status: warn
+    note: 1 unit = 1 m, pivot at the floor centre, door on +Z; the 0.49 m offset
+      is the open door swinging out on +Z
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'WARN: pivot is 0.49 m from the middle of the footprint
+
+      size
+      1.40 x 2.76 x 2.38 m (w x h x d)'
+  - id: geometry
+    done: 1
+    version: 1.0.0
+    status: warn
+    note: 25,889 triangles in 7 meshes (bevelled hard surface, weighted normals);
+      the payphone hangs on a panel built into the back wall; UV2 on every lit mesh;
+      the glass is transparent and skips lightmaps
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'WARN: Booth glass: no lightmap UVs (UV2); bake with light probes or
+      add UV2
+
+      WARN: Booth door glass: no lightmap UVs (UV2); bake with light
+      probes or add UV2
+
+      25889 triangles in 7 meshes (budget 30000)'
+  - id: materials
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: '4 materials: Booth and Payphone on our own Unity Stable/Handmade PBR (clear
+      coat, world-space scan detail, specular occlusion), Booth glass (Pink Glass
+      with fingerprints, the one transparent surface) and the sparkles'
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'Booth: Unity Stable/Handmade PBR (glows)
+
+      Booth glass (pink):
+      Unity Stable/Pink Glass (transparent)
+
+      Payphone: Unity Stable/Handmade
+      PBR
+
+      Booth sparkles: Unity Stable/Sparkle (transparent)'
+  - id: textures
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: booth atlas 2048 (albedo, normal, metallic/coat/edge/smoothness), 1024
+      occlusion and emission; payphone atlas 1024; four 1024 tiling detail scans;
+      glass smudges 1024; all compressed with mipmaps, data maps linear
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'booth-albedo 2048x2048, Compressed, mipmaps
+
+      booth-normal 2048x2048,
+      Compressed, mipmaps
+
+      detail-paint-normal 1024x1024, Compressed, mipmaps
+
+      booth-metallic-smoothness
+      2048x2048, Compressed, mipmaps
+
+      booth-occlusion 1024x1024, Compressed,
+      mipmaps
+
+      booth-emission 1024x1024, Compressed, mipmaps
+
+      detail-paint-roughness
+      1024x1024, Compressed, mipmaps
+
+      glass-smudge 1024x1024, Compressed, mipmaps
+
+      payphone-albedo
+      1024x1024, Compressed, mipmaps
+
+      payphone-normal 1024x1024, Compressed,
+      mipmaps
+
+      detail-steel-normal 1024x1024, Compressed, mipmaps
+
+      payphone-metallic-smoothness
+      1024x1024, Compressed, mipmaps
+
+      payphone-occlusion 1024x1024, Compressed,
+      mipmaps
+
+      detail-steel-roughness 1024x1024, Compressed, mipmaps
+
+      booth-sparkle
+      64x64, Compressed, mipmaps'
+  - id: colliders
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: floor box at the plinth top (8 cm), three wall boxes and one on the open
+      door, so nobody walks through the glass; nothing above the booth
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'Booth door: BoxCollider, top 2.02 m
+
+      Booth floor: BoxCollider,
+      top 0.08 m
+
+      Booth walls: BoxCollider, top 2.20 m
+
+      Booth walls:
+      BoxCollider, top 2.20 m
+
+      Booth walls: BoxCollider, top 2.20 m'
+  - id: lighting
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: static, no lights; the TELEPHONE signs glow through the emission map (x2
+      HDR) for the bloom; occlusion is baked; metal and clear coat need the stop's
+      reflection probe (it renders on load)
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: '0 lights; glowing materials: Booth; asset is static'
+  - id: effects
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: 360 particles max (swirl 300 + base glow 60), no collision, our own additive
+      Sparkle shader
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'Swirling sparkles: max 300, Unity Stable/Sparkle, Local space
+
+      Base
+      glow: max 60, Unity Stable/Sparkle, Local space'
+  - id: prefab
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: packs the Blender meshes, baked textures, detail scans and our own Handmade
+      PBR, Pink Glass and Sparkle shaders
+    doneAt: 2026-10-19T08:35:32Z
+    doneBy: Claude (agent)
+    details: 'packs our own PinkGlass.shader (Unity Stable shaders) so it works without
+      the shop
+
+      packs our own HandmadePBR.shader (Unity Stable shaders) so
+      it works without the shop
+
+      packs our own Sparkle.shader (Unity Stable
+      shaders) so it works without the shop
+
+      prefab Assets/LiminalDoors/Booth/Phone
+      Booth.prefab; folder Assets/LiminalDoors/Booth; 30 project files in the package'
+  - id: review
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: 'Astra looked at the Unity renders (stop 01, close-ups, asset previews)
+      and said: Yes, the booth looks ready. Desktop test 02:36 entered the world
+      with no exceptions.'
+    doneAt: 2026-10-19T14:06:20Z
+    doneBy: Astra in chat
+    details: 3 preview renders in Exports/unity-assets-library/liminal-doors-phone-booth/1.0.0/previews
+  - id: export
+    done: 1
+    version: 1.0.0
+    status: pass
+    note: exported to Exports/unity-assets-library/liminal-doors-phone-booth/1.0.0
+    doneAt: 2026-10-19T14:06:53Z
+    doneBy: agent queue
+    details: ready to export v1.0.0 to Exports/unity-assets-library/liminal-doors-phone-booth/1.0.0
+  exportedVersions:
+  - 1.0.0

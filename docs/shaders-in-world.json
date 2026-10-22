@@ -1,0 +1,215 @@
+{
+    "schema": "unity-unicorn.world-shaders/v1",
+    "world": "Liminal Doors",
+    "scanned_at": "2026-10-19T08:36:38Z",
+    "unity": "2022.3.22f1",
+    "scanned_by": "shaders-shop (agent queue)",
+    "scenes": [
+        "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+    ],
+    "shaders": [
+        {
+            "shader": "LiminalDoors/Evening Sky",
+            "shader_path": "Assets/LiminalDoors/Shaders/EveningSky.shader",
+            "catalog_id": "in-assets",
+            "catalog_name": "inside the world's Assets folder (own or bundled; check)",
+            "license": "check",
+            "source": "Assets/LiminalDoors/Shaders",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Materials/Stop 02 Sky.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "LiminalDoors/Field Grass",
+            "shader_path": "Assets/LiminalDoors/Shaders/FieldGrass.shader",
+            "catalog_id": "in-assets",
+            "catalog_name": "inside the world's Assets folder (own or bundled; check)",
+            "license": "check",
+            "source": "Assets/LiminalDoors/Shaders",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Materials/Stop 02 Field Grass.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "LiminalDoors/Field Ground",
+            "shader_path": "Assets/LiminalDoors/Shaders/FieldGround.shader",
+            "catalog_id": "in-assets",
+            "catalog_name": "inside the world's Assets folder (own or bundled; check)",
+            "license": "check",
+            "source": "Assets/LiminalDoors/Shaders",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Materials/Stop 02 Field Ground.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "LiminalDoors/Soft Glow",
+            "shader_path": "Assets/LiminalDoors/Shaders/SoftGlow.shader",
+            "catalog_id": "in-assets",
+            "catalog_name": "inside the world's Assets folder (own or bundled; check)",
+            "license": "check",
+            "source": "Assets/LiminalDoors/Shaders",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Materials/Stop 02 Rose Motes.mat",
+                "Assets/LiminalDoors/Materials/Stop 02 Way Back Motes.mat",
+                "Assets/LiminalDoors/Materials/Stop 02 Way Back Light.mat",
+                "Assets/LiminalDoors/Materials/Stop 02 Rose Doorway Light.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "LiminalDoors/Soft Lit",
+            "shader_path": "Assets/LiminalDoors/Shaders/SoftLit.shader",
+            "catalog_id": "in-assets",
+            "catalog_name": "inside the world's Assets folder (own or bundled; check)",
+            "license": "check",
+            "source": "Assets/LiminalDoors/Shaders",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Materials/Stop 02 Rose Door.mat",
+                "Assets/LiminalDoors/Materials/Stop 02 Arrival Door.mat",
+                "Assets/LiminalDoors/Materials/Stop 02 Flat Stone.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Standard",
+            "shader_path": "Resources/unity_builtin_extra",
+            "catalog_id": "unity-builtin",
+            "catalog_name": "Unity built-in",
+            "license": "unity-builtin",
+            "source": "Unity built-in",
+            "version": "",
+            "materials": [
+                "Packages/com.vrchat.worlds/Samples/UdonExampleScene/SampleAssetsSet/Materials/GridFloor_udon.mat",
+                "Packages/com.vrchat.worlds/Samples/UdonExampleScene/SampleAssetsSet/Materials/SampleAssets_matte.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Cloud Puff",
+            "shader_path": "Assets/ShadersShop/UnityStable/CloudPuff.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Sky/Materials/Cloud puff.mat",
+                "Assets/LiminalDoors/Sky/Materials/Cloud puff (near).mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Cloud Sea",
+            "shader_path": "Assets/ShadersShop/UnityStable/CloudSea.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Sky/Materials/Cloud sea.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Handmade PBR",
+            "shader_path": "Assets/ShadersShop/UnityStable/HandmadePBR.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Booth/Materials/Payphone.mat",
+                "Assets/LiminalDoors/Booth/Materials/Booth.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Pink Glass",
+            "shader_path": "Assets/ShadersShop/UnityStable/PinkGlass.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Booth/Materials/Booth glass (pink).mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Sparkle",
+            "shader_path": "Assets/ShadersShop/UnityStable/Sparkle.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Booth/Materials/Booth sparkles.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "Unity Stable/Sunset Sky",
+            "shader_path": "Assets/ShadersShop/UnityStable/SunsetSky.shader",
+            "catalog_id": "unity-stable-shaders",
+            "catalog_name": "Unity Stable shaders (our own)",
+            "license": "own-work",
+            "source": "Assets/ShadersShop/UnityStable",
+            "version": "",
+            "materials": [
+                "Assets/LiminalDoors/Sky/Materials/Sunset sky.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        },
+        {
+            "shader": "FX/MirrorReflection",
+            "shader_path": "Packages/com.vrchat.base/Runtime/VRCSDK/Sample Assets/Shaders/Mirror.shader",
+            "catalog_id": "vrchat-sdk",
+            "catalog_name": "VRChat SDK shaders",
+            "license": "vrchat-sdk",
+            "source": "com.vrchat.base",
+            "version": "3.10.5",
+            "materials": [
+                "Packages/com.vrchat.base/Runtime/VRCSDK/Sample Assets/Materials/MirrorReflection.mat"
+            ],
+            "scenes": [
+                "Assets/LiminalDoors/Scenes/Liminal Doors.unity"
+            ]
+        }
+    ]
+}

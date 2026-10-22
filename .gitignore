@@ -72,19 +72,18 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
-# Local downloads and review logs
-/*.zip
-/sdk-index.json
-/Downloads/
-/*.log
-
+# Local review output, logs and agent queue (Liminal Doors)
 /Review/
-/Packages/com.vrchat.base/
-/Packages/com.vrchat.worlds/
-*.flag
-.env
-.env.*
-*.key
-*.pem
-
+/*.log
 /ClientSimStorage/
+__pycache__/
+
+# shaders-shop installs: restored from the shop (docs/shaders-in-world.json lists them), like the VPM packages
+/Assets/Mochie/
+/Assets/Mochie.meta
+# Poiyomi editor preferences
+/Poi/
+# unity-asset-creator exports (published to findastra/unity-assets-library)
+/Exports/
+# ThryEditor (Poiyomi) settings and caches
+/Thry/

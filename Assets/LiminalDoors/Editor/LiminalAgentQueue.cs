@@ -5,15 +5,19 @@
 //   status                      -> signed-in SDK account, scene, compile/play state
 //   refresh                     -> AssetDatabase.Refresh (compiles new scripts)
 //   save                        -> saves open scenes
-//   menu LiminalDoors/<path>    -> runs one of this project's LiminalDoors/ menu items (nothing else is allowed)
+//   menu LiminalDoors/<path>    -> runs one of this project's LiminalDoors/ menu items, or a Unity Unicorn/ tool's
+//                                  (unity-asset-creator); nothing else is allowed
+//   desktop-test                -> saves, then SDK Build & Test with one desktop client (no upload);
+//                                  progress in Review/desktop-test-status.txt (LiminalDesktopTest, 2026-10-18)
 // The result goes to Review/agent-queue/<same name>.result.txt and the .cmd file is deleted.
-// Building, desktop tests and uploads are not wired here yet; uploads always need the owner's OK in chat.
+// Uploads are not wired here; they always need the owner's OK in chat.
 using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [InitializeOnLoad]
 public static class LiminalAgentQueue
@@ -48,6 +52,17 @@ public static class LiminalAgentQueue
         Write(file, DateTime.Now.ToString("HH:mm:ss") + " " + command + "\n" + result);
     }
 
+    // Saves only scenes that already have a file. SaveOpenScenes() pops a modal "Save Scene" dialog for an Untitled
+    // scene (as on a project's first open), which blocks the editor until someone clicks it (2026-10-18).
+    static void SaveNamedScenes()
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            var scene = SceneManager.GetSceneAt(i);
+            if (scene.isDirty && !string.IsNullOrEmpty(scene.path)) EditorSceneManager.SaveScene(scene);
+        }
+    }
+
     static void Write(string cmdFile, string text) =>
         File.WriteAllText(Path.ChangeExtension(cmdFile, null) + ".result.txt", text + "\n");
 
@@ -60,12 +75,19 @@ public static class LiminalAgentQueue
         {
             case "status": return Status();
             case "refresh": AssetDatabase.Refresh(); return "Refreshed. Check status again after compiling finishes.";
-            case "save": EditorSceneManager.SaveOpenScenes(); return "Saved open scenes.";
+            case "save": SaveNamedScenes(); return "Saved open scenes.";
             case "menu":
-                if (!arg.StartsWith("LiminalDoors/")) return "REFUSED: only LiminalDoors/ menu items can be run from the queue.";
-                EditorSceneManager.SaveOpenScenes();
+                if (!arg.StartsWith("LiminalDoors/") && !arg.StartsWith("Unity Unicorn/")) return "REFUSED: only LiminalDoors/ and Unity Unicorn/ menu items can be run from the queue.";
+                SaveNamedScenes();
                 return EditorApplication.ExecuteMenuItem(arg) ? "Ran " + arg + ". See its own Review/ report." : "FAILED: no menu item " + arg;
-            default: return "Unknown command. Use: status, refresh, save, menu LiminalDoors/...";
+            case "desktop-test":
+                // LiminalDesktopTest lives in Assembly-CSharp-Editor (it needs the SDK); looked up by name so this assembly doesn't.
+                var test = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("LiminalDesktopTest")).FirstOrDefault(t => t != null);
+                if (test == null) return "FAILED: LiminalDesktopTest is not compiled (check the console for errors).";
+                SaveNamedScenes();
+                test.GetMethod("Run").Invoke(null, null);
+                return "Started. See Review/desktop-test-status.txt.";
+            default: return "Unknown command. Use: status, refresh, save, menu LiminalDoors/... or Unity Unicorn/..., desktop-test";
         }
     }
 
