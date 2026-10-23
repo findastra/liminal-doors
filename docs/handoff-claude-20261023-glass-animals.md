@@ -1,7 +1,7 @@
 # Handoff: the glass animals (Claude, 2026-10-23)
 
-status: **IN PROGRESS, waiting on Astra's five answers.** Branch `claude/glass-animals-20261023` (no PR yet). Owner of
-these files: this chat, until it says otherwise. Reviewer: unassigned.
+status: **IN PROGRESS, waiting on Astra's five answers.** Branch `claude/glass-animals-20261023`, draft PR #4. Owner
+of these files: this chat, until it says otherwise. Reviewer: unassigned.
 
 Astra, 2026-10-23: apply the Rainbow Maker's cut-glass glitter to Liminal Doors' glass animals and tool; "we will
 also need real life scans of animals to do those crystal renders, sort of like the marble carving tool but different,
