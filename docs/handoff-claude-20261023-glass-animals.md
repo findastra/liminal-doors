@@ -1,7 +1,7 @@
 # Handoff: the glass animals (Claude, 2026-10-23)
 
-status: **IN PROGRESS, waiting on Astra's five answers.** Branch `claude/glass-animals-20261023`, draft PR #4. Owner
-of these files: this chat, until it says otherwise. Reviewer: unassigned.
+status: **IN PROGRESS, answers in; the first scan (the fox) is next.** Branch `claude/glass-animals-20261023`,
+draft PR #4. Owner of these files: this chat, until it says otherwise. Reviewer: unassigned.
 
 Astra, 2026-10-23: apply the Rainbow Maker's cut-glass glitter to Liminal Doors' glass animals and tool; "we will
 also need real life scans of animals to do those crystal renders, sort of like the marble carving tool but different,
@@ -25,17 +25,18 @@ possibly easier."
 - **Nothing is downloaded or placed in the world yet.** Five questions decide the defaults. The deck:
   https://claude.ai/artifact/2gGuEkMFTdY3WMCCd3DhpQ (private to Astra).
 
-## The five questions (recommended answer first)
+## The five questions, answered (Astra, 2026-10-23)
 
-| # | Question | Recommended |
+| # | Question | Answer |
 |---|---|---|
 | 1 | Where do the real animal scans come from? | Museum and public scans (Smithsonian, Sketchfab CC0 / CC BY, Poly Haven), Astra OKs each download |
 | 2 | Cut crystal or smooth glass? | Cut crystal |
-| 3 | How big is a glass animal? | A little ornament, about 22 cm |
+| 3 | How big is a glass animal? | **Life size**, like the prismatic wolf Astra saw in VRChat ("everything except animals are life size"): a 40 cm fox, a 1.1 m crane, a 1.5 m kangaroo; the insects, gecko and firefly a few centimetres. The README's "one little glass animal" wording is hers to change. |
 | 4 | Which animal is cut first? | The fox, Doorspace 01 |
 | 5 | Clear glass, or a colour? | Clear, with rainbow fire |
 
-Answers go here and in the glass-carver guide.
+Life size changes the hiding: Doorspace 01's spot is inside the cloud puffs by the booth, so the 40 cm fox would be
+buried there; the bigger animals (crane, flamingo, kangaroo, deer) need their spots checked for room.
 
 ## Who acts next
 
