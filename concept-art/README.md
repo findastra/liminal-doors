@@ -13,6 +13,12 @@ The plates were made with OpenAI Codex's built-in image generation on 2026-10-15
   are painted out with the picture's own cloud sea (`tools/cloud-floor-20261020.cs`); the booth now rises out of the
   clouds. The grassy original is in git history and on plate 1, so `cut-floors.ps1` would bring it back: keep the 20261020 file.
 - `floors-contact-sheet-20261019.png`: all 34 at a glance.
+- `liminal-doors-imagebook-20261023.pdf`: Codex's 2026-10-15 concept imagebook (plates, floor register, door rules,
+  reference index, build guidance), 20 of its 24 pages, cleaned the same way (Astra, 2026-10-23): no floors 34, 35 or
+  37, no glass wolf, no bubble chair, no screenshot from another creator's world, and no index rows or links for
+  Astral Bounds, Crystals Absence or Copperhead ASMR Barbershop. Plate 6 shows 34 and 35 as dark panels; page footers
+  keep the book's own numbers, so they skip 15, 16, 19 and 24. The original stays on Astra's PC only. Made with
+  `tools/clean-imagebook-20261023.py`.
 - `liminal-doors-redline-sheet-20261019.jpg`: the same layout at full size (3098 x 3374 px) for redlines in Procreate. The Concept Atlas's "Export all 34 for redlines" button saves this file; the + on each card makes a sheet of just the floors you pick. Labels read "NN place animal", as on the page. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.
 
 To change a floor, replace its file with your edit. A new date in the name (for example `-20261019`) keeps the original next to it.
