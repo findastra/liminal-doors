@@ -1,29 +1,35 @@
 # Liminal Doors
 
-A VRChat world of doors that open onto quiet in-between places: an empty pool after closing, a laundrette with a sky
-turning in one washer, a platform between trains. Behind every door hides one little glass animal. Hatching now: the
-first door opens on Astra's pink phone booth, alone above a sea of pink clouds. PC VR / desktop.
+*By Astra.* A VRChat world of doors that open onto quiet in-between places: an empty pool after closing, a laundrette
+with a sky turning in one washer, a platform between trains. Behind every door hides one little glass animal. PC VR /
+desktop.
 
-The world's caretaker pet is **Door Dormouse** (pet program #82, The Threshold). The floor plan, concept book and idea
-inbox were drafted by Codex on 2026-10-15/16.
+## The Doorspaces
 
-![Doorspace 01, Pinkscape Fox: the pink booth standing in clouds](docs/renders/stop-01-01-door.png)
+Hatching now: the first door opens on Astra's pink phone booth, alone above a sea of pink clouds.
 
-## Fresh start (2026-10-18)
+<table>
+<tr>
+<td width="50%"><img src="docs/renders/stop-01-01-door.png" alt="Doorspace 01, Pinkscape Fox: the pink K6 phone booth standing in pink clouds under a setting sun" width="100%"></td>
+<td width="50%"><img src="docs/renders/stop-02-01-arrival-view.jpg" alt="Doorspace 02, Faraway Field Hare: a path through tall pink frond grass under a sparkling dusk sky" width="100%"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/renders/stop-03-01-arrival-view.jpg" alt="Doorspace 03, Pool After Closing Axolotl: a long tiled pool hall with caustics, underwater windows and a violet skylight" width="100%"></td>
+<td width="50%"><img src="docs/renders/doorspace-09-1-arrival.jpg" alt="Doorspace 09, the Upside-Down Conservatory: vine curtains hanging from white frames over a pale tiled floor" width="100%"></td>
+</tr>
+</table>
 
-This project starts from VRChat Creator Companion's **World template** (VRChat SDK 3.10.5, Unity 2022.3.22f1). From
-Astra's Infinite Pole it takes only the **phone booth's shape** (six meshes in `Assets/LiminalDoors/Booth/Meshes`), and
-that booth is being changed: for now it wears plain materials. An earlier version that copied much more of Infinite
-Pole is kept on the branch `claude/stop-01-pink-booth-20261018`.
+**Not on VRChat yet.** The world is being built; when it is published, its link goes here. All 31 new Doorspaces at a
+glance (arrival, halfway, the door): [`docs/renders/doorspaces-20261019/`](docs/renders/doorspaces-20261019/).
+
+**Needs:** VRChat on a PC, in VR or on desktop.
+
+The world's caretaker pet is **Door Dormouse** (pet program #82, The Threshold).
 
 ## Doorspaces
 
 Each place behind a door is a **Doorspace**. All of them live in one scene, `Assets/LiminalDoors/Scenes/Liminal Doors.unity`,
 each as its own root in the Hierarchy named `Doorspace NN · Place Animal`, 3 km apart.
-
-**Getting around in the editor:** *LiminalDoors > Doorspaces > Window* (Ctrl+Shift+D) lists every Doorspace. *Go* flies the
-Scene view to where you arrive and puts that Doorspace's sky up; *Door* flies to its forward door; *Solo* hides the others
-in the Scene view only; *Show all* brings them back. Ctrl+Shift+] and Ctrl+Shift+[ step to the next and previous one.
 
 | # | Doorspace | Status |
 |---|---|---|
@@ -63,22 +69,23 @@ in the Scene view only; *Show all* brings them back. Ctrl+Shift+] and Ctrl+Shift
 | 36 | Blue-Sky Terminal Kingfisher | First pass (2026-10-19), from its concept. The glass kingfisher to come |
 
 Floors 34, 35 and 37 were taken out after the originality check (`docs/originality-check-20261019.md`).
-**LiminalDoors > World > Build all** rebuilds stops 02 and 03 and the Doorspaces 04-36 and wires every door;
-*LiminalDoors > Doorspaces > Build Doorspaces 04-36* rebuilds only those. Renders are in `docs/renders/`.
 
-![Doorspace 09: the Upside-Down Conservatory, vine curtains from Unity Unicorn's trumpet-vine tool](docs/renders/doorspace-09-1-arrival.jpg)
+## Developer Notes
 
-All 31 new Doorspaces at a glance (arrival, halfway, the door): `docs/renders/doorspaces-20261019/`.
+1. **Fresh start (2026-10-18):** This project starts from VRChat Creator Companion's **World template** (VRChat SDK 3.10.5, Unity 2022.3.22f1). From Astra's Infinite Pole it takes only the **phone booth's shape** (six meshes in `Assets/LiminalDoors/Booth/Meshes`), and that booth is being changed: for now it wears plain materials. An earlier version that copied much more of Infinite Pole is kept on the branch `claude/stop-01-pink-booth-20261018`.
+2. **Getting around in the editor:** *LiminalDoors > Doorspaces > Window* (Ctrl+Shift+D) lists every Doorspace. *Go* flies the Scene view to where you arrive and puts that Doorspace's sky up; *Door* flies to its forward door; *Solo* hides the others in the Scene view only; *Show all* brings them back. Ctrl+Shift+] and Ctrl+Shift+[ step to the next and previous one.
+3. **Building:** **LiminalDoors > World > Build all** rebuilds stops 02 and 03 and the Doorspaces 04-36 and wires every door; *LiminalDoors > Doorspaces > Build Doorspaces 04-36* rebuilds only those. Renders are in `docs/renders/`.
+4. The VRChat SDK packages are unpacked into `Packages/` from Creator Companion's cache and aren't committed. Open the project in VCC or Unity 2022.3.22f1 to restore them.
+5. Menu **LiminalDoors > Stop 01**: *Build* rebuilds the stop (existing materials are kept), *Render* writes `Review/stop-01-render/`, *Open* frames the booth door. **LiminalDoors > Desktop test** runs the SDK's Build & Test (no upload).
+6. Agents drive an open editor through `Review/agent-queue/*.cmd` (`status`, `refresh`, `save`, `menu LiminalDoors/...`, `desktop-test`) instead of relaunching Unity.
+7. Uploads, releases and `main` change only with Astra's OK.
 
-![Stop 02: the Faraway Field](docs/renders/stop-02-01-arrival-view.jpg)
-![Stop 03: Pool After Closing](docs/renders/stop-03-01-arrival-view.jpg)
+## Credits
 
-## Working in it
+1. The floor plan, concept book and idea inbox: drafted by OpenAI Codex, 2026-10-15/16.
+2. The Unity project, the Doorspaces and the renders: built with Claude Opus 5.5, from 2026-10-18. The vine curtains
+   in Doorspace 09 come from Unity Unicorn's trumpet-vine tool.
 
-- The VRChat SDK packages are unpacked into `Packages/` from Creator Companion's cache and aren't committed. Open the
-  project in VCC or Unity 2022.3.22f1 to restore them.
-- Menu **LiminalDoors > Stop 01**: *Build* rebuilds the stop (existing materials are kept), *Render* writes
-  `Review/stop-01-render/`, *Open* frames the booth door. **LiminalDoors > Desktop test** runs the SDK's Build & Test (no upload).
-- Agents drive an open editor through `Review/agent-queue/*.cmd` (`status`, `refresh`, `save`, `menu LiminalDoors/...`,
-  `desktop-test`) instead of relaunching Unity.
-- Uploads, releases and `main` change only with Astra's OK.
+## License
+
+No general source license is granted yet. Third-party assets keep their own licenses.
