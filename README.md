@@ -85,3 +85,7 @@ Floors 34, 35 and 37 were taken out after the originality check (`docs/originali
 1. The floor plan, concept book and idea inbox: drafted by OpenAI Codex, 2026-10-15/16.
 2. The Unity project, the Doorspaces and the renders: built with Claude Opus 5.5, from 2026-10-18. The vine curtains
    in Doorspace 09 come from Unity Unicorn's trumpet-vine tool.
+
+## License
+
+No general source license is granted yet. Third-party assets keep their own licenses.
