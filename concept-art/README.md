@@ -12,6 +12,18 @@ The plates were made with OpenAI Codex's built-in image generation on 2026-10-15
   instead. No green grass, no regular grass, just all clouds." The grass tufts and the wet stone path around the booth
   are painted out with the picture's own cloud sea (`tools/cloud-floor-20261020.cs`); the booth now rises out of the
   clouds. The grassy original is in git history and on plate 1, so `cut-floors.ps1` would bring it back: keep the 20261020 file.
+- **Recolored 2026-10-29 (Astra, reviewing the portfolio's Liminal Doors Polaroid):** floors 03, 04, 05, 07, 15, 16 and
+  18 have a `-20261029` recolor next to the original; each keeps its door and scene. 03: no red or orange, only aqua,
+  violet and magenta. 04: the door is bright ocean blue. 05: the aqua door stays, the concrete is bright pink. 07: the
+  velvet is a soft indigo-violet next to the neon yellow door, and the bare branches are fluffy pampas plumes. 15: all
+  red, orange and yellow. 16: blue, navy and aqua with the pink door. 18: new colors and less detail. Made with
+  `tools/recolor-floors-20261029.py`, which reads the `-20261015` originals.
+- `neon-pools/`: flooded, tiled pool rooms with glowing slits of light and one door (2026-10-29), after a picture Astra
+  loves. `neon-pool-01-flooded-corridor-20261029.png` is that picture, as she gave it; its colorways are made with
+  `tools/ref-colorways-20261029.py`. Rooms 02 to 05 (corridor, stairs, colonnade, skylight) are our own Blender
+  renders (`tools/neon-pools-20261029.py`, Blender 4.5, Cycles, about 12 s each on the GPU). Every room comes in six
+  colorways: dream (violet and blue, like her picture), acid, fire-ice, toxic, candy and ultra-red. They are concept
+  art for the Polaroid and new Doorspaces, not floors yet: no floor numbers.
 - `floors-contact-sheet-20261019.png`: all 34 at a glance.
 - `liminal-doors-imagebook-20261023.pdf`: Codex's 2026-10-15 concept imagebook (plates, floor register, door rules,
   reference index, build guidance), 20 of its 24 pages, cleaned the same way (Astra, 2026-10-23): no floors 34, 35 or
