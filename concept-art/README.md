@@ -12,6 +12,8 @@ The plates were made with OpenAI Codex's built-in image generation on 2026-10-15
   instead. No green grass, no regular grass, just all clouds." The grass tufts and the wet stone path around the booth
   are painted out with the picture's own cloud sea (`tools/cloud-floor-20261020.cs`); the booth now rises out of the
   clouds. The grassy original is in git history and on plate 1, so `cut-floors.ps1` would bring it back: keep the 20261020 file.
+- `color-palette-theory/`: flooded, tiled pool rooms in six neon colorways each (2026-10-29), Astra's color models for
+  her projects, not floors. See its README.
 - `floors-contact-sheet-20261019.png`: all 34 at a glance.
 - `liminal-doors-imagebook-20261023.pdf`: Codex's 2026-10-15 concept imagebook (plates, floor register, door rules,
   reference index, build guidance), 20 of its 24 pages, cleaned the same way (Astra, 2026-10-23): no floors 34, 35 or
