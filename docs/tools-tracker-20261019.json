@@ -1,0 +1,16 @@
+{
+  "schema": "the-threshold.tools-tracker/v1",
+  "updated": "2026-11-12",
+  "about": "What the tools tracker reads (tools-tracker-20261019.html). worlds: one row per world, pointing at that world's tools-by-floor ledger; refs are tried in order, so a ledger still on a branch is found there until it merges to main. tools: Astra's or an agent's notes on each tool, keyed by the tool id used in the ledgers. The same id in two worlds is the same tool. readiness is one of: not rated, getting better, ready to package.",
+  "worlds": [
+    {
+      "id": "liminal-doors",
+      "name": "Liminal Doors",
+      "repo": "findastra/liminal-doors",
+      "ledger": "docs/tools-by-floor-20261019.json",
+      "refs": ["main"],
+      "floors_per_episode": 37
+    }
+  ],
+  "tools": {}
+}
