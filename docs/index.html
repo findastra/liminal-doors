@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Liminal Doors · Found Floors</title>
+<meta name="description" content="Astra's Liminal Doors, a VRChat world: every floor so far, with a check for each one you've found.">
+<style>
+/* By Astra. Concept art: OpenAI Codex (GPT-6), 2026-10-15/16. Collection page: Claude Opus 5.5, 2026-10-19.
+   This is the public copy for visitors, linked from the world's VRChat description (Astra, 2026-10-19: "so when people
+   click it, that they can also go to that website and track their own progress"). It keeps the collection, the
+   been-here check, the episodes and the unified footer. Astra's redline export and the T tools view stay on her own
+   copy: the tools live on The Threshold's pet program page ("they're two separate things").
+   Moved from findastra/the-threshold (private since 2026-10-20) to liminal-doors docs/ on 2026-11-12, so the link in the
+   VRChat description works again: findastra.github.io/liminal-doors (Astra, 2026-11-12: "All recommended"). */
+:root{color-scheme:dark;--bg:#26272b;--card:#43454d;--raised:#2d2e33;--ink:#f4f4f6;--muted:#b3b4bc;--pink:#ff97cf;--pink-soft:#ffb4d4;--neon:#3ff3ff;--live:#46ff9a;--plum:#30172c;--border:#45464d;--line:#6a6b74;--link:#bcece3;
+  --serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',sans-serif;--mono:ui-monospace,Consolas,'Cascadia Mono',monospace;
+  font:16px/1.6 var(--sans);background:var(--bg);color:var(--ink)}
+body{margin:0;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}
+a{color:var(--link);text-underline-offset:4px}
+button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#36373d;color:var(--ink);border-radius:15px;padding:10px 16px;cursor:pointer;font:inherit}
+button:hover{background:#44454c}
+:focus-visible{outline:3px solid var(--neon);outline-offset:4px}
+[hidden]{display:none!important}
+.wrap{padding-block:26px 30px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:18px}
+nav a{text-decoration:none}
+.brand{letter-spacing:.13em;font-size:12px;text-transform:uppercase;color:var(--link)}
+.eyebrow{font:12px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#c6c7cf}
+.muted{color:var(--muted);font-size:14px}
+/* the collection */
+.section-head{display:flex;justify-content:space-between;gap:16px;align-items:end;flex-wrap:wrap;margin:34px 0 22px}
+h1{font:400 clamp(34px,5vw,52px)/1.1 var(--serif);letter-spacing:-.02em;margin:6px 0 0;text-wrap:balance}
+.how{margin:10px 0 0;max-width:560px}
+.count{font:13px/1.5 var(--mono);background:#34353a;border:1px solid #55565e;border-radius:50px;padding:7px 14px;font-variant-numeric:tabular-nums}
+/* the VRChat link under the name: a glowing neon chip, live dot and all */
+.vrc{margin:12px 0 0}
+.vrc-chip{display:inline-flex;align-items:center;gap:10px;max-width:100%;padding:8px 16px 8px 12px;border-radius:999px;border:1.5px solid transparent;
+  background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(90deg,var(--neon),var(--pink)) border-box;
+  color:var(--ink);font:600 14px/1.3 var(--sans);text-decoration:none;box-shadow:0 0 16px #3ff3ff40,0 0 30px #ff97cf22}
+.vrc-tag{font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--neon)}
+.vrc-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--live);box-shadow:0 0 8px var(--live)}
+.vrc-chip.is-soon .vrc-dot{background:var(--pink);box-shadow:0 0 8px var(--pink)}
+@media (prefers-reduced-motion:no-preference){.vrc-dot{animation:live 1.8s ease-in-out infinite}@keyframes live{50%{opacity:.35;transform:scale(.8)}}}
+/* nine episodes of 37 floors, 333 places in all; one comes out on the third Friday of every other month */
+.episodes-wrap{margin:-6px 0 26px}
+.episodes{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,148px),1fr));gap:10px}
+.episodes li{display:grid;gap:1px;padding:10px 12px;border:1px solid var(--border);border-radius:14px;background:var(--raised)}
+.episodes b{font:700 12px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.episodes span{font-size:13px;color:var(--muted)}
+.episodes time{font:600 14px/1.35 var(--sans);color:var(--ink)}
+.episodes li.is-now{border-color:var(--neon);box-shadow:inset 0 0 0 1px var(--neon),0 0 16px #3ff3ff33}
+.episodes li.is-now b{color:var(--neon)}
+.ep-note{margin:10px 0 0}
+.head-side{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.small-btn{padding:7px 14px;border-radius:50px;font:13px/1.5 var(--mono)}
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:22px}
+.floor{border:1px solid var(--border);border-radius:20px;overflow:hidden;background:var(--card);min-width:0;transition:border-color .2s}
+.floor.is-seen{border-color:var(--pink)}
+.floor-image{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;background:#1d1e22;border-bottom:1px solid var(--border)}
+.floor-copy{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px 14px 18px}
+.floor-name{min-width:0}
+.floor-name .eyebrow{display:block}
+/* place and animal side by side, "Faraway Field Hare"; the animal drops to the next line only on a narrow card */
+.floor-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:7px;margin:3px 0 0;font-size:inherit;font-weight:inherit;line-height:1.25}
+.floor-title .place{font:600 16px/1.3 var(--sans);color:#e2e2e8}
+/* each glass animal's name: thick see-through glass letters with an iridescent film, a glint that sweeps across now
+   and then, micro RGB glitter on the letters, and a fine field of sparkles twinkling behind */
+.prism{position:relative;display:inline-block;max-width:100%;font:900 22px/1.25 var(--sans);letter-spacing:.01em;color:#fff;
+  background:linear-gradient(100deg,#ff7ad95c 0%,#ffd27a4d 14%,#f4ff9a4d 28%,#7affc44d 42%,#7af3ff5c 56%,#a48bff5c 70%,#ff8af05c 84%,#ff7ad95c 100%) 0 50%/150% 100%,
+    linear-gradient(110deg,transparent 46%,#ffffffc0 50%,transparent 54%) 100% 0/500% 100% no-repeat;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:.75px #ffffffb8;
+  filter:drop-shadow(0 0 1px #ff9be8b0) drop-shadow(0 0 5px #7af3ff4d)}
+.prism::before{content:"";position:absolute;inset:-9px -18px -7px -12px;z-index:-1;pointer-events:none;
+  background:radial-gradient(circle,#fff 0 .45px,transparent .9px) 0 0/14px 12px,radial-gradient(circle,#ffc4f0 0 .4px,transparent .85px) 6px 4px/19px 10px,
+    radial-gradient(circle,#b8faff 0 .4px,transparent .85px) 10px 7px/12px 17px,radial-gradient(circle,#e2d0ff 0 .4px,transparent .85px) 3px 9px/23px 15px,
+    radial-gradient(circle,#fff 0 .35px,transparent .75px) 8px 2px/9px 13px,radial-gradient(circle,#fff8c4 0 .4px,transparent .8px) 1px 5px/17px 19px,
+    radial-gradient(ellipse 60% 70% at 50% 55%,#b48cff1f,transparent 75%);
+  -webkit-mask:radial-gradient(ellipse 58% 62% at 50% 52%,#000 25%,transparent 78%);mask:radial-gradient(ellipse 58% 62% at 50% 52%,#000 25%,transparent 78%)}
+.prism::after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle,#ffffffd0 0 .35px,transparent .7px) 0 0/9px 7px,radial-gradient(circle,#ff2d55d0 0 .35px,transparent .7px) 2px 3px/11px 8px,
+    radial-gradient(circle,#2dff7ad0 0 .35px,transparent .7px) 5px 1px/7px 10px,radial-gradient(circle,#2d8bffd0 0 .35px,transparent .7px) 1px 6px/13px 9px;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@media (prefers-reduced-motion:no-preference){
+  .prism{animation:prism 8s linear infinite}.prism::after{animation:glitter 1.5s steps(1) infinite}
+  .prism::before{animation:twinkle 2.8s ease-in-out infinite,drift 1.7s steps(1) infinite;animation-delay:calc(var(--d,0s) * -1)}
+  @keyframes drift{33%{background-position:5px 7px,13px 1px,4px 12px,15px 3px,2px 8px,9px 11px,0 0}66%{background-position:9px 3px,2px 7px,7px 2px,8px 11px,5px 0,14px 4px,0 0}}
+  @keyframes prism{from{background-position:0 50%,100% 0}to{background-position:-300% 50%,0 0}}
+  @keyframes twinkle{0%,100%{opacity:.95}30%{opacity:.4}55%{opacity:1}80%{opacity:.55}}
+  @keyframes glitter{33%{background-position:4px 3px,7px 1px,2px 6px,8px 3px}66%{background-position:2px 5px,1px 6px,4px 2px,5px 0}}
+}
+/* the been-here check on every card */
+.mark{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;user-select:none;min-width:46px;flex:none}
+.mark input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.seal{width:34px;height:34px;border-radius:50%;border:2px dashed var(--pink);display:grid;place-items:center;color:transparent;transition:background .2s,border-color .2s,color .2s,transform .2s}
+.seal svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mark:hover .seal{background:#52545d}
+.mark input:focus-visible+.seal{outline:3px solid var(--neon);outline-offset:3px}
+.mark-text{font:11px/1.2 var(--mono);letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.mark input:checked+.seal{background:var(--pink);border:2px solid var(--pink-soft);color:var(--plum);box-shadow:0 0 0 4px #ff97cf2e}
+.mark input:checked~.mark-text{color:var(--pink)}
+@media (prefers-reduced-motion:no-preference){.mark input:checked+.seal{animation:pop .32s ease-out}@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.14)}100%{transform:scale(1)}}}
+/* astras-pet-os unified footer (PET-PROGRAM-FRAMEWORK.md, section 3, item 9), a collapsible panel */
+.panel{position:relative;border:1px solid var(--border);padding:26px 20px 16px;margin:60px 0 10px}
+.panel>summary{position:absolute;top:-.8em;left:14px;list-style:none;cursor:pointer;background:var(--bg);padding:0 6px;max-width:calc(100% - 28px)}
+.panel>summary::-webkit-details-marker{display:none}
+.panel .legend{font:13px/1.3 var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.panel:not([open]){padding:14px 20px 0}
+.footer-grid p{margin:4px 0;color:#dcdce1;overflow-wrap:anywhere}
+.footer-grid .small{font-size:12.5px;color:var(--muted)}
+.footer-grid code{font:12px var(--mono);color:var(--muted)}
+@media(max-width:450px){.wrap{padding-block:18px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.vrc-chip{font-size:13px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<nav><a class="brand" href="#collection">Liminal Doors / Found floors</a><a href="tools-tracker-20261019.html">The Threshold ↗</a></nav>
+<section id="collection" aria-labelledby="collection-title"><div class="section-head"><div><span class="eyebrow">Concept art · PC VRChat</span><h1 id="collection-title">Liminal Doors</h1><p class="vrc"><span class="vrc-chip is-soon"><span class="vrc-dot" aria-hidden="true"></span><span class="vrc-tag">VRChat</span><span>Hatching · the link goes live at launch</span></span></p><p class="muted how">Every door takes you somewhere random. Tick a floor once you’ve found it; your ticks stay in this browser.</p></div><div class="head-side"><button class="small-btn" id="show-episodes" aria-expanded="false" aria-controls="episodes">Episodes</button><span class="count" id="seen-count" role="status">Found 0 of 34</span></div></div><section class="episodes-wrap" id="episodes" aria-label="Episodes and release dates" hidden><ol class="episodes"><li class="is-now"><b>Episode 1</b><span>Floors 1–37 · in the works</span><time datetime="2027-01-15">Fri, Jan 15, 2027</time></li><li><b>Episode 2</b><span>Floors 38–74</span><time datetime="2027-03-19">Fri, Mar 19, 2027</time></li><li><b>Episode 3</b><span>Floors 75–111</span><time datetime="2027-05-21">Fri, May 21, 2027</time></li><li><b>Episode 4</b><span>Floors 112–148</span><time datetime="2027-07-16">Fri, Jul 16, 2027</time></li><li><b>Episode 5</b><span>Floors 149–185</span><time datetime="2027-09-17">Fri, Sep 17, 2027</time></li><li><b>Episode 6</b><span>Floors 186–222</span><time datetime="2027-11-19">Fri, Nov 19, 2027</time></li><li><b>Episode 7</b><span>Floors 223–259</span><time datetime="2028-01-21">Fri, Jan 21, 2028</time></li><li><b>Episode 8</b><span>Floors 260–296</span><time datetime="2028-03-17">Fri, Mar 17, 2028</time></li><li><b>Episode 9</b><span>Floors 297–333</span><time datetime="2028-05-19">Fri, May 19, 2028</time></li></ol><p class="muted ep-note">9 episodes × 37 floors = 333 places, one every other month. Episode 1 has 34 of its 37 floors drawn; floors 34, 35 and 37 still need a new, original idea.</p></section><ul class="grid" id="floors"></ul></section>
+<details class="panel footer" open><summary title="Click the label to fold or unfold this panel"><span class="legend">astras-pet-os-unified-footer</span></summary><div class="footer-grid">
+<p>By Astra. Liminal Doors is cared for by Door Dormouse’s pet program, <a href="tools-tracker-20261019.html">The Threshold</a> (MIT license); the world itself has no license yet. Signature: not signed yet.</p>
+<p><b>Languages:</b> Liminal Doors: C# 53.5%, ShaderLab 25.3%, Python 19.2%, HLSL 2.0%</p>
+<p><b>Home:</b> <a href="https://findastra.github.io/astras-pet-os/system-map-20261012.html">System Map</a> · <a href="https://findastra.github.io/astras-pet-os/apps/astras-pet-os-20261008.html">The Farm</a> · <a href="https://findastra.github.io/astras-pet-os/apps/pet-programs/pet-program-spawner-20261018.html">every pet program</a></p>
+<p><b>Source:</b> <a href="https://github.com/findastra/liminal-doors">findastra/liminal-doors</a></p>
+<p><b>Docs:</b> <a href="https://github.com/findastra/astras-pet-os/blob/main/PET-PROGRAM-FRAMEWORK.md">PET-PROGRAM-FRAMEWORK.md</a> · <a href="https://github.com/findastra/astras-pet-os/blob/main/PROTECTION-RINGS.md">PROTECTION-RINGS.md</a></p>
+<p class="small">The Friendly Farmer’s shared footer (<code>astras-pet-os-unified-footer</code>, PET-PROGRAM-FRAMEWORK.md section 3, item 9), as Liminal Doors’ own copy. Concept art made with OpenAI Codex, 2026-10-15.</p></div></details>
+</main>
+<script type="application/json" id="floors-data">[{"n": 1, "animal": "Fox", "place": "Pinkscape"}, {"n": 2, "animal": "Hare", "place": "Faraway Field"}, {"n": 3, "animal": "Axolotl", "place": "Pool After Closing"}, {"n": 4, "animal": "Raccoon", "place": "Last Laundrette"}, {"n": 5, "animal": "Gecko", "place": "Apricot Underpass"}, {"n": 6, "animal": "Crane", "place": "Platform Between Trains"}, {"n": 7, "animal": "Moth", "place": "Velvet Waiting Room"}, {"n": 8, "animal": "Frog", "place": "Rain That Misses You"}, {"n": 9, "animal": "Hummingbird", "place": "Upside-Down Conservatory"}, {"n": 10, "animal": "Ibex", "place": "Salt Moon"}, {"n": 11, "animal": "Cat", "place": "Motel Without Rooms"}, {"n": 12, "animal": "Manta Ray", "place": "Tidal Carpet"}, {"n": 13, "animal": "Hedgehog", "place": "Vending Machine Clearing"}, {"n": 14, "animal": "Lynx", "place": "Lavender Quarry"}, {"n": 15, "animal": "Seahorse", "place": "Empty Aquarium"}, {"n": 16, "animal": "Heron", "place": "Blackwater Footbridge"}, {"n": 17, "animal": "Dragonfly", "place": "Soft Staircase"}, {"n": 18, "animal": "Snow Leopard", "place": "Snow in the Lobby"}, {"n": 19, "animal": "Raven", "place": "Pearl Car Park"}, {"n": 20, "animal": "Octopus", "place": "Room Beneath the Ocean"}, {"n": 21, "animal": "Deer", "place": "Wind Telephone"}, {"n": 22, "animal": "Firefly", "place": "Sleeping Arcade"}, {"n": 23, "animal": "Kangaroo", "place": "Low-Gravity Court"}, {"n": 24, "animal": "Scarab", "place": "Ribbon Dunes"}, {"n": 25, "animal": "Praying Mantis", "place": "Frosted Office"}, {"n": 26, "animal": "Flamingo", "place": "Red Sun Reservoir"}, {"n": 27, "animal": "Jellyfish", "place": "Room of Curtains"}, {"n": 28, "animal": "Butterfly", "place": "Glass Orchard"}, {"n": 29, "animal": "Red Panda", "place": "Midnight Food Court"}, {"n": 30, "animal": "Swan", "place": "Door at Sunrise"}, {"n": 31, "animal": "Otter", "place": "Steam Between Stars"}, {"n": 32, "animal": "Sandpiper", "place": "Sunset Sandbar"}, {"n": 33, "animal": "Dolphin", "place": "Aquaglass Concourse"}, {"n": 36, "animal": "Kingfisher", "place": "Blue-Sky Terminal"}]</script>
+<script>
+// The collection and the been-here check on every floor. Each visitor's ticks stay in their own browser
+// (localStorage, key liminal-doors-seen-v1); nothing is sent anywhere.
+(()=>{'use strict';
+  const floors=JSON.parse(document.getElementById('floors-data').textContent),$=id=>document.getElementById(id);
+  const KEY='liminal-doors-seen-v1',two=n=>String(n).padStart(2,'0');
+  const src=n=>'liminal-doors-assets/floors/floor-'+two(n)+'-20261015.jpg',byN=new Map(floors.map(f=>[f.n,f]));
+  const clean=a=>Array.isArray(a)?a.filter(n=>byN.has(n)):[];
+  let seen;
+  try{seen=new Set(clean(JSON.parse(localStorage.getItem(KEY)||'[]')));}catch(e){seen=new Set();}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify([...seen].sort((a,b)=>a-b)));}catch(e){}};
+  const CHECK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  function card(f){
+    const li=document.createElement('li');li.className='floor';li.dataset.n=f.n;
+    const img=document.createElement('img');img.className='floor-image';img.src=src(f.n);img.alt=f.place+' concept art';img.loading='lazy';img.decoding='async';
+    const copy=document.createElement('div');copy.className='floor-copy';
+    const name=document.createElement('div');name.className='floor-name';
+    const no=document.createElement('span');no.className='eyebrow';no.textContent='Floor '+two(f.n);
+    const t=document.createElement('h2');t.className='floor-title';t.setAttribute('aria-label',f.place+' '+f.animal);
+    const pl=document.createElement('span');pl.className='place';pl.textContent=f.place;
+    const h=document.createElement('span');h.className='prism';h.textContent=f.animal;h.dataset.text=f.animal;h.style.setProperty('--d',(f.n*.37%2.8).toFixed(2)+'s');
+    t.append(pl,h);name.append(no,t);
+    const l=document.createElement('label');l.className='mark';
+    const box=document.createElement('input');box.type='checkbox';box.setAttribute('aria-label','I have found '+f.place+' '+f.animal);
+    const seal=document.createElement('span');seal.className='seal';seal.setAttribute('aria-hidden','true');seal.innerHTML=CHECK;
+    const txt=document.createElement('span');txt.className='mark-text';l.append(box,seal,txt);
+    box.addEventListener('change',()=>{box.checked?seen.add(f.n):seen.delete(f.n);save();apply();});
+    copy.append(name,l);li.append(img,copy);return li;
+  }
+  const list=$('floors');
+  for(const f of floors)list.append(card(f));
+  function apply(){
+    for(const li of list.children){
+      const s=seen.has(Number(li.dataset.n));
+      li.querySelector('input').checked=s;li.querySelector('.mark-text').textContent=s?'found':'not yet';li.classList.toggle('is-seen',s);
+    }
+    $('seen-count').textContent='Found '+seen.size+' of '+floors.length;
+  }
+  apply();
+  const epBtn=$('show-episodes'),eps=$('episodes');
+  epBtn.onclick=()=>{const on=eps.hidden;eps.hidden=!on;epBtn.setAttribute('aria-expanded',String(on));epBtn.textContent=on?'Hide episodes':'Episodes';};
+})();
+</script>
+</body>
+</html>

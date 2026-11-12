@@ -22,6 +22,13 @@ The plates were made with OpenAI Codex's built-in image generation on 2026-10-15
   keep the book's own numbers, so they skip 15, 16, 19 and 24. The original stays on Astra's PC only. Made with
   `tools/clean-imagebook-20261023.py`.
 - `liminal-doors-redline-sheet-20261019.jpg`: the same layout at full size (3098 x 3374 px) for redlines in Procreate. The Concept Atlas's "Export all 34 for redlines" button saves this file; the + on each card makes a sheet of just the floors you pick. Labels read "NN place animal", as on the page. Send the marked-up sheet back to Claude, and each floor's notes are read by its place on the grid.
+- `atlas/`: the Concept Atlas's source (2026-11-12), so the page can be rebuilt; its first builder was lost from the PC.
+  `concept-atlas-template-20261112.html` is the page with placeholders for its data, and
+  `concept-atlas-floors-20261112.json` the floors it shows (number, animal, place). Rebuild it with
+  `python concept-art/tools/build-concept-atlas-20261112.py --out <empty folder outside the repo>`: it fills in the
+  floors, the T view from `../docs/tools-by-floor-20261019.json`, web JPEGs of `floors/` and the redline sheet, the
+  same 36 files the published Atlas serves. The page's link to The Threshold's hosted page is not in this repo (its
+  address holds Astra's name): pass it with `--threshold-link` when rebuilding her copy.
 
 To change a floor, replace its file with your edit. A new date in the name (for example `-20261019`) keeps the original next to it.
 

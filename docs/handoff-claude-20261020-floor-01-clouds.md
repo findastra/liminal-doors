@@ -70,4 +70,4 @@ Astra's naming rule (lowercase, hyphens, `-YYYYMMDD`) arrived on 2026-10-20. Tod
 | 1 | Sign in to the VRChat SDK (VRChat SDK > Show Control Panel), then queue `desktop-test` | Astra, then any agent |
 | 2 | Review this revision, then merge liminal-doors PR #2 when the world is ready | reviewer unassigned; merge is Astra's |
 | 3 | Export the sky 1.1.0 to unity-assets-library (a public push) | needs Astra's OK |
-| 4 | Make the-threshold public again if the found-floors page should be live | Astra |
+| 4 | Make the-threshold public again if the found-floors page should be live | Answered 2026-11-12: the page moved to this repo's `docs/` instead (findastra.github.io/liminal-doors) |

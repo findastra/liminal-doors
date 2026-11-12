@@ -70,6 +70,24 @@ each as its own root in the Hierarchy named `Doorspace NN · Place Animal`, 3 km
 
 Floors 34, 35 and 37 were taken out after the originality check (`docs/originality-check-20261019.md`).
 
+## Found floors page
+
+**https://findastra.github.io/liminal-doors/** is the page the world's VRChat description links to. Visitors tick each
+floor once they've found it; the ticks stay in their own browser and nothing is sent anywhere. **Episodes** opens the
+nine release dates.
+
+![The found floors page](docs/images/found-floors-desktop-20261019.jpg)
+
+- The page is [docs/index.html](docs/index.html). Its pictures, in `docs/liminal-doors-assets/floors/`, are web copies
+  of `concept-art/floors/`. **Add a floor:** add its picture as `docs/liminal-doors-assets/floors/floor-NN-20261015.jpg`
+  (or the date it was drawn, and change `src` to match) and a row in the `floors-data` list at the bottom of the page.
+- **The Threshold ↗** on the page opens The Threshold's tools tracker,
+  [docs/tools-tracker-20261019.html](docs/tools-tracker-20261019.html): which tools made which floors, read from
+  [docs/tools-by-floor-20261019.json](docs/tools-by-floor-20261019.json). Its settings are in
+  [docs/tools-tracker-20261019.json](docs/tools-tracker-20261019.json).
+- GitHub Pages serves this repo's `docs/` folder from `main`. Both pages moved here from findastra/the-threshold on
+  2026-11-12 (Astra: "All recommended"), because the-threshold is private and its Pages site is off.
+
 ## Developer Notes
 
 1. **Fresh start (2026-10-18):** This project starts from VRChat Creator Companion's **World template** (VRChat SDK 3.10.5, Unity 2022.3.22f1). From Astra's Infinite Pole it takes only the **phone booth's shape** (six meshes in `Assets/LiminalDoors/Booth/Meshes`), and that booth is being changed: for now it wears plain materials. An earlier version that copied much more of Infinite Pole is kept on the branch `claude/stop-01-pink-booth-20261018`.

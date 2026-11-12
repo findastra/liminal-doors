@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tools Tracker · The Threshold</title>
+<style>
+/* By Astra; Claude Opus 5.5 (claude-opus-5-5), 2026-10-19. The Threshold's type, boxes and paired lights, in graphite with neon accents.
+   Moved from findastra/the-threshold (private since 2026-10-20) to liminal-doors docs/ on 2026-11-12, with the found
+   floors page, so both are on liminal-doors' GitHub Pages (Astra, 2026-11-12: "All recommended"). */
+:root{color-scheme:dark;--bg:#26272b;--card:#303136;--sunk:#2a2b30;--line:#45464d;--ink:#f2f1f6;--muted:#aeafb8;--cyan:#3ff3ff;--green:#46ff9a;--pink:#ff97cf;--yellow:#ffd84a;--red:#ff5c7a;--blue:#4fb4ff;--label:ui-monospace,SFMono-Regular,Consolas,monospace;font:16px/1.6 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg)}
+a{color:var(--cyan);text-underline-offset:4px}code{font:13px var(--label);color:var(--pink);overflow-wrap:anywhere}
+button{font:inherit;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:15px;padding:8px 16px;cursor:pointer}
+button:hover{border-color:var(--cyan)}button:disabled{opacity:.45;cursor:default;border-color:var(--line)}button[aria-expanded=true]{border-color:var(--cyan);color:var(--cyan)}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}[hidden]{display:none!important}
+.wrap{max-width:880px;margin:auto;padding:30px 32px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:18px}nav a{text-decoration:none}
+.brand,.eyebrow{font:12px/1.5 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+header{padding:26px 0 6px}h1{font:400 44px/1.1 Georgia,serif;margin:10px 0 8px}h3{font:400 24px/1.2 Georgia,serif;margin:4px 0 10px}
+.muted{color:var(--muted);font-size:14px}header p{margin:0;max-width:640px}
+.panel{position:relative;border:1px solid var(--line);border-radius:22px;padding:28px 20px 20px;margin:34px 0 0}
+.panel>summary{position:absolute;top:-.8em;left:18px;list-style:none;cursor:pointer;background:var(--bg);padding:0 8px;max-width:calc(100% - 36px)}
+.panel>summary::-webkit-details-marker{display:none}.panel:not([open]){padding:16px 20px 0}
+.legend{font:13px/1.3 var(--label);color:var(--muted);overflow-wrap:anywhere}
+.kind{font:12px var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+.tool{border:1px solid var(--line);border-radius:22px;background:var(--card);padding:18px 20px 20px;margin:0;min-width:0}
+.tool>legend{display:flex;align-items:center;gap:4px;padding:0 8px;font:13px/1.3 var(--label);color:var(--cyan);overflow-wrap:anywhere;max-width:100%}
+.lights{display:inline-flex;gap:6px;margin-right:8px;flex:none}
+.light{width:16px;height:16px;padding:0;border-radius:50%;border:1px solid #111;box-shadow:0 0 6px currentColor}
+.light.onoff{background:var(--green);color:var(--green)}.light.onoff.is-off{background:var(--red);color:var(--red)}
+.light.care{background:var(--blue);color:var(--blue)}.light.care.is-fix{background:var(--yellow);color:var(--yellow)}
+.tool[data-enabled=false] .tool-body{opacity:.5}
+.summary{margin:0 0 14px;font-size:15px}.summary b{color:var(--green);font-weight:600}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.view{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.tracked{border-bottom:1px solid var(--line)}.tracked:last-child{border-bottom:0}
+.tracked>summary{display:flex;align-items:baseline;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;padding:11px 4px;cursor:pointer;list-style:none}
+.tracked>summary::-webkit-details-marker{display:none}.tracked>summary:hover .name,.tracked[open]>summary .name{color:var(--cyan)}
+.name{font-weight:600;overflow-wrap:anywhere}.where{font:12.5px var(--label);color:var(--muted);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.chip{font:12px/1.4 var(--label);border:1px solid var(--line);border-radius:20px;padding:1px 9px;white-space:nowrap}
+.chip.notes{color:var(--pink);border-color:var(--pink)}.chip.ready{color:var(--green);border-color:var(--green)}.chip.better{color:var(--yellow);border-color:var(--yellow)}
+.detail{background:var(--sunk);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 0 14px;overflow-wrap:anywhere}
+.detail dl{margin:0}.detail dt{font:12px var(--label);letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-top:12px}.detail dt:first-child{margin-top:0}.detail dd{margin:3px 0 0}
+.detail ul{margin:4px 0 0;padding-left:20px}.detail li{margin:2px 0}
+.changes{display:block;font-size:14px;color:var(--muted);margin-top:4px}
+.how li{margin:8px 0}.error{color:var(--red)}
+footer{margin:40px 0 10px;border-top:1px solid var(--line);padding-top:18px;text-align:center;font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+@media(max-width:600px){.wrap{padding:20px 16px}h1{font-size:36px}.panel{padding:26px 12px 14px}.tool{padding:14px 12px 16px}.detail{padding:12px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<nav><span class="brand">Astra’s PetOS / World caretaker</span><a href="https://github.com/findastra/liminal-doors/tree/main/docs">findastra/liminal-doors docs/ ↗</a></nav>
+<header>
+<span class="eyebrow">Door Dormouse’s pet program · v1.0</span>
+<h1>The Threshold</h1>
+<p class="muted">Which tools made which worlds, and how each one gets better. When every world is made, the tools marked ready to package are the toolkit.</p>
+</header>
+
+<details class="panel" id="door-dormouse-L1-panel" open>
+<summary><span class="legend">door-dormouse-L1-panel</span></summary>
+<p class="kind">your tools</p>
+<fieldset class="tool" id="tools-tracker" data-enabled="true">
+<legend><span class="lights"><button class="light onoff" id="light-on" type="button"></button><button class="light care" id="light-care" type="button"></button></span>the-threshold-v1.0-tools-tracker-v1.0</legend>
+<div class="tool-body">
+<h3>Tools tracker</h3>
+<p class="summary" id="summary" role="status">Reading the ledgers…</p>
+<div class="actions">
+<button type="button" id="show-tools" aria-expanded="false" aria-controls="tools-view">Tools</button>
+<button type="button" id="show-how" aria-expanded="false" aria-controls="how-view">How to add</button>
+</div>
+<div class="view" id="tools-view" hidden>
+<p class="muted" id="sources"></p>
+<div id="tool-list"></div>
+</div>
+<div class="view how" id="how-view" hidden>
+<ul>
+<li><strong>A tool:</strong> add it to the world’s ledger under <code>tools</code> (<code>name</code>, <code>does</code>, <code>path</code>), then put its id in <code>every_floor</code>, <code>whole_world</code> or under its floor number in <code>floors</code>. Use the same id in every world.</li>
+<li><strong>A world:</strong> add a row to <code>worlds</code> in <a href="https://github.com/findastra/liminal-doors/blob/main/docs/tools-tracker-20261019.json">tools-tracker-20261019.json</a> that points at the world’s ledger. The ledger has the same shape as <a href="https://github.com/findastra/liminal-doors/blob/main/docs/tools-by-floor-20261019.json">Liminal Doors’</a>.</li>
+<li><strong>Getting better:</strong> in the same file, add <code>{"date", "by", "world", "floors", "note"}</code> to <code>tools.&lt;id&gt;.getting_better</code>. When a tool is ready, set its <code>readiness</code> to <code>ready to package</code>.</li>
+</ul>
+<p class="muted">The two lights only work in this browser. They are not the Farm’s kill switch.</p>
+</div>
+</div>
+</fieldset>
+</details>
+
+<footer>By Astra ✧ The Threshold v1.0 ✧ tools tracker v1.0 ✧ reads public ledgers on GitHub and changes nothing</footer>
+</main>
+<script>
+// By Astra; Claude Opus 5.5 (claude-opus-5-5), 2026-10-19. Reads the worlds' tools-by-floor ledgers and this repo's notes;
+// the only thing it stores is this browser's two lights.
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const CONFIG = ['tools-tracker-20261019.json', 'https://raw.githubusercontent.com/findastra/liminal-doors/main/docs/tools-tracker-20261019.json'];
+  const READINESS = ['not rated', 'getting better', 'ready to package'];
+  const LIGHTS_KEY = 'the-threshold-tools-tracker-lights';
+  const REPO = /^[\w.-]+\/[\w.-]+$/;
+  let tools = [];
+  let notes = {};
+
+  const el = (tag, props, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (k === 'class') n.className = v; else if (k === 'text') n.textContent = v; else n.setAttribute(k, v);
+    }
+    for (const kid of kids) if (kid != null) n.append(kid);
+    return n;
+  };
+  const link = (href, text) => el('a', { href, target: '_blank', rel: 'noopener', text });
+  const segs = s => String(s).split('/').map(encodeURIComponent).join('/');
+  const gh = (repo, kind, ref, path) => 'https://github.com/' + repo + '/' + kind + '/' + segs(ref) + '/' + segs(path);
+  const raw = (repo, ref, path) => 'https://raw.githubusercontent.com/' + repo + '/' + segs(ref) + '/' + segs(path);
+  const plural = (n, word) => n + ' ' + word + (n === 1 ? '' : 's');
+
+  async function firstJson(urls) {
+    let why = 'nothing to read';
+    for (const url of urls) {
+      try {
+        const r = await fetch(url, { cache: 'no-cache' });
+        if (r.ok) return { url, data: await r.json() };
+        why = url + ' answered ' + r.status;
+      } catch (e) { why = url + ': ' + e.message; }
+    }
+    throw Error(why);
+  }
+
+  // "1, 2, 3, 5" -> "1–3, 5"
+  function ranges(ns) {
+    const out = [];
+    for (let i = 0; i < ns.length; i++) {
+      let j = i;
+      while (j + 1 < ns.length && ns[j + 1] === ns[j] + 1) j++;
+      out.push(i === j ? String(ns[i]) : ns[i] + '–' + ns[j]);
+      i = j;
+    }
+    return out.join(', ');
+  }
+  const floorWord = ns => (ns.length === 1 ? 'floor ' : 'floors ') + ranges(ns);
+
+  function placeText(use) {
+    const parts = [];
+    if (use.every) parts.push('every floor');
+    if (use.whole) parts.push('the whole world');
+    if (use.floors.length) {
+      const per = use.world.floors_per_episode;
+      if (!per) parts.push(floorWord(use.floors));
+      else {
+        const eps = new Map();
+        for (const f of use.floors) {
+          const ep = Math.ceil(f / per);
+          if (!eps.has(ep)) eps.set(ep, []);
+          eps.get(ep).push(f);
+        }
+        for (const [ep, fs] of eps) parts.push('episode ' + ep + ', ' + floorWord(fs));
+      }
+    }
+    return parts.length ? parts.join('; ') : 'listed, not on a floor yet';
+  }
+
+  function shortPlace(tool) {
+    if (tool.uses.length > 1) return plural(tool.uses.length, 'world');
+    const u = tool.uses[0];
+    if (u.every) return 'every floor';
+    if (u.floors.length) return floorWord(u.floors);
+    return u.whole ? 'whole world' : 'no floor yet';
+  }
+
+  function checkConfig(c) {
+    if (!c || c.schema !== 'the-threshold.tools-tracker/v1' || !Array.isArray(c.worlds)) throw Error('tools-tracker-20261019.json is not a the-threshold.tools-tracker/v1 file.');
+    for (const w of c.worlds) {
+      if (!w || typeof w.name !== 'string' || !REPO.test(w.repo || '') || typeof w.ledger !== 'string' || !Array.isArray(w.refs) || !w.refs.length) throw Error('A world in tools-tracker-20261019.json needs name, repo, ledger and refs.');
+    }
+    return c;
+  }
+
+  function checkLedger(l) {
+    if (!l || !/\.tools-by-floor\/v1$/.test(l.schema || '') || !l.tools || typeof l.tools !== 'object') throw Error('not a tools-by-floor/v1 ledger');
+    return l;
+  }
+
+  async function loadWorld(world) {
+    const { url, data } = await firstJson(world.refs.map(ref => raw(world.repo, ref, world.ledger)));
+    const readFrom = world.refs.find(ref => url === raw(world.repo, ref, world.ledger));
+    return { world, ledger: checkLedger(data), readFrom };
+  }
+
+  function merge(loaded) {
+    const byId = new Map();
+    for (const { world, ledger } of loaded) {
+      const listed = key => Array.isArray(ledger[key]) ? ledger[key] : [];
+      const floors = ledger.floors && typeof ledger.floors === 'object' ? Object.entries(ledger.floors) : [];
+      for (const [id, t] of Object.entries(ledger.tools)) {
+        if (!t || typeof t !== 'object') continue;
+        let tool = byId.get(id);
+        if (!tool) { tool = { id, uses: [], from: null }; byId.set(id, tool); }
+        // The newest ledger describes the tool and links its newest version.
+        if (tool.from === null || String(ledger.updated || '') > tool.from) {
+          const repo = REPO.test(t.repo || '') ? t.repo : ledger.repo;
+          Object.assign(tool, {
+            name: String(t.name || id), does: String(t.does || ''), by: t.by ? String(t.by) : null,
+            url: /^https:\/\//.test(t.url || '') ? t.url : null,
+            repo: REPO.test(repo || '') ? repo : null, ref: String(t.ref || ledger.ref || 'main'),
+            path: typeof t.path === 'string' && t.path ? t.path : null, tree: t.tree === true,
+            from: String(ledger.updated || '')
+          });
+        }
+        tool.uses.push({
+          world, every: listed('every_floor').includes(id), whole: listed('whole_world').includes(id),
+          floors: floors.filter(([, ids]) => Array.isArray(ids) && ids.includes(id)).map(([f]) => Number(f))
+            .filter(Number.isInteger).sort((a, b) => a - b)
+        });
+      }
+    }
+    return [...byId.values()];
+  }
+
+  function noteFor(id) {
+    const n = notes[id] && typeof notes[id] === 'object' ? notes[id] : {};
+    const readiness = READINESS.includes(n.readiness) ? n.readiness : 'not rated';
+    const list = (Array.isArray(n.getting_better) ? n.getting_better : [])
+      .filter(x => x && typeof x.note === 'string')
+      .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    return { readiness, list };
+  }
+
+  async function loadChanges(tool, out) {
+    out.textContent = 'Checking GitHub for changes…';
+    try {
+      const r = await fetch('https://api.github.com/repos/' + tool.repo + '/commits?sha=' + encodeURIComponent(tool.ref) +
+        '&path=' + encodeURIComponent(tool.path) + '&per_page=100', { headers: { Accept: 'application/vnd.github+json' } });
+      if (r.status === 403 || r.status === 429) throw Error('GitHub’s hourly limit for pages without sign-in is used up. Try again later.');
+      if (!r.ok) throw Error('GitHub answered ' + r.status + '.');
+      const list = await r.json();
+      const c = Array.isArray(list) ? list[0] : null;
+      if (!c || !/^[0-9a-f]{40}$/.test(c.sha || '')) { out.textContent = 'No commits found for this path on ' + tool.ref + '.'; return; }
+      const date = String((c.commit && (c.commit.committer || c.commit.author) || {}).date || '').slice(0, 10);
+      const msg = String(c.commit && c.commit.message || '').split('\n')[0];
+      out.replaceChildren(
+        'Changed in ' + list.length + (list.length === 100 ? '+' : '') + (list.length === 1 ? ' commit' : ' commits') + ' on ' + tool.ref + '. Newest: ' + date + ', ',
+        link(gh(tool.repo, tool.tree ? 'tree' : 'blob', c.sha, tool.path), c.sha.slice(0, 7)), ' ' + msg);
+    } catch (e) {
+      out.textContent = 'Could not check changes: ' + e.message;
+    }
+  }
+
+  function toolRow(tool) {
+    const { readiness, list } = noteFor(tool.id);
+    const where = el('span', { class: 'where' }, shortPlace(tool));
+    if (list.length) where.append(el('span', { class: 'chip notes', text: plural(list.length, 'note') }));
+    if (readiness !== 'not rated') where.append(el('span', { class: 'chip ' + (readiness === 'ready to package' ? 'ready' : 'better'), text: readiness }));
+    const row = el('details', { class: 'tracked', id: 'tool-' + tool.id }, el('summary', {}, el('span', { class: 'name', text: tool.name }), where));
+
+    const used = el('ul');
+    for (const u of tool.uses) used.append(el('li', {}, el('strong', { text: u.world.name }), ': ' + placeText(u)));
+
+    const newest = el('dd');
+    let changes = null;
+    if (tool.path && tool.repo) {
+      newest.append(link(gh(tool.repo, tool.tree ? 'tree' : 'blob', tool.ref, tool.path), tool.repo + ' · ' + tool.path),
+        ' · ', link('https://github.com/' + tool.repo + '/commits/' + segs(tool.ref) + '/' + segs(tool.path), 'history'));
+      changes = el('span', { class: 'changes' });
+      newest.append(changes);
+    } else if (tool.url) {
+      newest.append(link(tool.url, tool.url));
+    } else {
+      newest.append(tool.by ? 'No file to link: made with ' + tool.by + '.' : 'No file to link yet.');
+    }
+
+    const better = el('dd', {}, el('span', { class: 'chip' + (readiness === 'ready to package' ? ' ready' : readiness === 'getting better' ? ' better' : ''), text: readiness }));
+    if (list.length) {
+      const ul = el('ul');
+      for (const n of list) {
+        const head = [n.date, n.by, n.world, n.floors != null ? 'floors ' + n.floors : null].filter(Boolean).map(String).join(' · ');
+        ul.append(el('li', {}, head ? el('strong', { text: head + ': ' }) : null, n.note));
+      }
+      better.append(ul);
+    } else {
+      better.append(el('div', { class: 'muted', text: 'No notes yet. Astra or an agent adds them in tools-tracker-20261019.json as the tool improves.' }));
+    }
+
+    row.append(el('div', { class: 'detail' }, el('dl', {},
+      el('dt', { text: 'What it does' }), el('dd', { text: tool.does || '—' }),
+      el('dt', { text: 'Used in' }), el('dd', {}, used),
+      el('dt', { text: 'Newest version' }), newest,
+      el('dt', { text: 'Getting better' }), better)));
+
+    let checked = false;
+    row.addEventListener('toggle', () => {
+      if (row.open && changes && !checked) { checked = true; loadChanges(tool, changes); }
+    });
+    return row;
+  }
+
+  function toggler(button, view) {
+    button.addEventListener('click', () => {
+      const open = view.hidden;
+      view.hidden = !open;
+      button.setAttribute('aria-expanded', String(open));
+    });
+  }
+  toggler($('show-tools'), $('tools-view'));
+  toggler($('show-how'), $('how-view'));
+
+  // The paired lights: this browser only.
+  let lights = { on: true, fix: false };
+  try {
+    const s = JSON.parse(localStorage.getItem(LIGHTS_KEY) || 'null');
+    if (s && typeof s.on === 'boolean' && typeof s.fix === 'boolean') lights = s;
+  } catch (e) { /* no storage: lights start on and working */ }
+  function drawLights() {
+    const on = $('light-on'), care = $('light-care');
+    on.classList.toggle('is-off', !lights.on);
+    on.setAttribute('aria-pressed', String(lights.on));
+    on.setAttribute('aria-label', 'tools-tracker: ' + (lights.on ? 'on' : 'off'));
+    on.title = lights.on ? 'On. Click to turn the tools tracker off in this browser.' : 'Off. Click to turn it back on.';
+    care.classList.toggle('is-fix', lights.fix);
+    care.setAttribute('aria-pressed', String(lights.fix));
+    care.setAttribute('aria-label', 'tools-tracker: ' + (lights.fix ? 'requires maintenance' : 'working correctly'));
+    care.title = lights.fix ? 'Requires maintenance. Click to clear.' : 'Working correctly. Click to mark it as requiring maintenance.';
+    $('tools-tracker').dataset.enabled = String(lights.on);
+    for (const [b, v] of [[$('show-tools'), $('tools-view')], [$('show-how'), $('how-view')]]) {
+      b.disabled = !lights.on;
+      if (!lights.on) { v.hidden = true; b.setAttribute('aria-expanded', 'false'); }
+    }
+  }
+  function saveLights() {
+    try { localStorage.setItem(LIGHTS_KEY, JSON.stringify(lights)); } catch (e) { /* this visit only */ }
+    drawLights();
+  }
+  $('light-on').addEventListener('click', () => { lights.on = !lights.on; saveLights(); });
+  $('light-care').addEventListener('click', () => { lights.fix = !lights.fix; saveLights(); });
+  drawLights();
+
+  (async () => {
+    const summary = $('summary');
+    try {
+      const config = checkConfig((await firstJson(CONFIG)).data);
+      notes = config.tools && typeof config.tools === 'object' ? config.tools : {};
+      const results = await Promise.allSettled(config.worlds.map(loadWorld));
+      const loaded = [], failed = [];
+      results.forEach((r, i) => (r.status === 'fulfilled' ? loaded.push(r.value) : failed.push(config.worlds[i].name + ' (' + r.reason.message + ')')));
+      tools = merge(loaded);
+
+      const ready = tools.filter(t => noteFor(t.id).readiness === 'ready to package').length;
+      summary.replaceChildren(el('b', { text: plural(tools.length, 'tool') }), ' in ' + plural(loaded.length, 'world') + ' · ' + ready + ' ready to package');
+      if (failed.length) summary.append(el('span', { class: 'error', text: ' · could not read ' + failed.join(', ') }));
+      $('show-tools').textContent = 'Tools (' + tools.length + ')';
+
+      const sources = $('sources');
+      loaded.forEach(({ world, ledger, readFrom }, i) => {
+        sources.append(i ? ' · ' : '', world.name + ' ledger, updated ' + (ledger.updated || 'no date') + ', read from ',
+          link(gh(world.repo, 'blob', readFrom, world.ledger), readFrom));
+      });
+      $('tool-list').replaceChildren(...tools.map(toolRow));
+    } catch (e) {
+      summary.replaceChildren(el('span', { class: 'error', text: 'Could not read the tools: ' + e.message }));
+    }
+  })();
+})();
+</script>
+</body>
+</html>

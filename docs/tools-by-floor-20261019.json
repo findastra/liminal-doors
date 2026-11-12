@@ -1,9 +1,9 @@
 {
   "schema": "liminal-doors.tools-by-floor/v1",
-  "updated": "2026-10-19",
-  "about": "Which tools made which Liminal Doors floor. The Collection page's T button reads this. Astra (2026-10-19): track which tools were used in which worlds and which ones get better, so the finished toolkit can be packaged. Paths link to the newest version on GitHub; when PR #2 is merged, change ref to main.",
+  "updated": "2026-11-12",
+  "about": "Which tools made which Liminal Doors floor. The Collection page's T button reads this. Astra (2026-10-19): track which tools were used in which worlds and which ones get better, so the finished toolkit can be packaged. Paths link to the newest version on GitHub, on main (PR #2 merged; ref was claude/fresh-start-20261018 until 2026-11-12).",
   "repo": "findastra/liminal-doors",
-  "ref": "claude/fresh-start-20261018",
+  "ref": "main",
   "tools": {
     "codex-image": {"name": "OpenAI Codex image generation", "does": "Drew the seven concept plates the floors come from (2026-10-15).", "by": "OpenAI Codex", "url": null},
     "floor-cutter": {"name": "Floor cutter", "does": "Cut the seven plates into one picture per floor along their divider lines.", "path": "concept-art/tools/cut-floors.ps1"},
