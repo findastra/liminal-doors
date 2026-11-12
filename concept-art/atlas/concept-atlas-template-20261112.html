@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- Liminal Doors Concept Atlas: the template the builder fills (concept-art/tools/build-concept-atlas-20261112.py).
+     Its placeholders, in double braces: FLOORS_DATA (concept-art/atlas/concept-atlas-floors-20261112.json),
+     TOOLS_DATA (docs/tools-by-floor-20261019.json), FLOOR_COUNT, SHEET_SIZE and THRESHOLD_LINK (empty unless
+     the builder is given --threshold-link). Source copy of the published page, 2026-11-12. -->
+<title>Liminal Doors Concept Atlas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Astra's Liminal Doors: {{FLOOR_COUNT}} concept floors, a check for each one you've been to, and a + to put floors on one sheet for redlines.">
+<style>
+/* By Astra. Concept art: OpenAI Codex (GPT-6), 2026-10-15/16. Collection page: Claude Opus 5.5, 2026-10-19
+   (Astra: keep the page simple; graphite gray with neon accents; whole square pictures (wide crops lost context) in cards that wrap with the window;
+   a check for "I have been here", a + for "add to the image export"; each glass animal's name rainbow, prismatic
+   and micro-glittery; her universal footer).
+   Layout: a slim menu, the redline export bar, the collection grid, then the astras-pet-os unified footer. */
+:root{color-scheme:dark;--bg:#26272b;--card:#43454d;--raised:#2d2e33;--ink:#f4f4f6;--muted:#b3b4bc;--pink:#ff97cf;--pink-soft:#ffb4d4;--neon:#3ff3ff;--lilac:#c79bff;--live:#46ff9a;--plum:#30172c;--border:#45464d;--line:#6a6b74;--link:#bcece3;
+  --serif:Georgia,'Times New Roman',serif;--sans:system-ui,-apple-system,'Segoe UI',sans-serif;--mono:ui-monospace,Consolas,'Cascadia Mono',monospace;
+  font:16px/1.6 var(--sans);background:var(--bg);color:var(--ink)}
+body{background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}
+a{color:var(--link);text-underline-offset:4px}
+button,.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#36373d;color:var(--ink);border-radius:15px;padding:10px 16px;cursor:pointer;text-decoration:none;font:inherit}
+button:hover,.button:hover{background:#44454c}
+button.primary{background:var(--pink-soft);border-color:var(--pink-soft);color:var(--plum)}
+button.quiet{border-color:transparent;background:transparent;color:var(--muted);padding-inline:8px}
+button.quiet:hover{color:var(--ink);background:#36373d}
+:focus-visible{outline:3px solid var(--neon);outline-offset:4px}
+[hidden]{display:none!important}
+.wrap{padding-block:26px 30px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:18px}
+nav a{text-decoration:none}
+.brand{letter-spacing:.13em;font-size:12px;text-transform:uppercase;color:var(--link)}
+.eyebrow{font:12px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#c6c7cf}
+.muted{color:var(--muted);font-size:14px}
+.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+/* redline export */
+.redlines{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px 24px;margin:22px 0 0;padding:18px 22px;border:1px solid var(--line);border-radius:20px;background:var(--raised)}
+.redlines-copy{min-width:0}.redlines p{margin:4px 0 0;color:#dcdce1;max-width:680px}
+.redlines .plus{color:var(--neon)}
+.redlines figure{grid-column:1/-1;margin:6px 0 0}.redlines img{display:block;width:100%;max-width:1100px;height:auto;border-radius:12px;border:1px solid var(--border)}.redlines figcaption{margin-top:8px}
+/* the collection */
+.section-head{display:flex;justify-content:space-between;gap:16px;align-items:end;flex-wrap:wrap;margin:40px 0 22px}
+h1{font:400 clamp(34px,5vw,52px)/1.1 var(--serif);letter-spacing:-.02em;margin:6px 0 0;text-wrap:balance}
+.count{font:13px/1.5 var(--mono);background:#34353a;border:1px solid #55565e;border-radius:50px;padding:7px 14px;font-variant-numeric:tabular-nums}
+/* the VRChat link under the name: a glowing neon chip, live dot and all */
+.vrc{margin:12px 0 0}
+.vrc-chip{display:inline-flex;align-items:center;gap:10px;max-width:100%;padding:8px 16px 8px 12px;border-radius:999px;border:1.5px solid transparent;
+  background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(90deg,var(--neon),var(--pink)) border-box;
+  color:var(--ink);font:600 14px/1.3 var(--sans);text-decoration:none;box-shadow:0 0 16px #3ff3ff40,0 0 30px #ff97cf22}
+a.vrc-chip:hover{box-shadow:0 0 22px #3ff3ff80,0 0 40px #ff97cf44}
+.vrc-tag{font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--neon)}
+.vrc-dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--live);box-shadow:0 0 8px var(--live)}
+.vrc-chip.is-soon .vrc-dot{background:var(--pink);box-shadow:0 0 8px var(--pink)}
+@media (prefers-reduced-motion:no-preference){.vrc-dot{animation:live 1.8s ease-in-out infinite}@keyframes live{50%{opacity:.35;transform:scale(.8)}}}
+/* nine episodes of 37 floors, 333 places in all; one comes out on the third Friday of every other month */
+.episodes-wrap{margin:-6px 0 26px}
+.episodes{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,148px),1fr));gap:10px}
+.episodes li{display:grid;gap:1px;padding:10px 12px;border:1px solid var(--border);border-radius:14px;background:var(--raised)}
+.episodes b{font:700 12px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.episodes span{font-size:13px;color:var(--muted)}
+.episodes time{font:600 14px/1.35 var(--sans);color:var(--ink)}
+.episodes li.is-now{border-color:var(--neon);box-shadow:inset 0 0 0 1px var(--neon),0 0 16px #3ff3ff33}
+.episodes li.is-now b{color:var(--neon)}
+.ep-note{margin:10px 0 0}
+.head-side{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.small-btn{padding:7px 14px;border-radius:50px;font:13px/1.5 var(--mono)}
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:22px}
+/* one floor, expanded with its tools (the T link) */
+.floor-view{max-width:700px}
+.back{display:inline-block;margin:0 0 14px;text-decoration:none;font-size:15px}
+.floor.big .floor-copy{padding:18px 20px}
+.floor.big .floor-title .place{font-size:20px}
+.floor.big .prism{font-size:28px}
+.tools{padding:2px 20px 20px;border-top:1px solid var(--border)}
+.tools h3{margin:18px 0 8px}
+.tools ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tools li{display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:#4c4e57}
+.tool-name{font-weight:650;color:var(--link);text-decoration:none}
+a.tool-name:hover{text-decoration:underline}
+span.tool-name{color:var(--ink)}
+.tool-does{font-size:14px;color:#d6d7dd}
+.tools .small{font-size:12.5px;margin:16px 0 0}
+.floor{border:1px solid var(--border);border-radius:20px;overflow:hidden;background:var(--card);min-width:0;transition:border-color .2s,box-shadow .2s}
+.floor.is-seen{border-color:var(--pink)}
+.floor.is-picked{box-shadow:0 0 0 2px var(--neon),0 0 18px #3ff3ff33}
+.floor-image{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;background:#1d1e22;border-bottom:1px solid var(--border)}
+.floor-copy{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px 14px 18px}
+.floor-name{min-width:0}
+.floor-name .eyebrow{display:block}
+/* place and animal side by side, "Faraway Field Hare"; the animal drops to the next line only on a narrow card */
+.floor-title{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:7px;margin:3px 0 0;font-size:inherit;font-weight:inherit;line-height:1.25}
+.floor-title .place{font:600 16px/1.3 var(--sans);color:#e2e2e8}
+/* each glass animal's name: thick see-through glass letters with an iridescent film, a glint that sweeps across now
+   and then, micro RGB glitter on the letters, and a fine field of sparkles twinkling behind */
+.prism{position:relative;display:inline-block;max-width:100%;font:900 22px/1.25 var(--sans);letter-spacing:.01em;color:#fff;
+  background:linear-gradient(100deg,#ff7ad95c 0%,#ffd27a4d 14%,#f4ff9a4d 28%,#7affc44d 42%,#7af3ff5c 56%,#a48bff5c 70%,#ff8af05c 84%,#ff7ad95c 100%) 0 50%/150% 100%,
+    linear-gradient(110deg,transparent 46%,#ffffffc0 50%,transparent 54%) 100% 0/500% 100% no-repeat;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-text-stroke:.75px #ffffffb8;
+  filter:drop-shadow(0 0 1px #ff9be8b0) drop-shadow(0 0 5px #7af3ff4d)}
+.prism::before{content:"";position:absolute;inset:-9px -18px -7px -12px;z-index:-1;pointer-events:none;
+  background:radial-gradient(circle,#fff 0 .45px,transparent .9px) 0 0/14px 12px,radial-gradient(circle,#ffc4f0 0 .4px,transparent .85px) 6px 4px/19px 10px,
+    radial-gradient(circle,#b8faff 0 .4px,transparent .85px) 10px 7px/12px 17px,radial-gradient(circle,#e2d0ff 0 .4px,transparent .85px) 3px 9px/23px 15px,
+    radial-gradient(circle,#fff 0 .35px,transparent .75px) 8px 2px/9px 13px,radial-gradient(circle,#fff8c4 0 .4px,transparent .8px) 1px 5px/17px 19px,
+    radial-gradient(ellipse 60% 70% at 50% 55%,#b48cff1f,transparent 75%);
+  -webkit-mask:radial-gradient(ellipse 58% 62% at 50% 52%,#000 25%,transparent 78%);mask:radial-gradient(ellipse 58% 62% at 50% 52%,#000 25%,transparent 78%)}
+.prism::after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle,#ffffffd0 0 .35px,transparent .7px) 0 0/9px 7px,radial-gradient(circle,#ff2d55d0 0 .35px,transparent .7px) 2px 3px/11px 8px,
+    radial-gradient(circle,#2dff7ad0 0 .35px,transparent .7px) 5px 1px/7px 10px,radial-gradient(circle,#2d8bffd0 0 .35px,transparent .7px) 1px 6px/13px 9px;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@media (prefers-reduced-motion:no-preference){
+  .prism{animation:prism 8s linear infinite}.prism::after{animation:glitter 1.5s steps(1) infinite}
+  .prism::before{animation:twinkle 2.8s ease-in-out infinite,drift 1.7s steps(1) infinite;animation-delay:calc(var(--d,0s) * -1)}
+  @keyframes drift{33%{background-position:5px 7px,13px 1px,4px 12px,15px 3px,2px 8px,9px 11px,0 0}66%{background-position:9px 3px,2px 7px,7px 2px,8px 11px,5px 0,14px 4px,0 0}}
+  @keyframes prism{from{background-position:0 50%,100% 0}to{background-position:-300% 50%,0 0}}
+  @keyframes twinkle{0%,100%{opacity:.95}30%{opacity:.4}55%{opacity:1}80%{opacity:.55}}
+  @keyframes glitter{33%{background-position:4px 3px,7px 1px,2px 6px,8px 3px}66%{background-position:2px 5px,1px 6px,4px 2px,5px 0}}
+}
+/* the marks on every card: + puts the floor on the redline export, the check says "I have been here",
+   T opens the floor's tools */
+.marks{display:flex;gap:8px;flex:none}
+.mark{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;user-select:none;min-width:46px;color:inherit;text-decoration:none}
+.mark-tools .seal{border-color:var(--lilac);color:var(--lilac);font:800 16px/1 var(--sans)}
+.mark-tools:focus-visible{outline:none}.mark-tools:focus-visible .seal{outline:3px solid var(--neon);outline-offset:3px}
+.mark-tools[aria-current] .seal{background:var(--lilac);border:2px solid #e6d6ff;color:#1f1430;box-shadow:0 0 0 4px #c79bff2e}
+.mark-tools[aria-current] .mark-text{color:var(--lilac)}
+.mark input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.seal{width:34px;height:34px;border-radius:50%;border:2px dashed var(--pink);display:grid;place-items:center;color:transparent;transition:background .2s,border-color .2s,color .2s,transform .2s}
+.seal svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mark:hover .seal{background:#52545d}
+.mark input:focus-visible+.seal{outline:3px solid var(--neon);outline-offset:3px}
+.mark-text{font:11px/1.2 var(--mono);letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.mark-been input:checked+.seal{background:var(--pink);border:2px solid var(--pink-soft);color:var(--plum);box-shadow:0 0 0 4px #ff97cf2e}
+.mark-been input:checked~.mark-text{color:var(--pink)}
+.mark-export .seal{border-color:var(--neon);color:var(--neon)}
+.mark-export input:checked+.seal{background:var(--neon);border:2px solid #b5fbff;color:#0c1c1e;box-shadow:0 0 0 4px #3ff3ff2e}
+.mark-export input:checked~.mark-text{color:var(--neon)}
+@media (prefers-reduced-motion:no-preference){.mark input:checked+.seal{animation:pop .32s ease-out}@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.14)}100%{transform:scale(1)}}}
+/* astras-pet-os unified footer (PET-PROGRAM-FRAMEWORK.md, section 3, item 9) */
+.module{position:relative;border:1px solid var(--border);padding:26px 20px 16px;margin:60px 0 10px}
+.module>summary{position:absolute;top:-.8em;left:14px;list-style:none;cursor:pointer;background:var(--bg);padding:0 6px;max-width:calc(100% - 28px)}
+.module>summary::-webkit-details-marker{display:none}
+.module .legend{font:13px/1.3 var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.module:not([open]){padding:14px 20px 0}
+.footer-grid p{margin:4px 0;color:#dcdce1;overflow-wrap:anywhere}
+.footer-grid .small{font-size:12.5px;color:var(--muted)}
+.footer-grid code{font:12px var(--mono);color:var(--muted)}
+@media(max-width:760px){.redlines{grid-template-columns:1fr}}
+@media(max-width:450px){.wrap{padding-block:18px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.actions>*{max-width:100%}.vrc-chip{font-size:13px}}
+</style>
+<style>html,body{margin:0;padding:0}</style>
+</head>
+<body>
+<main class="wrap">
+<nav><a class="brand" href="#collection">Liminal Doors / Concept atlas</a>{{THRESHOLD_LINK}}</nav>
+<section class="redlines" id="redlines" aria-label="Export floors for redlines"><div class="redlines-copy"><span class="eyebrow">For your redlines</span><p id="export-lead"><strong>All {{FLOOR_COUNT}} floors on one sheet</strong>, numbered like the collection ({{SHEET_SIZE}}). Tap <b class="plus">+</b> on any floors to export just those. Save it, draw on it in Procreate, then send the marked-up sheet back to Claude.</p><p class="muted" id="export-msg" role="status"></p></div><div class="actions"><button class="primary" id="export-sheet">Export all {{FLOOR_COUNT}} for redlines ↓</button><button id="show-sheet" aria-expanded="false" aria-controls="sheet">Show the sheet</button><button class="quiet" id="clear-picks" hidden>Clear picks</button></div><figure id="sheet" hidden><img id="sheet-img" alt="The Liminal Doors floors on one sheet, six across, each labelled with its number, animal and place"><figcaption class="muted">On an iPad or iPhone, press and hold the sheet and choose Save to Photos, then import it into Procreate.</figcaption></figure></section>
+<section id="collection" aria-labelledby="collection-title"><div class="section-head"><div><span class="eyebrow">Concept art · PC VRChat</span><h1 id="collection-title">Liminal Doors</h1><p class="vrc"><span class="vrc-chip is-soon"><span class="vrc-dot" aria-hidden="true"></span><span class="vrc-tag">VRChat</span><span>Hatching · the link goes live at launch</span></span></p></div><div class="head-side"><button class="small-btn" id="show-episodes" aria-expanded="false" aria-controls="episodes">Episodes</button><span class="count" id="seen-count" role="status">Been to 0 of {{FLOOR_COUNT}}</span></div></div><section class="episodes-wrap" id="episodes" aria-label="Episodes and release dates" hidden><ol class="episodes"><li class="is-now"><b>Episode 1</b><span>Floors 1–37 · in the works</span><time datetime="2027-01-15">Fri, Jan 15, 2027</time></li><li><b>Episode 2</b><span>Floors 38–74</span><time datetime="2027-03-19">Fri, Mar 19, 2027</time></li><li><b>Episode 3</b><span>Floors 75–111</span><time datetime="2027-05-21">Fri, May 21, 2027</time></li><li><b>Episode 4</b><span>Floors 112–148</span><time datetime="2027-07-16">Fri, Jul 16, 2027</time></li><li><b>Episode 5</b><span>Floors 149–185</span><time datetime="2027-09-17">Fri, Sep 17, 2027</time></li><li><b>Episode 6</b><span>Floors 186–222</span><time datetime="2027-11-19">Fri, Nov 19, 2027</time></li><li><b>Episode 7</b><span>Floors 223–259</span><time datetime="2028-01-21">Fri, Jan 21, 2028</time></li><li><b>Episode 8</b><span>Floors 260–296</span><time datetime="2028-03-17">Fri, Mar 17, 2028</time></li><li><b>Episode 9</b><span>Floors 297–333</span><time datetime="2028-05-19">Fri, May 19, 2028</time></li></ol><p class="muted ep-note">9 episodes × 37 floors = 333 places, one every other month. Episode 1 has 34 of its 37 floors drawn; floors 34, 35 and 37 still need a new, original idea.</p></section><ul class="grid" id="floors"></ul><section class="floor-view" id="floor-view" aria-label="One floor and its tools" hidden></section></section>
+<details class="module footer" open><summary title="Click the label to fold or unfold this module"><span class="legend">astras-pet-os-unified-footer</span></summary><div class="footer-grid">
+<p><em>An Intelligent App, or Pet, by Astra.</em> Liminal Doors is cared for by Door Dormouse's pet program, The Threshold (MIT license); the world itself has no license yet. Signature: not signed yet.</p>
+<p><b>Languages:</b> Liminal Doors: C# 53.5%, ShaderLab 25.3%, Python 19.2%, HLSL 2.0%</p>
+<p><b>Home:</b> <a href="https://findastra.github.io/astras-pet-os/system-map-20261012.html">System Map</a> · <a href="https://findastra.github.io/astras-pet-os/apps/astras-pet-apps-20261008.html">The Farm</a> · <a href="https://findastra.github.io/astras-pet-os/apps/pet-programs/pet-program-spawner-20261018.html">every pet program</a></p>
+<p><b>Source:</b> <a href="https://github.com/findastra/liminal-doors">findastra/liminal-doors</a> · <a href="https://github.com/findastra/the-threshold">findastra/the-threshold</a></p>
+<p><b>Docs:</b> <a href="https://github.com/findastra/astras-pet-os/blob/main/PET-PROGRAM-FRAMEWORK.md">PET-PROGRAM-FRAMEWORK.md</a> · <a href="https://github.com/findastra/astras-pet-os/blob/main/PROTECTION-RINGS.md">PROTECTION-RINGS.md</a></p>
+<p class="small">The Friendly Farmer's shared footer (<code>astras-pet-os-unified-footer</code>, PET-PROGRAM-FRAMEWORK.md section 3, item 9), as Liminal Doors' own copy. Concept art made with OpenAI Codex, 2026-10-15.</p></div></details>
+</main>
+<script type="application/json" id="floors-data">{{FLOORS_DATA}}</script>
+<script type="application/json" id="tools-data">{{TOOLS_DATA}}</script>
+<script>
+// The collection, its two marks per floor, and the redline export.
+// "Been here" ticks are each viewer's own: kept privately per person in the page's store when it runs inside Claude
+// (data/users/<id>/seen, live on every device), and in this browser otherwise. "+" picks stay in this browser.
+(()=>{'use strict';
+  const floors=JSON.parse(document.getElementById('floors-data').textContent),$=id=>document.getElementById(id);
+  const KEY='liminal-doors-seen-v1',PKEY='liminal-doors-export-picks-v1',two=n=>String(n).padStart(2,'0');
+  const src=n=>'liminal-doors-assets/floors/floor-'+two(n)+'-20261015.jpg',byN=new Map(floors.map(f=>[f.n,f]));
+  let seen=new Set(),picked=new Set(),store=null,writing=false,again=false;
+  const clean=a=>Array.isArray(a)?a.filter(n=>byN.has(n)):[];
+  const read=k=>{try{return new Set(clean(JSON.parse(localStorage.getItem(k)||'[]')));}catch(e){return new Set();}};
+  const write=(k,s)=>{try{localStorage.setItem(k,JSON.stringify([...s]));}catch(e){}};
+  seen=read(KEY);picked=read(PKEY);
+  const SVG={plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',check:'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'};
+  function mark(kind,f,label){
+    const l=document.createElement('label');l.className='mark mark-'+kind;
+    const box=document.createElement('input');box.type='checkbox';box.setAttribute('aria-label',label);
+    const seal=document.createElement('span');seal.className='seal';seal.setAttribute('aria-hidden','true');seal.innerHTML=kind==='been'?SVG.check:SVG.plus;
+    const t=document.createElement('span');t.className='mark-text';l.append(box,seal,t);return l;
+  }
+  // T: each floor's own link (#floor-NN) opens the same card, bigger, with every tool used on it, linked on GitHub
+  const TOOLS=JSON.parse(document.getElementById('tools-data').textContent);
+  const toolURL=t=>t.path?'https://github.com/'+(t.repo||TOOLS.repo)+'/'+(t.tree?'tree':'blob')+'/'+(t.ref||TOOLS.ref)+'/'+t.path.split('/').map(encodeURIComponent).join('/'):(t.url||null);
+  function toolsPanel(f){
+    const p=document.createElement('div');p.className='tools';
+    const groups=[['On this floor',TOOLS.floors[String(f.n)]||[]],['Concept art, every floor',TOOLS.every_floor],['The whole world',TOOLS.whole_world]];
+    for(const [title,ids] of groups){
+      const h=document.createElement('h3');h.className='eyebrow';h.textContent=title;p.append(h);
+      if(!ids.length){const e=document.createElement('p');e.className='muted';e.textContent='Not built in Unity yet: this floor is concept art for now.';p.append(e);continue;}
+      const ul=document.createElement('ul');
+      for(const id of ids){
+        const t=TOOLS.tools[id];if(!t)continue;
+        const li=document.createElement('li'),u=toolURL(t),a=document.createElement(u?'a':'span'),d=document.createElement('span');
+        a.className='tool-name';a.textContent=t.name+(u?' ↗':'');if(u){a.href=u;a.target='_blank';a.rel='noopener';}
+        d.className='tool-does';d.textContent=t.does;li.append(a,d);ul.append(li);
+      }
+      p.append(ul);
+    }
+    const note=document.createElement('p');note.className='muted small';note.textContent='Each link opens the newest version on GitHub. Tool list updated '+TOOLS.updated+'.';p.append(note);
+    return p;
+  }
+  const list=$('floors');
+  for(const f of floors)list.append(card(f,false));
+  function card(f,big){
+    const li=document.createElement(big?'article':'li');li.className='floor'+(big?' big':'');li.dataset.n=f.n;
+    const img=document.createElement('img');img.className='floor-image';img.src=src(f.n);img.alt=f.place+' concept art';img.loading='lazy';img.decoding='async';
+    const copy=document.createElement('div');copy.className='floor-copy';
+    const name=document.createElement('div');name.className='floor-name';
+    const no=document.createElement('span');no.className='eyebrow';no.textContent='Floor '+two(f.n);
+    const t=document.createElement('h2');t.className='floor-title';t.setAttribute('aria-label',f.place+' '+f.animal);
+    const pl=document.createElement('span');pl.className='place';pl.textContent=f.place;
+    const h=document.createElement('span');h.className='prism';h.textContent=f.animal;h.dataset.text=f.animal;h.style.setProperty('--d',(f.n*.37%2.8).toFixed(2)+'s');
+    t.append(pl,h);name.append(no,t);
+    const marks=document.createElement('div');marks.className='marks';
+    const ex=mark('export',f,'Add '+f.place+' '+f.animal+' to the redline export'),been=mark('been',f,'I have been to '+f.place+' '+f.animal);
+    const tl=document.createElement('a');tl.className='mark mark-tools';tl.href='#floor-'+two(f.n);tl.setAttribute('aria-label','Tools used on '+f.place+' '+f.animal);
+    tl.innerHTML='<span class="seal" aria-hidden="true">T</span><span class="mark-text">tools</span>';if(big)tl.setAttribute('aria-current','page');
+    marks.append(ex,been,tl);copy.append(name,marks);li.append(img,copy);if(big)li.append(toolsPanel(f));
+    ex.querySelector('input').addEventListener('change',e=>{e.target.checked?picked.add(f.n):picked.delete(f.n);write(PKEY,picked);apply();if(!sheet.hidden)preview();});
+    been.querySelector('input').addEventListener('change',e=>{e.target.checked?seen.add(f.n):seen.delete(f.n);apply();save();});
+    return li;
+  }
+  const sheet=$('sheet'),sheetImg=$('sheet-img'),toggle=$('show-sheet'),msg=$('export-msg'),lead=$('export-lead'),leadAll=lead.innerHTML;
+  function apply(){
+    for(const li of document.querySelectorAll('.floor')){
+      const n=Number(li.dataset.n),s=seen.has(n),k=picked.has(n),[ex,been]=li.querySelectorAll('.mark');
+      ex.querySelector('input').checked=k;ex.querySelector('.mark-text').textContent=k?'added':'export';li.classList.toggle('is-picked',k);
+      been.querySelector('input').checked=s;been.querySelector('.mark-text').textContent=s?'been here':'not yet';li.classList.toggle('is-seen',s);
+    }
+    $('seen-count').textContent='Been to '+seen.size+' of '+floors.length;
+    const ks=[...picked].sort((a,b)=>a-b);
+    $('export-sheet').textContent=ks.length?'Export '+ks.length+' picked for redlines ↓':'Export all '+floors.length+' for redlines ↓';
+    $('clear-picks').hidden=!ks.length;
+    if(!ks.length){lead.innerHTML=leadAll;return;}
+    lead.textContent='';const b=document.createElement('strong');b.textContent=ks.length===1?'1 floor picked':ks.length+' floors picked';
+    lead.append(b,' with + (floor'+(ks.length>1?'s ':' ')+ks.map(two).join(', ')+'), on one sheet. Save it, draw on it in Procreate, then send the marked-up sheet back to Claude.');
+  }
+  async function save(){
+    write(KEY,seen);if(!store)return;if(writing){again=true;return;}
+    writing=true;
+    try{do{again=false;await store.set({floors:[...seen].sort((a,b)=>a-b)});}while(again);}
+    catch(e){if(e&&(e.code==='invalid_argument'||e.code==='revoked'||e.code==='not_granted'))store=null;}
+    finally{writing=false;}
+  }
+  apply();
+  // the floor view and the episodes, each shown only when asked for
+  const view=$('floor-view'),epBtn=$('show-episodes'),eps=$('episodes');let lastN=0;
+  function route(){
+    const m=/^#floor-(\d{2})$/.exec(location.hash),f=m&&byN.get(Number(m[1]));
+    if(!f){
+      if(!view.hidden){view.hidden=true;view.replaceChildren();list.hidden=false;const c=list.querySelector('[data-n="'+lastN+'"]');if(c)c.scrollIntoView({block:'center'});}
+      return;
+    }
+    lastN=f.n;const back=document.createElement('a');back.className='back';back.href='#collection';back.textContent='← All floors';
+    view.replaceChildren(back,card(f,true));view.hidden=false;list.hidden=true;apply();view.scrollIntoView({block:'start'});
+  }
+  window.addEventListener('hashchange',route);route();
+  epBtn.onclick=()=>{const on=eps.hidden;eps.hidden=!on;epBtn.setAttribute('aria-expanded',String(on));epBtn.textContent=on?'Hide episodes':'Episodes';};
+  (async()=>{
+    if(!window.claude||!window.claude.use)return;
+    try{
+      const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);if(!db||!user)return;
+      const id=await user.id();if(!id)return;
+      const ref=db.doc('data/users/'+id+'/seen');let first=true;
+      ref.onSnapshot(snap=>{
+        if(writing||again)return;
+        const remote=snap.exists?clean((snap.data()||{}).floors):null;
+        if(first){first=false;store=ref;if(remote===null){if(seen.size)save();return;}}
+        if(remote!==null){seen=new Set(remote);write(KEY,seen);apply();}
+      },()=>{store=null;});
+    }catch(e){}
+  })();
+  // redline export: the full sheet as made, or a sheet of just the + picks drawn here in the same layout
+  // (6 across, 500 px tiles, "NN animal place" under each)
+  const FULL='liminal-doors-assets/liminal-doors-redline-sheet-20261019.jpg',FULLNAME='liminal-doors-redline-sheet-20261019.jpg';
+  const label=n=>(two(n)+' '+byN.get(n).place+' '+byN.get(n).animal).toLowerCase().replace(/-/g,' ');
+  async function load(u){
+    const r=await fetch(u);if(!r.ok)throw new Error('image '+r.status);const b=await r.blob();
+    if(window.createImageBitmap)return createImageBitmap(b);
+    return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(b);});
+  }
+  async function picksSheet(ks){
+    const tile=500,lab=46,pad=14,c=Math.min(6,ks.length),rows=Math.ceil(ks.length/c),W=c*(tile+pad)+pad,H=pad+rows*(tile+lab+pad);
+    const imgs=new Map(await Promise.all(ks.map(async n=>[n,await load(src(n))])));
+    const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+    g.fillStyle='#26272b';g.fillRect(0,0,W,H);g.imageSmoothingQuality='high';g.font='23px "Segoe UI",system-ui,sans-serif';g.fillStyle='#fff';g.textBaseline='top';
+    ks.forEach((n,i)=>{
+      const x=pad+(i%c)*(tile+pad),y=pad+Math.floor(i/c)*(tile+lab+pad),im=imgs.get(n),s=Math.min(tile/im.width,tile/im.height),iw=Math.round(im.width*s),ih=Math.round(im.height*s);
+      g.drawImage(im,x+Math.round((tile-iw)/2),y+Math.round((tile-ih)/2),iw,ih);g.fillText(label(n),x,y+tile+6,tile);
+    });
+    return new Promise((res,rej)=>cv.toBlob(b=>b?res(b):rej(new Error('sheet')),'image/jpeg',.9));
+  }
+  const today=()=>{const d=new Date();return d.getFullYear()+two(d.getMonth()+1)+two(d.getDate());};
+  const picksName=ks=>'liminal-doors-redlines-'+(ks.length<=6?ks.map(two).join('-'):ks.length+'-floors')+'-'+today()+'.jpg';
+  let shownURL=null;
+  async function preview(){
+    const ks=[...picked].sort((a,b)=>a-b);
+    if(shownURL){URL.revokeObjectURL(shownURL);shownURL=null;}
+    if(!ks.length){sheetImg.src=FULL;return;}
+    try{shownURL=URL.createObjectURL(await picksSheet(ks));sheetImg.src=shownURL;}catch(e){msg.textContent='Couldn’t draw the picked sheet in this view, so this is the full sheet.';sheetImg.src=FULL;}
+  }
+  const showSheet=on=>{sheet.hidden=!on;toggle.setAttribute('aria-expanded',String(on));toggle.textContent=on?'Hide the sheet':'Show the sheet';if(on)preview();};
+  toggle.onclick=()=>showSheet(sheet.hidden);
+  $('clear-picks').onclick=()=>{picked.clear();write(PKEY,picked);apply();if(!sheet.hidden)preview();msg.textContent='';};
+  $('export-sheet').onclick=async()=>{
+    const ks=[...picked].sort((a,b)=>a-b),name=ks.length?picksName(ks):FULLNAME;
+    msg.textContent=ks.length?'Making a sheet of your '+ks.length+' picked floor'+(ks.length>1?'s':'')+'…':'Preparing the sheet…';
+    let blob=null;
+    try{if(ks.length)blob=await picksSheet(ks);}catch(e){msg.textContent='Couldn’t make the picked sheet in this view. Clear picks to export all '+floors.length+'.';return;}
+    let dl=null;try{dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;}catch(e){dl=null;}
+    const done='Saved '+name+'. Draw your redlines, then send the sheet back to Claude.',noSave='This view can’t save files, so the sheet is open below: press and hold it to save it.';
+    if(dl){try{if(!blob)blob=await (await fetch(FULL)).blob();await dl.save({filename:name,data:blob});msg.textContent=done;}
+      catch(e){if(e&&e.code==='declined')msg.textContent='Not saved. Press Export again whenever you like.';else{msg.textContent=noSave;showSheet(true);}}return;}
+    if(window.claude){msg.textContent=noSave;showSheet(true);return;}
+    const a=document.createElement('a'),href=blob?URL.createObjectURL(blob):FULL;a.href=href;a.download=name;document.body.append(a);a.click();a.remove();
+    if(blob)setTimeout(()=>URL.revokeObjectURL(href),60000);
+    msg.textContent='Downloading '+name+'. Draw your redlines, then send the sheet back to Claude.';
+  };
+})();
+</script>
+</body>
+</html>
